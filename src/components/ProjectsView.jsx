@@ -674,32 +674,140 @@ export default function ProjectsView({ onBack }) {
 
       {/* MODAL 1: THÊM / SỬA DỰ ÁN */}
       {isProjectModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <h3 className="font-black text-slate-800 text-base flex items-center gap-2">
-                <i className="fas fa-folder-plus text-indigo-600"></i>
-                {editingProject ? 'Chỉnh Sửa Dự Án' : 'Thêm Dự Án Mới'}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsProjectModalOpen(false);
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '540px',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              border: '1px solid #cbd5e1',
+              overflow: 'hidden',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '16px 24px',
+                borderBottom: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#f8fafc',
+                boxSizing: 'border-box',
+                width: '100%'
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: '#1e293b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}
+              >
+                <span
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    backgroundColor: '#eef2ff',
+                    color: '#4f46e5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '13px'
+                  }}
+                >
+                  <i className="fas fa-folder-plus"></i>
+                </span>
+                <span>{editingProject ? 'Chỉnh Sửa Dự Án' : 'Thêm Dự Án Mới'}</span>
               </h3>
               <button
+                type="button"
                 onClick={() => setIsProjectModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition-colors cursor-pointer"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  color: '#64748b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
               >
                 <i className="fas fa-times"></i>
               </button>
             </div>
 
-            <form onSubmit={handleSaveProject} className="p-6 space-y-4">
+            {/* Modal Form */}
+            <form
+              onSubmit={handleSaveProject}
+              style={{
+                padding: '24px',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxSizing: 'border-box',
+                width: '100%',
+                margin: 0
+              }}
+            >
               {projectFormError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#b91c1c',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
                   <i className="fas fa-triangle-exclamation"></i>
-                  {projectFormError}
+                  <span>{projectFormError}</span>
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tên Dự Án <span className="text-rose-500">*</span>
+              <div style={{ width: '100%' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
+                  Tên Dự Án <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
@@ -707,12 +815,25 @@ export default function ProjectsView({ onBack }) {
                   placeholder="Ví dụ: Tòa Nhà Park 2, Chi nhánh Cần Thơ..."
                   value={projName}
                   onChange={(e) => setProjName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    backgroundColor: '#f8fafc',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#0f172a',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    display: 'block',
+                    textAlign: 'left'
+                  }}
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+              <div style={{ width: '100%' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                   Vị trí / Địa chỉ
                 </label>
                 <input
@@ -720,12 +841,25 @@ export default function ProjectsView({ onBack }) {
                   placeholder="Ví dụ: 123 Nguyễn Văn Linh, Quận 7, TP.HCM"
                   value={projLocation}
                   onChange={(e) => setProjLocation(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    backgroundColor: '#f8fafc',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#0f172a',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    display: 'block',
+                    textAlign: 'left'
+                  }}
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+              <div style={{ width: '100%' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                   Mô tả dự án
                 </label>
                 <textarea
@@ -733,66 +867,113 @@ export default function ProjectsView({ onBack }) {
                   placeholder="Ghi chú về quy mô, mục đích dự án..."
                   value={projDesc}
                   onChange={(e) => setProjDesc(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-500 outline-none transition-all resize-none"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    backgroundColor: '#f8fafc',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '12px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: '#0f172a',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    display: 'block',
+                    textAlign: 'left',
+                    resize: 'none'
+                  }}
                 ></textarea>
               </div>
 
               {!editingProject && (
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-2">
+                <div style={{ width: '100%' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '8px', textAlign: 'left' }}>
                     Khởi tạo thiết bị ban đầu
                   </label>
-                  <div className="space-y-2">
-                    <label className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-0.5 transition-all ${
-                      templateMode === 'empty' ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20' : 'border-slate-200'
-                    }`}>
-                      <div className="flex items-center gap-2">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        border: templateMode === 'empty' ? '2px solid #4f46e5' : '1.5px solid #e2e8f0',
+                        backgroundColor: templateMode === 'empty' ? '#eef2ff' : '#ffffff',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input
                           type="radio"
                           name="projTemplate"
                           checked={templateMode === 'empty'}
                           onChange={() => setTemplateMode('empty')}
-                          className="text-indigo-600"
+                          style={{ accentColor: '#4f46e5' }}
                         />
-                        <span className="text-xs font-bold text-slate-800">Dự án trống hoàn toàn (Khuyên dùng)</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                          Dự án trống hoàn toàn (Khuyên dùng)
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 pl-5">
+                      <span style={{ fontSize: '11px', color: '#64748b', paddingLeft: '22px' }}>
                         Tạo sẵn các tầng cơ bản, chưa có thiết bị nào để bạn tự thêm Switch từ đầu như dự án đầu tiên.
                       </span>
                     </label>
 
-                    <label className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-0.5 transition-all ${
-                      templateMode === 'standard' ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20' : 'border-slate-200'
-                    }`}>
-                      <div className="flex items-center gap-2">
+                    <label
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        border: templateMode === 'standard' ? '2px solid #4f46e5' : '1.5px solid #e2e8f0',
+                        backgroundColor: templateMode === 'standard' ? '#eef2ff' : '#ffffff',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input
                           type="radio"
                           name="projTemplate"
                           checked={templateMode === 'standard'}
                           onChange={() => setTemplateMode('standard')}
-                          className="text-indigo-600"
+                          style={{ accentColor: '#4f46e5' }}
                         />
-                        <span className="text-xs font-bold text-slate-800">Khung chuẩn (Core + 2 Switch)</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                          Khung chuẩn (Core + 2 Switch)
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 pl-5">
+                      <span style={{ fontSize: '11px', color: '#64748b', paddingLeft: '22px' }}>
                         Tạo sẵn 1 Switch Core và 2 Switch Access kết nối Fiber.
                       </span>
                     </label>
 
-                    <label className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-0.5 transition-all ${
-                      templateMode === 'clone' ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20' : 'border-slate-200'
-                    }`}>
-                      <div className="flex items-center gap-2">
+                    <label
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: '12px',
+                        border: templateMode === 'clone' ? '2px solid #4f46e5' : '1.5px solid #e2e8f0',
+                        backgroundColor: templateMode === 'clone' ? '#eef2ff' : '#ffffff',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input
                           type="radio"
                           name="projTemplate"
                           checked={templateMode === 'clone'}
                           onChange={() => setTemplateMode('clone')}
-                          className="text-indigo-600"
+                          style={{ accentColor: '#4f46e5' }}
                         />
-                        <span className="text-xs font-bold text-slate-800">Sao chép mẫu</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                          Sao chép mẫu
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 pl-5">
+                      <span style={{ fontSize: '11px', color: '#64748b', paddingLeft: '22px' }}>
                         Sao chép toàn bộ thiết bị Switch từ Dự án Trung Tâm sang.
                       </span>
                     </label>
@@ -800,28 +981,50 @@ export default function ProjectsView({ onBack }) {
                 </div>
               )}
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setIsProjectModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  style={{
+                    padding: '9px 18px',
+                    backgroundColor: '#f1f5f9',
+                    border: 'none',
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    cursor: 'pointer'
+                  }}
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingProj}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  style={{
+                    padding: '9px 20px',
+                    backgroundColor: '#4f46e5',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)'
+                  }}
                 >
                   {isSubmittingProj ? (
                     <>
-                      <i className="fas fa-spinner fa-spin text-xs"></i>
-                      Đang xử lý...
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Đang xử lý...</span>
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-check text-xs"></i>
-                      {editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án & Bắt Đầu Thêm Thiết Bị'}
+                      <i className="fas fa-check"></i>
+                      <span>{editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án & Bắt Đầu Thêm Thiết Bị'}</span>
                     </>
                   )}
                 </button>
@@ -833,38 +1036,146 @@ export default function ProjectsView({ onBack }) {
 
       {/* MODAL 2: THÊM / SỬA SWITCH TRỰC TIẾP CHO DỰ ÁN */}
       {isSwitchModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 99999,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSwitchModalOpen(false);
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '540px',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              border: '1px solid #cbd5e1',
+              overflow: 'hidden',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '16px 24px',
+                borderBottom: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#f8fafc',
+                boxSizing: 'border-box',
+                width: '100%'
+              }}
+            >
               <div>
-                <h3 className="font-black text-slate-800 text-base flex items-center gap-2">
-                  <i className="fas fa-server text-emerald-600"></i>
-                  {editingSwitch ? 'Chỉnh Sửa Switch' : 'Thêm Switch Mới Vào Dự Án'}
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: '15px',
+                    fontWeight: 800,
+                    color: '#1e293b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '10px',
+                      backgroundColor: '#ecfdf5',
+                      color: '#059669',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '13px'
+                    }}
+                  >
+                    <i className="fas fa-server"></i>
+                  </span>
+                  <span>{editingSwitch ? 'Chỉnh Sửa Switch' : 'Thêm Switch Mới Vào Dự Án'}</span>
                 </h3>
-                <p className="text-[11px] text-indigo-700 font-bold mt-0.5">
+                <p style={{ margin: '4px 0 0 42px', fontSize: '11px', fontWeight: 700, color: '#4f46e5' }}>
                   Dự án: {currentInspectProject.name} (ID: {inspectProjId})
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsSwitchModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition-colors cursor-pointer"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  color: '#64748b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
               >
                 <i className="fas fa-times"></i>
               </button>
             </div>
 
-            <form onSubmit={handleSaveSwitch} className="p-6 space-y-4">
+            {/* Switch Form */}
+            <form
+              onSubmit={handleSaveSwitch}
+              style={{
+                padding: '24px',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                boxSizing: 'border-box',
+                width: '100%',
+                margin: 0
+              }}
+            >
               {switchFormError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#b91c1c',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
                   <i className="fas fa-triangle-exclamation"></i>
-                  {switchFormError}
+                  <span>{switchFormError}</span>
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Tên Switch <span className="text-rose-500">*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
+                    Tên Switch <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -872,13 +1183,24 @@ export default function ProjectsView({ onBack }) {
                     placeholder="VD: SW-CORE-01"
                     value={swName}
                     onChange={(e) => setSwName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    IP Quản Trị <span className="text-rose-500">*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
+                    IP Quản Trị <span style={{ color: '#ef4444' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -886,20 +1208,44 @@ export default function ProjectsView({ onBack }) {
                     placeholder="VD: 192.168.1.10"
                     value={swIp}
                     onChange={(e) => setSwIp(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-indigo-700 focus:bg-white focus:border-indigo-500 outline-none"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      color: '#4f46e5',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                     Hãng Sản Xuất
                   </label>
                   <select
                     value={swBrand}
                     onChange={(e) => setSwBrand(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none cursor-pointer"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer'
+                    }}
                   >
                     {brandOptions.map(b => (
                       <option key={b} value={b}>{b}</option>
@@ -908,28 +1254,51 @@ export default function ProjectsView({ onBack }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                     Model
                   </label>
                   <input
                     type="text"
-                    placeholder="VD: CBS350-24T, RG-NBS3100..."
+                    placeholder="VD: CBS350-24T..."
                     value={swModel}
                     onChange={(e) => setSwModel(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-indigo-500 outline-none"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Tầng / Vị Trí Lắp Đặt
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
+                    Tầng / Vị Trí
                   </label>
                   <select
                     value={swFloor}
                     onChange={(e) => setSwFloor(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none cursor-pointer"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer'
+                    }}
                   >
                     {(projectFloors || []).map(f => (
                       <option key={f.floor} value={f.floor}>{f.floor}</option>
@@ -942,19 +1311,42 @@ export default function ProjectsView({ onBack }) {
                       placeholder="Gõ tên tầng mới..."
                       value={swCustomFloor}
                       onChange={(e) => setSwCustomFloor(e.target.value)}
-                      className="w-full mt-1.5 px-3 py-1.5 bg-white border border-indigo-300 rounded-lg text-xs font-medium outline-none"
+                      style={{
+                        width: '100%',
+                        marginTop: '6px',
+                        padding: '8px 12px',
+                        backgroundColor: '#ffffff',
+                        border: '1.5px solid #818cf8',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
                     />
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                     Số Cổng (Ports)
                   </label>
                   <select
                     value={swPorts}
                     onChange={(e) => setSwPorts(Number(e.target.value))}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-indigo-500 outline-none cursor-pointer"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      backgroundColor: '#f8fafc',
+                      border: '1.5px solid #cbd5e1',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      cursor: 'pointer'
+                    }}
                   >
                     <option value={8}>8 Ports</option>
                     <option value={16}>16 Ports</option>
@@ -965,20 +1357,26 @@ export default function ProjectsView({ onBack }) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                   Kiểu Switch
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   {['core', 'distribution', 'access'].map(type => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => setSwType(type)}
-                      className={`py-2 text-xs font-bold rounded-xl border capitalize cursor-pointer transition-all ${
-                        swType === type
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-                      }`}
+                      style={{
+                        padding: '8px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        borderRadius: '10px',
+                        border: swType === type ? '2px solid #4f46e5' : '1.5px solid #cbd5e1',
+                        backgroundColor: swType === type ? '#4f46e5' : '#f8fafc',
+                        color: swType === type ? '#ffffff' : '#334155',
+                        textTransform: 'capitalize',
+                        cursor: 'pointer'
+                      }}
                     >
                       {type}
                     </button>
@@ -986,28 +1384,50 @@ export default function ProjectsView({ onBack }) {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setIsSwitchModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  style={{
+                    padding: '9px 18px',
+                    backgroundColor: '#f1f5f9',
+                    border: 'none',
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    cursor: 'pointer'
+                  }}
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingSwitch}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  style={{
+                    padding: '9px 20px',
+                    backgroundColor: '#059669',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 6px -1px rgba(5, 150, 105, 0.2)'
+                  }}
                 >
                   {isSubmittingSwitch ? (
                     <>
-                      <i className="fas fa-spinner fa-spin text-xs"></i>
-                      Đang lưu...
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Đang lưu...</span>
                     </>
                   ) : (
                     <>
-                      <i className="fas fa-check text-xs"></i>
-                      {editingSwitch ? 'Cập Nhật Switch' : 'Thêm Vào Dự Án Này'}
+                      <i className="fas fa-check"></i>
+                      <span>{editingSwitch ? 'Cập Nhật Switch' : 'Thêm Vào Dự Án Này'}</span>
                     </>
                   )}
                 </button>
