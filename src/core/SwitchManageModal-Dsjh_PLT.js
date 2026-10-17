@@ -9,6 +9,7 @@ import {
   s as c,
 } from "./index-QE6I14Fy.js";
 import { t as l } from "./elevator-BpwH_0-s.js";
+import { getAllBrandNames, getBrandColor, addCustomBrand } from "../services/brandManager.js";
 var u = e(t(), 1),
   d = n();
 function f(e, t) {
@@ -32,6 +33,14 @@ function p({
     y = t ? n.findIndex((e) => e.switches.some((e) => e.id === t.id)) : 0,
     [b, x] = (0, u.useState)(Math.max(y, 0)),
     [S, C] = (0, u.useState)(t?.brand ?? `Cisco`),
+    [availableBrands, setAvailableBrands] = (0, u.useState)(() => {
+      const all = getAllBrandNames();
+      if (t?.brand && !all.includes(t.brand)) all.push(t.brand);
+      return all;
+    }),
+    [isAddingBrand, setIsAddingBrand] = (0, u.useState)(false),
+    [newBrandInput, setNewBrandInput] = (0, u.useState)(''),
+    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),
     [w, T] = (0, u.useState)(t?.isCore ?? !1),
     [E, D] = (0, u.useState)(t?.name ?? ``),
     [O, k] = (0, u.useState)(t?.mac ?? ``),
@@ -100,7 +109,7 @@ function p({
         uplinkType: Y,
         uplinkSpeed: Z,
         zone: M.trim(),
-        color: o[S],
+        color: o[S] || getBrandColor(S),
         conns: l,
         logs: t?.logs,
         ...(t?.backup ? { backup: t.backup } : {}),
@@ -202,20 +211,79 @@ function p({
                   }),
                   (0, d.jsxs)(`div`, {
                     children: [
-                      (0, d.jsx)(`label`, {
-                        htmlFor: `sw-input-brand`,
-                        className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
-                        children: `Thương hiệu`,
+                      (0, d.jsxs)(`div`, {
+                        className: `flex justify-between items-center`,
+                        children: [
+                          (0, d.jsx)(`label`, {
+                            htmlFor: `sw-input-brand`,
+                            className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
+                            children: `Thương hiệu`,
+                          }),
+                          (0, d.jsx)(`button`, {
+                            type: `button`,
+                            onClick: () => setIsAddingBrand(!isAddingBrand),
+                            className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors`,
+                            children: isAddingBrand ? `Đóng` : `+ Thêm hiệu`,
+                          }),
+                        ],
                       }),
-                      (0, d.jsx)(`select`, {
-                        id: `sw-input-brand`,
-                        value: S,
-                        onChange: (e) => C(e.target.value),
-                        className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
-                        children: Object.keys(o).map((e) =>
-                          (0, d.jsx)(`option`, { value: e, children: e }, e),
-                        ),
-                      }),
+                      isAddingBrand
+                        ? (0, d.jsxs)(`div`, {
+                            className: `mt-1.5 p-2 bg-indigo-50/50 border border-indigo-200 rounded-xl flex items-center gap-2`,
+                            children: [
+                              (0, d.jsx)(`input`, {
+                                value: newBrandInput,
+                                onChange: (e) => setNewBrandInput(e.target.value),
+                                placeholder: `Tên hiệu (VD: MikroTik, Ruijie...)`,
+                                className: `flex-1 px-2.5 py-1.5 bg-white border border-indigo-200 rounded-lg text-xs font-bold outline-none text-slate-800`,
+                                autoFocus: true,
+                              }),
+                              (0, d.jsx)(`input`, {
+                                type: `color`,
+                                value: newBrandColor,
+                                onChange: (e) => setNewBrandColor(e.target.value),
+                                className: `w-7 h-7 rounded-lg cursor-pointer border-0 p-0 bg-transparent`,
+                                title: `Chọn màu nhận diện`,
+                              }),
+                              (0, d.jsx)(`button`, {
+                                type: `button`,
+                                onClick: () => {
+                                  if (newBrandInput.trim()) {
+                                    addCustomBrand(newBrandInput.trim(), newBrandColor);
+                                    const updated = getAllBrandNames();
+                                    setAvailableBrands(updated);
+                                    C(newBrandInput.trim());
+                                    setNewBrandInput('');
+                                    setIsAddingBrand(false);
+                                  }
+                                },
+                                className: `px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm`,
+                                children: `Lưu`,
+                              }),
+                            ],
+                          })
+                        : (0, d.jsx)(`select`, {
+                            id: `sw-input-brand`,
+                            value: S,
+                            onChange: (e) => {
+                              if (e.target.value === '__add_new__') {
+                                setIsAddingBrand(true);
+                              } else {
+                                C(e.target.value);
+                              }
+                            },
+                            className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
+                            children: [
+                              ...availableBrands.map((e) =>
+                                (0, d.jsx)(`option`, { value: e, children: e }, e),
+                              ),
+                              (0, d.jsx)(
+                                `option`,
+                                { value: `__add_new__`, children: `+ Thêm thương hiệu mới...` },
+                                `__add_new__`,
+                              ),
+                            ],
+                          }),
                     ],
                   }),
                 ],
