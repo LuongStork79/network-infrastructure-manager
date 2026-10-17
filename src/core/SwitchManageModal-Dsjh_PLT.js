@@ -8,8 +8,8 @@ import {
   l as s,
   s as c,
 } from "./index-QE6I14Fy.js";
-import { t as l } from "./elevator-BpwH_0-s.js";
 import { getAllBrandNames, getBrandColor, addCustomBrand } from "../services/brandManager.js";
+import { getActiveProject, getActiveProjectId } from "../services/projectManager.js";
 var u = e(t(), 1),
   d = n();
 function f(e, t) {
@@ -184,6 +184,25 @@ function p({
           children: (0, d.jsxs)(`div`, {
             className: `space-y-4`,
             children: [
+              (0, d.jsxs)(`div`, {
+                className: `p-2.5 bg-indigo-50/80 border border-indigo-200/80 rounded-xl flex items-center justify-between text-xs`,
+                children: [
+                  (0, d.jsxs)(`div`, {
+                    className: `flex items-center gap-2`,
+                    children: [
+                      (0, d.jsx)(`i`, { className: `fas fa-folder-tree text-indigo-600` }),
+                      (0, d.jsxs)(`span`, {
+                        className: `text-indigo-900 font-bold`,
+                        children: [`Thuộc dự án: `, (0, d.jsx)(`strong`, { className: `text-indigo-700 underline`, children: getActiveProject()?.name || `Trung Tâm` })]
+                      })
+                    ]
+                  }),
+                  (0, d.jsxs)(`span`, {
+                    className: `text-[10px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-indigo-100`,
+                    children: [`ID: `, getActiveProjectId()]
+                  })
+                ]
+              }),
               (0, d.jsxs)(`div`, {
                 className: `grid grid-cols-2 gap-4`,
                 children: [

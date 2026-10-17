@@ -1,7 +1,7 @@
 // Quản lý Đa Dự Án (Multi-Project Manager)
 // Lưu trữ tập trung trên Firebase Cloud Firestore: collection "networkData", document "projects"
 import { db } from './firebase.js';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
 const STORAGE_PROJECTS_KEY = 'nim_projects_list';
 const STORAGE_ACTIVE_PROJECT_KEY = 'nim_active_project_id';
@@ -76,7 +76,7 @@ export function setActiveProjectId(id, options = { reload: true }) {
 }
 
 // Khởi tạo toàn bộ dữ liệu hạ tầng cho dự án mới để có thể dùng ngay "như cái đầu tiên"
-export async function initProjectInfrastructure(newId, templateMode = 'clone') {
+export async function initProjectInfrastructure(newId, templateMode = 'empty') {
   try {
     const modulesToClone = [
       'switches',
@@ -107,6 +107,23 @@ export async function initProjectInfrastructure(newId, templateMode = 'clone') {
           console.warn(`Could not clone ${mod}:`, e);
         }
       }
+    } else if (templateMode === 'empty') {
+      // Dự án hoàn toàn trống với các tầng cơ bản - sẵn sàng thêm mới thiết bị Switch từ đầu
+      const emptyInfrastructure = {
+        DB: [
+          { floor: 'Server Room', switches: [] },
+          { floor: 'Tầng 01', switches: [] },
+          { floor: 'Tầng 02', switches: [] },
+          { floor: 'Tầng 03', switches: [] },
+          { floor: 'Outside', switches: [] }
+        ]
+      };
+      await setDoc(doc(db, 'networkData', `${newId}_switches`), emptyInfrastructure);
+      await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_wifi`), { WifiDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvCameras`), { CctvCameraDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_odf`), { ODFDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_ipphone`), { IPPhoneDB: [] });
     } else {
       // Tạo khung hạ tầng chuẩn với Core Switch và 2 Access Switch hoạt động sẵn
       const coreId = `sw-${Date.now()}-core`;
@@ -247,13 +264,27 @@ export function updateProject(id, { name, desc, location }) {
   return updated;
 }
 
-export function deleteProject(id) {
+export async function deleteProject(id) {
   if (id === 'default') {
     throw new Error('Không thể xóa dự án mặc định của hệ thống!');
   }
   const projects = getProjectsList();
   const updated = projects.filter(p => p.id !== id);
   saveProjectsList(updated);
+
+  // Xóa các document của dự án này trong collection networkData trên Firestore
+  const modulesToDelete = [
+    'switches', 'firewall', 'wifi', 'wifiFloorplans', 'cctvCameras',
+    'cctvFloorplans', 'cctvFloorConnectors', 'odf', 'ipphone', 'nvr',
+    'krone', 'gponFrame', 'gponOnt', 'elevator', 'backupHistory'
+  ];
+  for (const mod of modulesToDelete) {
+    try {
+      await deleteDoc(doc(db, 'networkData', `${id}_${mod}`));
+    } catch (e) {
+      console.warn(`Could not delete doc ${id}_${mod}:`, e);
+    }
+  }
 
   if (getActiveProjectId() === id) {
     setActiveProjectId('default', { reload: true });

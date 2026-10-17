@@ -321,10 +321,10 @@ export default function ProjectsView({ onBack }) {
                   <label className="block text-[11px] font-black text-slate-500 uppercase tracking-wider mb-2">
                     Khởi tạo dữ liệu hạ tầng ban đầu
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <label
                       className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
-                        templateMode === 'clone'
+                        templateMode === 'empty'
                           ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
                           : 'border-slate-200 hover:border-slate-300'
                       }`}
@@ -333,14 +333,14 @@ export default function ProjectsView({ onBack }) {
                         <input
                           type="radio"
                           name="templateMode"
-                          checked={templateMode === 'clone'}
-                          onChange={() => setTemplateMode('clone')}
+                          checked={templateMode === 'empty'}
+                          onChange={() => setTemplateMode('empty')}
                           className="text-indigo-600 focus:ring-indigo-500"
                         />
-                        <span className="text-xs font-bold text-slate-800">Sao chép hạ tầng mẫu (Khuyên dùng)</span>
+                        <span className="text-xs font-bold text-slate-800">Dự án trống (Khuyên dùng)</span>
                       </div>
                       <span className="text-[10px] text-slate-500 pl-5">
-                        Có sẵn toàn bộ thiết bị Switch, các tầng, sơ đồ mạng để đổi tên / IP ngay
+                        Tạo các tầng cơ bản, chưa có thiết bị nào để bạn tự thêm mới từ đầu
                       </span>
                     </label>
 
@@ -359,10 +359,32 @@ export default function ProjectsView({ onBack }) {
                           onChange={() => setTemplateMode('standard')}
                           className="text-indigo-600 focus:ring-indigo-500"
                         />
-                        <span className="text-xs font-bold text-slate-800">Khung chuẩn (Core + 2 Switch)</span>
+                        <span className="text-xs font-bold text-slate-800">Khung chuẩn (3 Switch)</span>
                       </div>
                       <span className="text-[10px] text-slate-500 pl-5">
-                        Tạo sẵn Server Room, Core Switch và 2 Switch tầng để thêm mới thiết bị
+                        Tạo sẵn Server Room, Core Switch và 2 Switch tầng kết nối Fiber
+                      </span>
+                    </label>
+
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
+                        templateMode === 'clone'
+                          ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="templateMode"
+                          checked={templateMode === 'clone'}
+                          onChange={() => setTemplateMode('clone')}
+                          className="text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-xs font-bold text-slate-800">Sao chép mẫu</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 pl-5">
+                        Sao chép toàn bộ thiết bị Switch, các tầng từ Dự án Trung Tâm
                       </span>
                     </label>
                   </div>
