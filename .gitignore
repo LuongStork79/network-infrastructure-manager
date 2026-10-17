@@ -15,6 +15,7 @@ dist-ssr
 # Saved raw dumps
 Network Infrastructure Manager_files/
 Network Infrastructure Manager.html
+push-to-github.bat
 
 # Editor directories and files
 .vscode/*
