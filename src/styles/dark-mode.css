@@ -1,0 +1,465 @@
+/* ==========================================================================
+   Network Infrastructure Manager - Dark Mode Stylesheet
+   ========================================================================== */
+
+/* Smooth theme transitions */
+html.dark,
+html.dark body,
+html.dark .sidebar,
+html.dark .icon-rail,
+html.dark .info-panel,
+html.dark .main-view,
+html.dark .sw-card,
+html.dark .modal-content {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+}
+
+/* Base Body & App Root */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0b0f19 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark #root {
+  background-color: #0b0f19 !important;
+}
+
+/* Icon Rail (Leftmost navigation bar) */
+html.dark .icon-rail {
+  background-color: #080c14 !important;
+  border-right-color: #1e293b !important;
+}
+
+html.dark .icon-rail-btn {
+  color: #94a3b8 !important;
+}
+
+html.dark .icon-rail-btn:hover {
+  color: #818cf8 !important;
+  background-color: #1e293b !important;
+}
+
+html.dark .icon-rail-btn.active {
+  background-color: #312e81 !important;
+  color: #c7d2fe !important;
+}
+
+html.dark .icon-rail-divider {
+  background-color: #1e293b !important;
+}
+
+html.dark .icon-rail-btn-bottom.is-active-sandbox {
+  background-color: #451a03 !important;
+  color: #fbbf24 !important;
+  border-color: #92400e !important;
+}
+
+/* Sidebar (Device lists, filter, navigation tree) */
+html.dark .sidebar {
+  background-color: #0f172a !important;
+  border-right-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .sidebar h1,
+html.dark .sidebar h2,
+html.dark .sidebar h3,
+html.dark .sidebar h4 {
+  color: #f8fafc !important;
+}
+
+html.dark .sidebar .hide-on-collapse {
+  color: #cbd5e1;
+}
+
+html.dark .sidebar input,
+html.dark .sidebar select {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .sidebar input::placeholder {
+  color: #64748b !important;
+}
+
+html.dark .sidebar select option {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+/* Switch & Device Cards in Sidebar */
+html.dark .sw-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .sw-card:hover {
+  background-color: #243049 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .sw-card.active {
+  background-color: #1e1b4b !important;
+  border-color: #818cf8 !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+}
+
+html.dark .sw-card-name {
+  color: #f8fafc !important;
+}
+
+html.dark .sw-card-meta {
+  color: #94a3b8 !important;
+}
+
+html.dark .sw-stat-row {
+  border-top-color: #334155 !important;
+}
+
+html.dark .sw-stat .lbl {
+  color: #64748b !important;
+}
+
+html.dark .sw-stat .n {
+  color: #e2e8f0 !important;
+}
+
+/* Main View & Canvas */
+html.dark .main-view {
+  background-color: #090d16 !important;
+  background-image: 
+    linear-gradient(#1e293b44 1px, transparent 1px),
+    linear-gradient(90deg, #1e293b44 1px, transparent 1px),
+    linear-gradient(#312e8118 1px, transparent 1px),
+    linear-gradient(90deg, #312e8118 1px, transparent 1px) !important;
+}
+
+html.dark .topo-canvas {
+  color: #cbd5e1;
+}
+
+/* Topology Diagram Nodes */
+html.dark .sw-node-ui {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .sw-node-ui:hover {
+  background-color: #243049 !important;
+  border-color: #6366f1 !important;
+}
+
+html.dark .sw-node-ui.active {
+  border-color: #818cf8 !important;
+  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4) !important;
+}
+
+html.dark .firewall-node-ui {
+  background: 
+    linear-gradient(90deg, #ea580c, #c2410c) top/100% 5px no-repeat,
+    linear-gradient(#1e293b 0%, #151a24 100%) top/100% 100% no-repeat !important;
+  border-color: #7c2d12 !important;
+  box-shadow: 0 14px 32px -12px rgba(234, 88, 12, 0.35) !important;
+}
+
+html.dark .firewall-node-name {
+  color: #f8fafc !important;
+}
+
+html.dark .firewall-spec-chip {
+  background-color: #2a140b !important;
+  color: #fdba74 !important;
+  border-color: #7c2d12 !important;
+}
+
+html.dark .firewall-add-ghost-btn {
+  border-color: #475569 !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .gpon-olt-node-ui {
+  background: 
+    linear-gradient(90deg, #c026d3, #86198f) top/100% 5px no-repeat,
+    linear-gradient(#1e293b 0%, #1a1626 100%) top/100% 100% no-repeat !important;
+  border-color: #701a75 !important;
+  box-shadow: 0 14px 32px -12px rgba(192, 38, 211, 0.35) !important;
+}
+
+html.dark .gpon-olt-node-name {
+  color: #f8fafc !important;
+}
+
+html.dark .gpon-olt-spec-chip {
+  background-color: #28102a !important;
+  color: #f0abfc !important;
+  border-color: #701a75 !important;
+}
+
+html.dark .internet-cloud-ui {
+  background: linear-gradient(#1e293b 0%, #0f172a 100%) !important;
+  border-color: #2563eb !important;
+  color: #93c5fd !important;
+  box-shadow: 0 10px 24px -10px rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark .compact-icon {
+  background-color: #334155 !important;
+}
+
+html.dark .compact-label {
+  color: #cbd5e1 !important;
+}
+
+html.dark .iso-name-pill {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .iso-zone-label {
+  background-color: #1e293b !important;
+  border-color: #4f46e5 !important;
+  color: #a5b4fc !important;
+}
+
+/* Info Panel (Right side details) */
+html.dark .info-panel {
+  background-color: #0f172a !important;
+  border-left-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .info-panel h1,
+html.dark .info-panel h2,
+html.dark .info-panel h3,
+html.dark .info-panel h4 {
+  color: #f8fafc !important;
+}
+
+html.dark .info-panel input,
+html.dark .info-panel select,
+html.dark .info-panel textarea {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* Modals & Dialogs */
+html.dark .modal {
+  background-color: rgba(3, 7, 18, 0.8) !important;
+}
+
+html.dark .modal-content {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .modal-content h1,
+html.dark .modal-content h2,
+html.dark .modal-content h3,
+html.dark .modal-content h4 {
+  color: #f8fafc !important;
+}
+
+html.dark .modal-content p {
+  color: #cbd5e1 !important;
+}
+
+html.dark .modal-content label {
+  color: #94a3b8 !important;
+}
+
+html.dark .modal-content input,
+html.dark .modal-content select,
+html.dark .modal-content textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .modal-content input:focus,
+html.dark .modal-content select:focus,
+html.dark .modal-content textarea:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+}
+
+html.dark .login-card {
+  background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+html.dark .login-card-form h3 {
+  color: #f8fafc !important;
+}
+
+/* Projects View, Device Manager & Tables */
+html.dark table {
+  border-color: #334155 !important;
+}
+
+html.dark table thead th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+html.dark table tbody tr {
+  border-color: #334155 !important;
+}
+
+html.dark table tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+html.dark table td {
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Universal Tailwind Utility Overrides in Dark Mode */
+html.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-slate-100,
+html.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-slate-200,
+html.dark .bg-gray-200 {
+  background-color: #334155 !important;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-gray-900,
+html.dark .text-gray-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-gray-700 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-400,
+html.dark .text-gray-400 {
+  color: #64748b !important;
+}
+
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+
+html.dark .border-slate-300,
+html.dark .border-gray-300 {
+  border-color: #475569 !important;
+}
+
+html.dark .custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #475569 !important;
+}
+
+html.dark .custom-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: #64748b !important;
+}
+
+/* Dropdown menus & Popups */
+html.dark #search-results-dropdown {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Global Toast in dark mode */
+html.dark .toast-notification {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+/* ==========================================================================
+   CSS Custom Properties & ProjectsView Modal Theming
+   ========================================================================== */
+:root {
+  --pv-card-bg: #ffffff;
+  --pv-header-bg: #f8fafc;
+  --pv-border: #cbd5e1;
+  --pv-border-subtle: #e2e8f0;
+  --pv-text-title: #1e293b;
+  --pv-text-body: #475569;
+  --pv-input-bg: #f8fafc;
+}
+
+html.dark {
+  --pv-card-bg: #1e293b;
+  --pv-header-bg: #0f172a;
+  --pv-border: #334155;
+  --pv-border-subtle: #334155;
+  --pv-text-title: #f8fafc;
+  --pv-text-body: #cbd5e1;
+  --pv-input-bg: #0f172a;
+}
+
+/* ProjectsView custom styles in dark mode */
+html.dark .pv-modal-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .pv-modal-header {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+html.dark .pv-modal-footer {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+html.dark .pv-modal-input {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .pv-modal-card label {
+  color: #94a3b8 !important;
+}
+
+html.dark .pv-modal-card h3 {
+  color: #f8fafc !important;
+}
+

@@ -695,6 +695,7 @@ export default function ProjectsView({ onBack }) {
           }}
         >
           <div
+            className="pv-modal-card"
             style={{
               backgroundColor: '#ffffff',
               borderRadius: '20px',
@@ -711,6 +712,7 @@ export default function ProjectsView({ onBack }) {
           >
             {/* Modal Header */}
             <div
+              className="pv-modal-header"
               style={{
                 padding: '16px 24px',
                 borderBottom: '1px solid #e2e8f0',
@@ -981,7 +983,7 @@ export default function ProjectsView({ onBack }) {
                 </div>
               )}
 
-              <div style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
+              <div className="pv-modal-footer" style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setIsProjectModalOpen(false)}
@@ -1057,6 +1059,7 @@ export default function ProjectsView({ onBack }) {
           }}
         >
           <div
+            className="pv-modal-card"
             style={{
               backgroundColor: '#ffffff',
               borderRadius: '20px',
@@ -1073,6 +1076,7 @@ export default function ProjectsView({ onBack }) {
           >
             {/* Modal Header */}
             <div
+              className="pv-modal-header"
               style={{
                 padding: '16px 24px',
                 borderBottom: '1px solid #e2e8f0',
@@ -1384,7 +1388,7 @@ export default function ProjectsView({ onBack }) {
                 </div>
               </div>
 
-              <div style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
+              <div className="pv-modal-footer" style={{ paddingTop: '12px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setIsSwitchModalOpen(false)}
