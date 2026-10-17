@@ -1366,96 +1366,53 @@ function ue(e) {
       (t[1] = K),
       (t[2] = ae))
     : (ae = t[2]);
-  let X = ae,
-    oe;
-  t[3] !== h ||
-  t[4] !== ee ||
-  t[5] !== k ||
-  t[6] !== n ||
-  t[7] !== J ||
-  t[8] !== w ||
-  t[9] !== ne ||
-  t[10] !== y ||
-  t[11] !== s ||
-  t[12] !== S ||
-  t[13] !== j ||
-  t[14] !== _ ||
-  t[15] !== F ||
-  t[16] !== K ||
-  t[17] !== u ||
-  t[18] !== m ||
-  t[19] !== R ||
-  t[20] !== W ||
-  t[21] !== c ||
-  t[22] !== D
-    ? ((oe = function () {
-        if (!s) {
-          m(`Bạn không có quyền!`, `error`);
-          return;
-        }
-        let e = _.trim();
-        if (!e) {
-          m(`Vui lòng nhập tên Camera!`, `error`);
-          return;
-        }
-        let t = {
-          name: e,
-          ip: y.trim(),
-          mac: S.trim(),
-          sn: camSn.trim(),
-          user: camUser.trim(),
-          defaultPassword: camDefPass.trim(),
-          passwordNew: camNewPass.trim(),
-          floor: w,
-          zone: D.trim(),
-          brand: k.trim(),
-          model: j.trim(),
-          notes: F.trim(),
-          switchId: R,
-          switchPort: parseInt(W, 10) || null,
-          nvrId: K || null,
-          channel: parseInt(J, 10) || null,
-          angle: x(ee),
-          fov: L(ne),
-        };
-        if (n) {
-          let i = r(e);
-          (u({ ...n, ...t, logs: d(n.logs, i, c) }), h(`Camera: ${e}`, i, c));
-        } else {
-          let n = M(e, w);
-          (u({
-            id: `cctv-${Date.now()}`,
-            ...t,
-            x: null,
-            y: null,
-            floorplanId: null,
-            logs: d(void 0, n, c),
-          }),
-            h(`Camera: ${e}`, n, c));
-        }
+  let X = ae;
+  let oe = function () {
+    if (!s) {
+      m(`Bạn không có quyền!`, `error`);
+      return;
+    }
+    let e = _.trim();
+    if (!e) {
+      m(`Vui lòng nhập tên Camera!`, `error`);
+      return;
+    }
+    let t = {
+      name: e,
+      ip: y.trim(),
+      mac: S.trim(),
+      sn: camSn.trim(),
+      user: camUser.trim(),
+      defaultPassword: camDefPass.trim(),
+      passwordNew: camNewPass.trim(),
+      floor: w,
+      zone: D.trim(),
+      brand: k.trim(),
+      model: j.trim(),
+      notes: F.trim(),
+      switchId: R,
+      switchPort: parseInt(W, 10) || null,
+      nvrId: K || null,
+      channel: parseInt(J, 10) || null,
+      angle: x(ee),
+      fov: L(ne),
+    };
+    if (n) {
+      let i = r(e);
+      (u({ ...n, ...t, logs: d(n.logs, i, c) }), h(`Camera: ${e}`, i, c));
+    } else {
+      let n = M(e, w);
+      (u({
+        id: `cctv-${Date.now()}`,
+        ...t,
+        x: null,
+        y: null,
+        floorplanId: null,
+        logs: d(void 0, n, c),
       }),
-      (t[3] = h),
-      (t[4] = ee),
-      (t[5] = k),
-      (t[6] = n),
-      (t[7] = J),
-      (t[8] = w),
-      (t[9] = ne),
-      (t[10] = y),
-      (t[11] = s),
-      (t[12] = S),
-      (t[13] = j),
-      (t[14] = _),
-      (t[15] = F),
-      (t[16] = K),
-      (t[17] = u),
-      (t[18] = m),
-      (t[19] = R),
-      (t[20] = W),
-      (t[21] = c),
-      (t[22] = D),
-      (t[23] = oe))
-    : (oe = t[23]);
+        h(`Camera: ${e}`, n, c));
+    }
+  };
   let se = oe,
     ce;
   t[24] !== n?.name || t[25] !== f || t[26] !== m

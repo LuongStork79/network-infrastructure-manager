@@ -9,7 +9,9 @@ import {
   tn as ae,
 } from "./index-QE6I14Fy.js";
 import { t as oe } from "./elevator-BpwH_0-s.js";
-var se = ae(),
+var se = {
+    c: (size) => new Array(size).fill(Symbol.for("react.memo_cache_sentinel"))
+  },
   i = e(t(), 1),
   a = n();
 function ce(e) {
@@ -53,97 +55,54 @@ function ce(e) {
           : String(ve)
         : String(n.switchPort),
     ),
-    Fe = ae.flatMap(de),
-    Ie;
-  t[0] !== ye ||
-  t[1] !== n ||
-  t[2] !== h ||
-  t[3] !== v ||
-  t[4] !== f ||
-  t[5] !== u ||
-  t[6] !== ce ||
-  t[7] !== d ||
-  t[8] !== g ||
-  t[9] !== l ||
-  t[10] !== b ||
-  t[11] !== me ||
-  t[12] !== y ||
-  t[13] !== c ||
-  t[14] !== _ ||
-  t[15] !== x ||
-  t[16] !== S ||
-  t[17] !== m ||
-  t[18] !== o ||
-  t[19] !== p
-    ? ((Ie = function () {
-        if (!ce) {
-          c(`Bạn không có quyền!`, `error`);
-          return;
-        }
-        let e = l.trim();
-        if (!e) {
-          c(`Vui lòng nhập tên AP!`, `error`);
-          return;
-        }
-        let t = {
-          name: e,
-          ip: u.trim(),
-          mac: d.trim(),
-          sn: snVal.trim(),
-          user: userVal.trim(),
-          defaultPassword: defPassVal.trim(),
-          passwordNew: newPassVal.trim(),
-          floor: f,
-          zone: p.trim(),
-          type: m,
-          brand: h.trim(),
-          model: g.trim(),
-          ssid: _.trim(),
-          channel: v.trim(),
-          power: y.trim(),
-          notes: b.trim(),
-          switchId: x,
-          switchPort: parseInt(S, 10) || null,
-        };
-        if (n) {
-          let ee = te(e);
-          (me({ ...n, ...t, logs: r(n.logs, ee, o) }),
-            ye(`WiFi AP: ${e}`, ee, o));
-        } else {
-          let n = ne(e, f);
-          (me({
-            id: `wifi-${Date.now()}`,
-            ...t,
-            x: null,
-            y: null,
-            floorplanId: null,
-            logs: r(void 0, n, o),
-          }),
-            ye(`WiFi AP: ${e}`, n, o));
-        }
+    Fe = ae.flatMap(de);
+  let Ie = function () {
+    if (!ce) {
+      c(`Bạn không có quyền!`, `error`);
+      return;
+    }
+    let e = l.trim();
+    if (!e) {
+      c(`Vui lòng nhập tên AP!`, `error`);
+      return;
+    }
+    let t = {
+      name: e,
+      ip: u.trim(),
+      mac: d.trim(),
+      sn: snVal.trim(),
+      user: userVal.trim(),
+      defaultPassword: defPassVal.trim(),
+      passwordNew: newPassVal.trim(),
+      floor: f,
+      zone: p.trim(),
+      type: m,
+      brand: h.trim(),
+      model: g.trim(),
+      ssid: _.trim(),
+      channel: v.trim(),
+      power: y.trim(),
+      notes: b.trim(),
+      switchId: x,
+      switchPort: parseInt(S, 10) || null,
+    };
+    if (n) {
+      let ee = te(e);
+      (me({ ...n, ...t, logs: r(n.logs, ee, o) }),
+        ye(`WiFi AP: ${e}`, ee, o));
+    } else {
+      let n = ne(e, f);
+      (me({
+        id: `wifi-${Date.now()}`,
+        ...t,
+        x: null,
+        y: null,
+        floorplanId: null,
+        logs: r(void 0, n, o),
       }),
-      (t[0] = ye),
-      (t[1] = n),
-      (t[2] = h),
-      (t[3] = v),
-      (t[4] = f),
-      (t[5] = u),
-      (t[6] = ce),
-      (t[7] = d),
-      (t[8] = g),
-      (t[9] = l),
-      (t[10] = b),
-      (t[11] = me),
-      (t[12] = y),
-      (t[13] = c),
-      (t[14] = _),
-      (t[15] = x),
-      (t[16] = S),
-      (t[17] = m),
-      (t[18] = o),
-      (t[19] = p),
-      (t[20] = Ie))
-    : (Ie = t[20]);
+        ye(`WiFi AP: ${e}`, n, o));
+    }
+  };
   let Le = Ie,
     Re;
   t[21] !== n?.name || t[22] !== he || t[23] !== c
