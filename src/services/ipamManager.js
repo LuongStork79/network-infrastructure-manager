@@ -1,6 +1,16 @@
 // Quản lý IPAM: Subnets, VLANs và Gán IP (Add/Edit/Delete)
-const STORAGE_IPAM_SUBNETS_KEY = 'nim_custom_ipam_subnets';
-const STORAGE_IPAM_ALLOCATIONS_KEY = 'nim_custom_ip_allocations';
+// Phân tách độc lập theo từng Dự án (Project-scoped)
+import { getActiveProjectId } from './projectManager.js';
+
+function getSubnetsKey() {
+  const pid = getActiveProjectId();
+  return pid === 'default' ? 'nim_custom_ipam_subnets' : `nim_custom_ipam_subnets_${pid}`;
+}
+
+function getAllocationsKey() {
+  const pid = getActiveProjectId();
+  return pid === 'default' ? 'nim_custom_ip_allocations' : `nim_custom_ip_allocations_${pid}`;
+}
 
 export const DEFAULT_SUBNETS = {
   1: { name: 'Management', color: 'var(--vlan-1)', icon: 'fa-server', subnet: '10.195.32.0/19' },
@@ -18,7 +28,7 @@ export const DEFAULT_SUBNETS = {
 
 export function getCustomSubnets() {
   try {
-    const raw = localStorage.getItem(STORAGE_IPAM_SUBNETS_KEY);
+    const raw = localStorage.getItem(getSubnetsKey());
     if (raw) {
       const parsed = JSON.parse(raw);
       if (typeof parsed === 'object' && parsed !== null) {
@@ -33,7 +43,7 @@ export function getCustomSubnets() {
 
 export function saveCustomSubnets(subnets) {
   try {
-    localStorage.setItem(STORAGE_IPAM_SUBNETS_KEY, JSON.stringify(subnets));
+    localStorage.setItem(getSubnetsKey(), JSON.stringify(subnets));
     window.dispatchEvent(new CustomEvent('nim:subnets_updated', { detail: subnets }));
   } catch (e) {
     console.error('Error saving custom subnets:', e);
@@ -87,14 +97,14 @@ export function deleteSubnet(vlanId) {
 
 // Khôi phục về danh sách mặc định
 export function resetSubnetsToDefault() {
-  localStorage.removeItem(STORAGE_IPAM_SUBNETS_KEY);
+  localStorage.removeItem(getSubnetsKey());
   window.dispatchEvent(new CustomEvent('nim:subnets_updated'));
 }
 
 // Quản lý gán IP tĩnh / Đặt trước thủ công (Manual IP Allocations)
 export function getCustomIpAllocations() {
   try {
-    const raw = localStorage.getItem(STORAGE_IPAM_ALLOCATIONS_KEY);
+    const raw = localStorage.getItem(getAllocationsKey());
     if (raw) {
       const parsed = JSON.parse(raw);
       if (typeof parsed === 'object' && parsed !== null) {
@@ -107,7 +117,7 @@ export function getCustomIpAllocations() {
 
 export function saveCustomIpAllocations(allocations) {
   try {
-    localStorage.setItem(STORAGE_IPAM_ALLOCATIONS_KEY, JSON.stringify(allocations));
+    localStorage.setItem(getAllocationsKey(), JSON.stringify(allocations));
     window.dispatchEvent(new CustomEvent('nim:ip_allocations_updated', { detail: allocations }));
   } catch (e) {}
 }

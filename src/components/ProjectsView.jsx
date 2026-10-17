@@ -6,18 +6,20 @@ import {
   addProject,
   updateProject,
   deleteProject
-} from '../services/projectManager';
+} from '../services/projectManager.js';
 
 export default function ProjectsView({ onBack }) {
   const [projects, setProjects] = useState(getProjectsList());
   const [activeId, setActiveIdState] = useState(getActiveProjectId());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form states
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
   const [location, setLocation] = useState('');
+  const [templateMode, setTemplateMode] = useState('standard'); // 'standard' | 'clone'
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function ProjectsView({ onBack }) {
     setName('');
     setDesc('');
     setLocation('');
+    setTemplateMode('standard');
     setError('');
     setIsModalOpen(true);
   }
@@ -51,28 +54,39 @@ export default function ProjectsView({ onBack }) {
     setIsModalOpen(true);
   }
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
     if (!name.trim()) {
       setError('Vui lòng nhập tên dự án!');
       return;
     }
 
-    if (editingProject) {
-      updateProject(editingProject.id, { name, desc, location });
-    } else {
-      const created = addProject({ name, desc, location });
-      // Tự động kích hoạt dự án mới tạo nếu muốn
-      setActiveProjectId(created.id);
+    setIsSubmitting(true);
+    try {
+      if (editingProject) {
+        updateProject(editingProject.id, { name, desc, location });
+        setProjects(getProjectsList());
+        setIsModalOpen(false);
+      } else {
+        const created = await addProject({ name, desc, location, templateMode });
+        setProjects(getProjectsList());
+        setIsModalOpen(false);
+
+        if (confirm(`Đã tạo dự án "${created.name}" thành công!\n\nBạn có muốn chuyển sang làm việc ở dự án này ngay không?`)) {
+          setActiveProjectId(created.id, { reload: true });
+        }
+      }
+    } catch (err) {
+      setError(err.message || 'Lỗi khi lưu dự án');
+    } finally {
+      setIsSubmitting(false);
     }
-    setProjects(getProjectsList());
-    setActiveIdState(getActiveProjectId());
-    setIsModalOpen(false);
   }
 
   function handleSelect(id) {
-    setActiveProjectId(id);
-    setActiveIdState(id);
+    if (confirm('Chuyển sang làm việc với dự án này? Trang sẽ tải lại dữ liệu thiết bị của dự án đã chọn.')) {
+      setActiveProjectId(id, { reload: true });
+    }
   }
 
   function handleDelete(proj) {
@@ -80,7 +94,7 @@ export default function ProjectsView({ onBack }) {
       alert('Không thể xóa dự án mặc định của hệ thống!');
       return;
     }
-    if (confirm(`Bạn có chắc chắn muốn xóa dự án "${proj.name}" không?\nDữ liệu cấu hình của dự án này sẽ bị xóa.`)) {
+    if (confirm(`Bạn có chắc chắn muốn xóa dự án "${proj.name}" không?\nDữ liệu cấu hình của dự án này sẽ bị xóa khỏi hệ thống.`)) {
       try {
         deleteProject(proj.id);
         setProjects(getProjectsList());
@@ -101,13 +115,13 @@ export default function ProjectsView({ onBack }) {
           </div>
           <div>
             <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-3">
-              Quản Lý Dự Án (Projects)
+              Quản Lý Nhiều Dự Án (Multi-Project)
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
                 {projects.length} Dự án
               </span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Phân tách độc lập hạ tầng mạng, thiết bị Switch, CCTV, WiFi và IPAM theo từng công trình / chi nhánh
+              Phân tách độc lập hạ tầng mạng, Switch, CCTV, WiFi và IPAM theo từng công trình / chi nhánh trên Google Cloud Firestore
             </p>
           </div>
         </div>
@@ -115,7 +129,7 @@ export default function ProjectsView({ onBack }) {
         <div className="flex items-center gap-3">
           <button
             onClick={handleOpenAdd}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2"
+            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
           >
             <i className="fas fa-plus"></i>
             Thêm Dự Án Mới
@@ -123,7 +137,7 @@ export default function ProjectsView({ onBack }) {
           {onBack && (
             <button
               onClick={onBack}
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-2"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
             >
               <i className="fas fa-arrow-left"></i>
               Quay lại Topology
@@ -189,7 +203,7 @@ export default function ProjectsView({ onBack }) {
                       <i className="fas fa-calendar-alt mr-1.5 text-slate-300"></i>
                       Tạo ngày: {proj.createdAt || 'N/A'}
                     </span>
-                    <span className="font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100 text-slate-500">
+                    <span className="font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100 text-slate-500 text-[10px]">
                       ID: {proj.id}
                     </span>
                   </div>
@@ -207,7 +221,7 @@ export default function ProjectsView({ onBack }) {
                     ) : (
                       <button
                         onClick={() => handleSelect(proj.id)}
-                        className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <i className="fas fa-arrow-right-to-bracket"></i>
                         Chọn dự án này
@@ -216,7 +230,7 @@ export default function ProjectsView({ onBack }) {
 
                     <button
                       onClick={() => handleOpenEdit(proj)}
-                      className="p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-all text-xs"
+                      className="p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-all text-xs cursor-pointer"
                       title="Chỉnh sửa thông tin dự án"
                     >
                       <i className="fas fa-edit"></i>
@@ -225,7 +239,7 @@ export default function ProjectsView({ onBack }) {
                     {!proj.isDefault && proj.id !== 'default' && (
                       <button
                         onClick={() => handleDelete(proj)}
-                        className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all text-xs"
+                        className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all text-xs cursor-pointer"
                         title="Xóa dự án"
                       >
                         <i className="fas fa-trash-alt"></i>
@@ -241,16 +255,17 @@ export default function ProjectsView({ onBack }) {
 
       {/* Modal Thêm / Chỉnh Sửa Dự Án */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="font-extrabold text-base text-slate-800 flex items-center gap-2">
                 <i className="fas fa-folder-plus text-indigo-600"></i>
                 {editingProject ? 'Chỉnh Sửa Dự Án' : 'Thêm Dự Án Mới'}
               </h3>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all text-xs"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all text-xs cursor-pointer"
               >
                 <i className="fas fa-times"></i>
               </button>
@@ -272,7 +287,7 @@ export default function ProjectsView({ onBack }) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Chi nhánh Quận 7, Khách sạn Mường Thanh..."
+                  placeholder="VD: Chi nhánh Quận 7, Khách sạn Hạ Long..."
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
                   autoFocus
                 />
@@ -296,7 +311,7 @@ export default function ProjectsView({ onBack }) {
                   Mô tả dự án
                 </label>
                 <textarea
-                  rows="3"
+                  rows="2"
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                   placeholder="Mô tả quy mô hạ tầng, số tầng, phạm vi triển khai..."
@@ -304,20 +319,76 @@ export default function ProjectsView({ onBack }) {
                 ></textarea>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+              {/* Template khởi tạo (chỉ khi tạo mới) */}
+              {!editingProject && (
+                <div className="pt-2">
+                  <label className="block text-[11px] font-black text-slate-500 uppercase tracking-wider mb-2">
+                    Khởi tạo dữ liệu hạ tầng ban đầu
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
+                        templateMode === 'standard'
+                          ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="templateMode"
+                          checked={templateMode === 'standard'}
+                          onChange={() => setTemplateMode('standard')}
+                          className="text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-xs font-bold text-slate-800">Khung tủ Rack chuẩn</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 pl-5">
+                        Tạo sẵn Server Room, Tầng 1, Tầng 2 để thêm Switch ngay
+                      </span>
+                    </label>
+
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
+                        templateMode === 'clone'
+                          ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="templateMode"
+                          checked={templateMode === 'clone'}
+                          onChange={() => setTemplateMode('clone')}
+                          className="text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-xs font-bold text-slate-800">Sao chép dự án hiện tại</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 pl-5">
+                        Nhân bản toàn bộ sơ đồ Switch từ dự án đang chọn
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  <i className="fas fa-save"></i>
-                  {editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án'}
+                  <i className={`fas ${isSubmitting ? 'fa-spinner fa-spin' : 'fa-save'}`}></i>
+                  {editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án & Khởi Tạo'}
                 </button>
               </div>
             </form>
