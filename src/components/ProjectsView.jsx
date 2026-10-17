@@ -19,7 +19,7 @@ export default function ProjectsView({ onBack }) {
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
   const [location, setLocation] = useState('');
-  const [templateMode, setTemplateMode] = useState('standard'); // 'standard' | 'clone'
+  const [templateMode, setTemplateMode] = useState('clone'); // Mặc định clone để có sẵn toàn bộ thiết bị
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function ProjectsView({ onBack }) {
     setName('');
     setDesc('');
     setLocation('');
-    setTemplateMode('standard');
+    setTemplateMode('clone');
     setError('');
     setIsModalOpen(true);
   }
@@ -71,10 +71,8 @@ export default function ProjectsView({ onBack }) {
         const created = await addProject({ name, desc, location, templateMode });
         setProjects(getProjectsList());
         setIsModalOpen(false);
-
-        if (confirm(`Đã tạo dự án "${created.name}" thành công!\n\nBạn có muốn chuyển sang làm việc ở dự án này ngay không?`)) {
-          setActiveProjectId(created.id, { reload: true });
-        }
+        // Tự động chuyển ngay sang dự án mới tạo để xem sơ đồ thiết bị
+        setActiveProjectId(created.id, { reload: true });
       }
     } catch (err) {
       setError(err.message || 'Lỗi khi lưu dự án');
@@ -84,9 +82,7 @@ export default function ProjectsView({ onBack }) {
   }
 
   function handleSelect(id) {
-    if (confirm('Chuyển sang làm việc với dự án này? Trang sẽ tải lại dữ liệu thiết bị của dự án đã chọn.')) {
-      setActiveProjectId(id, { reload: true });
-    }
+    setActiveProjectId(id, { reload: true });
   }
 
   function handleDelete(proj) {
@@ -328,28 +324,6 @@ export default function ProjectsView({ onBack }) {
                   <div className="grid grid-cols-2 gap-3">
                     <label
                       className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
-                        templateMode === 'standard'
-                          ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
-                          : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="templateMode"
-                          checked={templateMode === 'standard'}
-                          onChange={() => setTemplateMode('standard')}
-                          className="text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span className="text-xs font-bold text-slate-800">Khung tủ Rack chuẩn</span>
-                      </div>
-                      <span className="text-[10px] text-slate-500 pl-5">
-                        Tạo sẵn Server Room, Tầng 1, Tầng 2 để thêm Switch ngay
-                      </span>
-                    </label>
-
-                    <label
-                      className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
                         templateMode === 'clone'
                           ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
                           : 'border-slate-200 hover:border-slate-300'
@@ -363,10 +337,32 @@ export default function ProjectsView({ onBack }) {
                           onChange={() => setTemplateMode('clone')}
                           className="text-indigo-600 focus:ring-indigo-500"
                         />
-                        <span className="text-xs font-bold text-slate-800">Sao chép dự án hiện tại</span>
+                        <span className="text-xs font-bold text-slate-800">Sao chép hạ tầng mẫu (Khuyên dùng)</span>
                       </div>
                       <span className="text-[10px] text-slate-500 pl-5">
-                        Nhân bản toàn bộ sơ đồ Switch từ dự án đang chọn
+                        Có sẵn toàn bộ thiết bị Switch, các tầng, sơ đồ mạng để đổi tên / IP ngay
+                      </span>
+                    </label>
+
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex flex-col gap-1 transition-all ${
+                        templateMode === 'standard'
+                          ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="templateMode"
+                          checked={templateMode === 'standard'}
+                          onChange={() => setTemplateMode('standard')}
+                          className="text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-xs font-bold text-slate-800">Khung chuẩn (Core + 2 Switch)</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 pl-5">
+                        Tạo sẵn Server Room, Core Switch và 2 Switch tầng để thêm mới thiết bị
                       </span>
                     </label>
                   </div>
@@ -388,7 +384,7 @@ export default function ProjectsView({ onBack }) {
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   <i className={`fas ${isSubmitting ? 'fa-spinner fa-spin' : 'fa-save'}`}></i>
-                  {editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án & Khởi Tạo'}
+                  {editingProject ? 'Lưu Thay Đổi' : 'Tạo Dự Án & Vào Làm Việc Ngay'}
                 </button>
               </div>
             </form>

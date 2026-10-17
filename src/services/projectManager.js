@@ -1,6 +1,5 @@
 // Quản lý Đa Dự Án (Multi-Project Manager)
 // Lưu trữ tập trung trên Firebase Cloud Firestore: collection "networkData", document "projects"
-// Hỗ trợ đồng bộ hóa thời gian thực và fallback offline qua localStorage.
 import { db } from './firebase.js';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
@@ -16,13 +15,6 @@ export const DEFAULT_PROJECTS = [
     createdAt: '17/10/2026',
     isDefault: true
   }
-];
-
-// Khung tủ Rack chuẩn khởi tạo cho dự án mới
-export const DEFAULT_STARTER_RACKS = [
-  { floor: 'Server Room', switches: [] },
-  { floor: 'Tầng 1', switches: [] },
-  { floor: 'Tầng 2', switches: [] }
 ];
 
 export function getProjectsList() {
@@ -76,7 +68,6 @@ export function setActiveProjectId(id, options = { reload: true }) {
     localStorage.setItem(STORAGE_ACTIVE_PROJECT_KEY, id);
     window.dispatchEvent(new CustomEvent('nim:project_changed', { detail: { projectId: id } }));
     if (options.reload) {
-      // Reload lại trang để rebind tất cả listener Firestore sang project mới
       window.location.reload();
     }
   } catch (e) {
@@ -84,28 +75,136 @@ export function setActiveProjectId(id, options = { reload: true }) {
   }
 }
 
-// Khởi tạo dữ liệu ban đầu cho dự án mới trong Firestore
-export async function initProjectInfrastructure(newId, templateMode = 'standard') {
+// Khởi tạo toàn bộ dữ liệu hạ tầng cho dự án mới để có thể dùng ngay "như cái đầu tiên"
+export async function initProjectInfrastructure(newId, templateMode = 'clone') {
   try {
-    const switchesRef = doc(db, 'networkData', `${newId}_switches`);
+    const modulesToClone = [
+      'switches',
+      'firewall',
+      'wifi',
+      'wifiFloorplans',
+      'cctvCameras',
+      'cctvFloorplans',
+      'cctvFloorConnectors',
+      'odf',
+      'ipphone',
+      'nvr',
+      'krone',
+      'gponFrame',
+      'gponOnt',
+      'elevator'
+    ];
+
     if (templateMode === 'clone') {
-      const currentActive = getActiveProjectId();
-      const currentDocId = currentActive === 'default' ? 'switches' : `${currentActive}_switches`;
-      const currentSnap = await getDoc(doc(db, 'networkData', currentDocId));
-      if (currentSnap.exists()) {
-        const clonedData = currentSnap.data();
-        await setDoc(switchesRef, clonedData);
-        return;
+      // Sao chép toàn bộ 100% thiết bị, tầng, sơ đồ từ Dự án Trung Tâm
+      for (const mod of modulesToClone) {
+        try {
+          const snap = await getDoc(doc(db, 'networkData', mod));
+          if (snap.exists()) {
+            await setDoc(doc(db, 'networkData', `${newId}_${mod}`), snap.data());
+          }
+        } catch (e) {
+          console.warn(`Could not clone ${mod}:`, e);
+        }
       }
+    } else {
+      // Tạo khung hạ tầng chuẩn với Core Switch và 2 Access Switch hoạt động sẵn
+      const coreId = `sw-${Date.now()}-core`;
+      const standardInfrastructure = {
+        DB: [
+          {
+            floor: 'Server Room',
+            switches: [
+              {
+                id: coreId,
+                name: '000-Core-SW',
+                brand: 'Cisco',
+                model: 'C9200L-24T-4X',
+                ip: '10.195.32.1',
+                mac: '00:1A:2B:3C:4D:01',
+                ports: 24,
+                sfpPorts: 4,
+                isCore: true,
+                uplinkTarget: 'none',
+                targetPort: 1,
+                uplinkPort: 24,
+                uplinkType: 'Fiber',
+                uplinkSpeed: '10G',
+                zone: 'Server Room',
+                color: 'var(--cisco-blue)',
+                conns: [],
+                logs: [{ time: '17/10/2026', msg: 'Khởi tạo Core Switch trung tâm' }]
+              }
+            ]
+          },
+          {
+            floor: 'Basement',
+            switches: []
+          },
+          {
+            floor: 'Tầng 01',
+            switches: [
+              {
+                id: `sw-${Date.now()}-t01`,
+                name: 'SW-T01-01',
+                brand: 'Cisco',
+                model: 'C1200-24P-4G',
+                ip: '10.195.32.11',
+                mac: '00:1A:2B:3C:4D:11',
+                ports: 24,
+                sfpPorts: 4,
+                isCore: false,
+                uplinkTarget: coreId,
+                targetPort: 24,
+                uplinkPort: 24,
+                uplinkType: 'Fiber',
+                uplinkSpeed: '1G',
+                zone: 'Tầng 01',
+                color: 'var(--cisco-blue)',
+                conns: [],
+                logs: [{ time: '17/10/2026', msg: 'Khởi tạo Access Switch Tầng 1' }]
+              }
+            ]
+          },
+          {
+            floor: 'Tầng 02',
+            switches: [
+              {
+                id: `sw-${Date.now()}-t02`,
+                name: 'SW-T02-01',
+                brand: 'Cisco',
+                model: 'C1200-24P-4G',
+                ip: '10.195.32.12',
+                mac: '00:1A:2B:3C:4D:12',
+                ports: 24,
+                sfpPorts: 4,
+                isCore: false,
+                uplinkTarget: coreId,
+                targetPort: 23,
+                uplinkPort: 24,
+                uplinkType: 'Fiber',
+                uplinkSpeed: '1G',
+                zone: 'Tầng 02',
+                color: 'var(--cisco-blue)',
+                conns: [],
+                logs: [{ time: '17/10/2026', msg: 'Khởi tạo Access Switch Tầng 2' }]
+              }
+            ]
+          },
+          { floor: 'Tầng 03', switches: [] },
+          { floor: 'Tầng 04', switches: [] },
+          { floor: 'Tầng 05', switches: [] },
+          { floor: 'Outside', switches: [] }
+        ]
+      };
+      await setDoc(doc(db, 'networkData', `${newId}_switches`), standardInfrastructure);
     }
-    // Mặc định tạo các Rack tiêu chuẩn để có thể thêm Switch ngay
-    await setDoc(switchesRef, { DB: DEFAULT_STARTER_RACKS });
   } catch (err) {
-    console.warn('Failed to initialize project infrastructure in Firestore:', err);
+    console.error('Failed to init project infrastructure:', err);
   }
 }
 
-export async function addProject({ name, desc, location, templateMode = 'standard' }) {
+export async function addProject({ name, desc, location, templateMode = 'clone' }) {
   const projects = getProjectsList();
   const newId = 'proj_' + Date.now();
   const now = new Date();
@@ -123,7 +222,7 @@ export async function addProject({ name, desc, location, templateMode = 'standar
   const updated = [...projects, newProject];
   saveProjectsList(updated);
 
-  // Khởi tạo các tủ Rack ban đầu trong Firestore
+  // Khởi tạo trọn gói hạ tầng thiết bị trong Firestore
   await initProjectInfrastructure(newId, templateMode);
 
   window.dispatchEvent(new CustomEvent('nim:projects_updated'));
@@ -196,7 +295,6 @@ export function subscribeToProjectsSync() {
           } catch (e) {}
         }
       } else {
-        // Khởi tạo document projects nếu chưa có trên Firestore
         setDoc(projectsRef, { list: DEFAULT_PROJECTS, updatedAt: new Date().toISOString() })
           .catch(() => {});
       }
@@ -208,7 +306,6 @@ export function subscribeToProjectsSync() {
   }
 }
 
-// Tự động khởi chạy listener khi import
 if (typeof window !== 'undefined') {
   subscribeToProjectsSync();
 }

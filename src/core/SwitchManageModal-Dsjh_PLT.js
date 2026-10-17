@@ -40,7 +40,7 @@ function p({
     }),
     [isAddingBrand, setIsAddingBrand] = (0, u.useState)(false),
     [newBrandInput, setNewBrandInput] = (0, u.useState)(''),
-    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),
+    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),[isAddingFloor, setIsAddingFloor] = (0, u.useState)(false),[newFloorInput, setNewFloorInput] = (0, u.useState)(''),
     [w, T] = (0, u.useState)(t?.isCore ?? !1),
     [E, D] = (0, u.useState)(t?.name ?? ``),
     [O, k] = (0, u.useState)(t?.mac ?? ``),
@@ -189,24 +189,69 @@ function p({
                 children: [
                   (0, d.jsxs)(`div`, {
                     children: [
-                      (0, d.jsx)(`label`, {
-                        htmlFor: `sw-input-floor`,
-                        className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
-                        children: `Tầng / Vị trí`,
+                      (0, d.jsxs)(`div`, {
+                        className: `flex items-center justify-between mb-1.5`,
+                        children: [
+                          (0, d.jsx)(`label`, {
+                            htmlFor: `sw-input-floor`,
+                            className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
+                            children: `Tầng / Vị trí`,
+                          }),
+                          (0, d.jsx)(`button`, {
+                            type: `button`,
+                            onClick: () => setIsAddingFloor(!isAddingFloor),
+                            className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer`,
+                            children: isAddingFloor ? `✕ Đóng` : `+ Thêm tầng`,
+                          }),
+                        ],
                       }),
-                      (0, d.jsx)(`select`, {
-                        id: `sw-input-floor`,
-                        value: b,
-                        onChange: (e) => x(Number(e.target.value)),
-                        className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
-                        children: n.map((e, t) =>
-                          (0, d.jsx)(
-                            `option`,
-                            { value: t, children: e.floor },
-                            e.floor,
+                      isAddingFloor ? (
+                        (0, d.jsxs)(`div`, {
+                          className: `flex items-center gap-1.5 mt-1.5`,
+                          children: [
+                            (0, d.jsx)(`input`, {
+                              type: `text`,
+                              value: newFloorInput,
+                              onChange: (e) => setNewFloorInput(e.target.value),
+                              placeholder: `VD: Tầng 03, Kho A...`,
+                              className: `flex-1 px-3 py-2 bg-white border border-indigo-300 rounded-xl text-xs font-semibold text-slate-800 outline-none`,
+                            }),
+                            (0, d.jsx)(`button`, {
+                              type: `button`,
+                              onClick: () => {
+                                if (newFloorInput.trim()) {
+                                  const floorName = newFloorInput.trim();
+                                  const existingIdx = n.findIndex((r) => r.floor.toLowerCase() === floorName.toLowerCase());
+                                  if (existingIdx !== -1) {
+                                    x(existingIdx);
+                                  } else {
+                                    n.push({ floor: floorName, switches: [] });
+                                    x(n.length - 1);
+                                  }
+                                  setNewFloorInput('');
+                                  setIsAddingFloor(false);
+                                }
+                              },
+                              className: `px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer`,
+                              children: `Lưu`,
+                            }),
+                          ],
+                        })
+                      ) : (
+                        (0, d.jsx)(`select`, {
+                          id: `sw-input-floor`,
+                          value: b,
+                          onChange: (e) => x(Number(e.target.value)),
+                          className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
+                          children: n.map((e, t) =>
+                            (0, d.jsx)(
+                              `option`,
+                              { value: t, children: e.floor },
+                              e.floor,
+                            ),
                           ),
-                        ),
-                      }),
+                        })
+                      ),
                     ],
                   }),
                   (0, d.jsxs)(`div`, {
