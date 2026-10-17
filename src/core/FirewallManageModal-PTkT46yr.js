@@ -6,12 +6,13 @@ import {
   l as r,
   s as i,
   t as re,
-  tn as a,
 } from "./index-QE6I14Fy.js";
 import { t as ie } from "./elevator-BpwH_0-s.js";
 import { n as ae, t as oe } from "./BackupHistoryModal-DIkefmZZ.js";
 var o = e(t(), 1),
-  se = a();
+  se = {
+    c: (size) => new Array(size).fill(Symbol.for("react.memo_cache_sentinel"))
+  };
 function ce(e) {
   let t = [];
   return (
@@ -87,6 +88,7 @@ function u(e) {
   let t = (0, se.c)(205),
     {
       mode: n,
+      initialType: initialDevType,
       fw: a,
       db: c,
       username: u,
@@ -99,20 +101,21 @@ function u(e) {
     h = r(ge),
     g = r(d),
     xe = i(he),
-    [_, Se] = (0, o.useState)(a?.name ?? ``),
-    [v, Ce] = (0, o.useState)(a?.brand ?? ``),
-    [y, we] = (0, o.useState)(a?.model ?? ``),
+    [deviceType, setDeviceType] = (0, o.useState)(() => {
+      if (initialDevType) return initialDevType;
+      if (a?.deviceType) return a.deviceType;
+      if (a?.name?.toLowerCase().includes('router') || a?.model?.toLowerCase().includes('router')) return 'router';
+      return 'firewall';
+    }),
+    [_, Se] = (0, o.useState)(a?.name ?? (initialDevType === 'router' ? 'Router-01' : (n === 'add' ? 'FW-Core-01' : ''))),
+    [v, Ce] = (0, o.useState)(a?.brand ?? (initialDevType === 'router' ? 'MikroTik' : (n === 'add' ? 'Fortinet' : ''))),
+    [y, we] = (0, o.useState)(a?.model ?? (initialDevType === 'router' ? 'CCR2004-16G-2S+' : (n === 'add' ? 'FortiGate 100F' : ''))),
     [b, Te] = (0, o.useState)(a?.ip ?? ``),
     [x, Ee] = (0, o.useState)(a?.mac ?? ``),
     [S, De] = (0, o.useState)(a?.zone ?? ``),
     [C, w] = (0, o.useState)(a?.notes ?? ``),
     [T, Oe] = (0, o.useState)(a?.lanUplinkTarget ?? ``),
     [E, ke] = (0, o.useState)(String(a?.lanUplinkPort ?? ``)),
-    [deviceType, setDeviceType] = (0, o.useState)(() => {
-      if (a?.deviceType) return a.deviceType;
-      if (a?.name?.toLowerCase().includes('router') || a?.model?.toLowerCase().includes('router')) return 'router';
-      return 'firewall';
-    }),
     D;
   t[0] === a?.wanLinks
     ? (D = t[1])
@@ -271,24 +274,20 @@ function u(e) {
           }),
           (t[72] = V))
         : (V = t[72]));
-    let ae;
-    t[73] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((ae = (0, l.jsx)(`div`, {
-          className: `w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-xs border border-orange-100`,
-          children: (0, l.jsx)(`i`, { className: `fas fa-shield-halved` }),
-        })),
-        (t[73] = ae))
-      : (ae = t[73]);
-    let oe = n === `add` ? `Thêm Firewall` : `Chỉnh sửa Firewall`,
-      o;
-    t[74] === oe
-      ? (o = t[75])
-      : ((o = (0, l.jsxs)(`h3`, {
-          className: `text-lg font-black text-slate-800 flex items-center gap-3`,
-          children: [ae, (0, l.jsx)(`span`, { children: oe })],
-        })),
-        (t[74] = oe),
-        (t[75] = o));
+    let isRouter = deviceType === 'router';
+    let ae = (0, l.jsx)(`div`, {
+      className: isRouter
+        ? `w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xs border border-sky-100 dark:border-sky-800`
+        : `w-8 h-8 rounded-lg bg-orange-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs border border-rose-100 dark:border-rose-800`,
+      children: (0, l.jsx)(`i`, { className: isRouter ? `fas fa-route` : `fas fa-shield-halved` }),
+    });
+    let oe = n === `add`
+      ? (isRouter ? `Thêm Router Gateway` : `Thêm Firewall`)
+      : (isRouter ? `Chỉnh sửa Router` : `Chỉnh sửa Firewall`),
+      o = (0, l.jsxs)(`h3`, {
+        className: `text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-3`,
+        children: [ae, (0, l.jsx)(`span`, { children: oe })],
+      });
     let se;
     t[76] === Symbol.for(`react.memo_cache_sentinel`)
       ? ((se = (0, l.jsx)(`i`, { className: `fas fa-times` })), (t[76] = se))
@@ -323,8 +322,10 @@ function u(e) {
           onClick: () => {
             setDeviceType('router');
             if (!_ || _ === 'FW-Core-01' || _ === 'Firewall') Se('Router-01');
+            if (!v || v === 'Fortinet' || v === 'Check Point') Ce('MikroTik');
+            if (!y || y === 'FortiGate 100F' || y === 'Quantum Spark') we('CCR2004-16G-2S+');
           },
-          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer \${
+          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             deviceType === 'router'
               ? 'bg-sky-500 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
@@ -336,13 +337,15 @@ function u(e) {
           onClick: () => {
             setDeviceType('firewall');
             if (!_ || _ === 'Router-01' || _ === 'Router Gateway') Se('FW-Core-01');
+            if (!v || v === 'MikroTik') Ce('Fortinet');
+            if (!y || y === 'CCR2004-16G-2S+') we('FortiGate 100F');
           },
-          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer \${
+          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             deviceType === 'firewall'
               ? 'bg-rose-500 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
           }`,
-          children: [(0, l.jsx)(`i`, { className: `fas fa-fire` }), ' Firewall']
+          children: [(0, l.jsx)(`i`, { className: `fas fa-shield-halved` }), ' Firewall']
         })
       ]
     });
@@ -959,16 +962,11 @@ function u(e) {
       })),
       (t[177] = m),
       (t[178] = nt));
-  let rt;
-  t[179] === N
-    ? (rt = t[180])
-    : ((rt = (0, l.jsx)(`button`, {
-        onClick: N,
-        className: `flex-1 py-3 bg-slate-800 text-white text-sm font-bold rounded-xl shadow-md hover:bg-black transition-all`,
-        children: `Lưu Firewall`,
-      })),
-      (t[179] = N),
-      (t[180] = rt));
+  let rt = (0, l.jsx)(`button`, {
+    onClick: N,
+    className: `flex-1 py-3 bg-slate-800 text-white text-sm font-bold rounded-xl shadow-md hover:bg-black transition-all cursor-pointer`,
+    children: isRouter ? `Lưu Router` : `Lưu Firewall`,
+  });
   let it;
   t[181] !== Q || t[182] !== nt || t[183] !== rt
     ? ((it = (0, l.jsxs)(`div`, {

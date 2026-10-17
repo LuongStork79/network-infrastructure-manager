@@ -48,7 +48,7 @@ export const useUIStore = create((set) => ({
   closeSwitchModal: () => set({ switchModalRequest: null }),
 
   firewallModalRequest: null,
-  openAddFirewallModal: () => set({ firewallModalRequest: { mode: 'add' } }),
+  openAddFirewallModal: (initialType = 'firewall') => set({ firewallModalRequest: { mode: 'add', initialType } }),
   openEditFirewallModal: (firewallId) => set({ firewallModalRequest: { mode: 'edit', firewallId } }),
   closeFirewallModal: () => set({ firewallModalRequest: null }),
 

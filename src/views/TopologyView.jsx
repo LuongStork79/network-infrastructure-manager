@@ -2377,10 +2377,10 @@ var Oe = (0, g.forwardRef)(function (e, t) {
         border: isRouter ? `2px solid #7dd3fc` : `2px solid #fca5a5`
       },
       children: [
-        (0, J.jsx)(`i`, { className: `fas ${isRouter ? 'fa-route' : 'fa-fire'} text-lg text-white drop-shadow` }),
+        (0, J.jsx)(`i`, { className: `fas ${isRouter ? 'fa-route' : 'fa-shield-halved'} text-base text-white drop-shadow` }),
         (0, J.jsx)(`span`, {
-          className: `text-[7.5px] font-black text-white/95 uppercase tracking-wider`,
-          children: isRouter ? `ROUTER` : `FW`
+          className: `text-[6.5px] font-black text-white/95 uppercase tracking-wider mt-0.5`,
+          children: isRouter ? `ROUTER` : `FIREWALL`
         })
       ],
     });
@@ -2519,64 +2519,112 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     );
   });
 function Ae(e) {
-  let t = (0, H.c)(11),
-    { firewall: n, registerRef: r, onManage: i, onAdd: a } = e,
-    o;
-  t[0] !== n || t[1] !== r
-    ? ((o =
-        n &&
-        n.wanLinks.length > 0 &&
-        (0, J.jsx)(`div`, {
-          className: `flex items-center gap-4 flex-wrap justify-center`,
-          children: n.wanLinks.map((e) =>
-            (0, J.jsx)(
-              ke,
-              { link: e, ref: (t) => r(`wan-cloud-${e.id}`, t) },
-              e.id,
-            ),
-          ),
-        })),
-      (t[0] = n),
-      (t[1] = r),
-      (t[2] = o))
-    : (o = t[2]);
-  let s;
-  t[3] !== n || t[4] !== a || t[5] !== i || t[6] !== r
-    ? ((s = n
-        ? (0, J.jsx)(Oe, {
-            fw: n,
-            ref: (e) => r(n.id, e),
-            onManage: () => i(n.id),
-          })
-        : (0, J.jsxs)(`button`, {
-            type: `button`,
-            onClick: a,
-            className: `firewall-add-ghost-btn`,
-            title: `Thêm thiết bị Router / Firewall kết nối ra Internet`,
-            children: [
-              (0, J.jsx)(`i`, { className: `fas fa-plus mr-1` }),
-              ` Thêm Router / Firewall`,
-            ],
-          })),
-      (t[3] = n),
-      (t[4] = a),
-      (t[5] = i),
-      (t[6] = r),
-      (t[7] = s))
-    : (s = t[7]);
-  let c;
-  return (
-    t[8] !== o || t[9] !== s
-      ? ((c = (0, J.jsxs)(`div`, {
-          className: `flex flex-col items-center gap-3`,
-          children: [o, s],
-        })),
-        (t[8] = o),
-        (t[9] = s),
-        (t[10] = c))
-      : (c = t[10]),
-    c
+  let { firewalls: fws, firewall: n, registerRef: r, onManage: i, onAdd: a } = e;
+  let devices = (Array.isArray(fws) && fws.length > 0) ? fws : (n ? [n] : []);
+
+  let allWanLinks = [];
+  devices.forEach(dev => {
+    (dev.wanLinks || []).forEach(wl => {
+      allWanLinks.push({ ...wl, parentFwId: dev.id });
+    });
+  });
+
+  let wanCloudElements = allWanLinks.length > 0 && (0, J.jsx)(`div`, {
+    className: `flex items-center gap-4 flex-wrap justify-center mb-1`,
+    children: allWanLinks.map((wl) =>
+      (0, J.jsx)(
+        ke,
+        { link: wl, ref: (t) => r(`wan-cloud-${wl.id}`, t) },
+        wl.id
+      )
+    ),
+  });
+
+  let hasRouter = devices.some(d => d.deviceType === 'router' || d.name?.toLowerCase().includes('router') || d.model?.toLowerCase().includes('router'));
+  let hasFirewall = devices.some(d => d.deviceType === 'firewall' || (!d.deviceType && !d.name?.toLowerCase().includes('router') && !d.model?.toLowerCase().includes('router')));
+
+  let deviceCards = devices.map(dev =>
+    (0, J.jsx)(Oe, {
+      fw: dev,
+      ref: (el) => r(dev.id, el),
+      onManage: () => i(dev.id),
+    }, dev.id)
   );
+
+  let controls;
+  if (devices.length === 0) {
+    controls = (0, J.jsxs)(`div`, {
+      className: `flex items-center gap-3`,
+      children: [
+        (0, J.jsxs)(`button`, {
+          type: `button`,
+          onClick: () => a('firewall'),
+          className: `firewall-add-ghost-btn flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-rose-300 dark:border-rose-700/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-bold text-xs transition-all shadow-sm cursor-pointer`,
+          title: `Thêm thiết bị Firewall bảo mật`,
+          children: [
+            (0, J.jsx)(`i`, { className: `fas fa-shield-halved text-rose-500` }),
+            ` + Thêm Firewall`,
+          ],
+        }),
+        (0, J.jsxs)(`button`, {
+          type: `button`,
+          onClick: () => a('router'),
+          className: `firewall-add-ghost-btn flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/30 font-bold text-xs transition-all shadow-sm cursor-pointer`,
+          title: `Thêm thiết bị Router định tuyến`,
+          children: [
+            (0, J.jsx)(`i`, { className: `fas fa-route text-sky-500` }),
+            ` + Thêm Router`,
+          ],
+        }),
+      ],
+    });
+  } else {
+    let addBtn = null;
+    if (!hasRouter) {
+      addBtn = (0, J.jsxs)(`button`, {
+        type: `button`,
+        onClick: () => a('router'),
+        className: `flex items-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-sky-300 dark:border-sky-700/60 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/30 font-bold text-xs transition-all shadow-sm cursor-pointer`,
+        title: `Thêm thiết bị Router`,
+        children: [
+          (0, J.jsx)(`i`, { className: `fas fa-route text-sky-500` }),
+          ` + Thêm Router`,
+        ],
+      });
+    } else if (!hasFirewall) {
+      addBtn = (0, J.jsxs)(`button`, {
+        type: `button`,
+        onClick: () => a('firewall'),
+        className: `flex items-center gap-2 px-4 py-3 rounded-2xl border-2 border-dashed border-rose-300 dark:border-rose-700/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-bold text-xs transition-all shadow-sm cursor-pointer`,
+        title: `Thêm thiết bị Firewall`,
+        children: [
+          (0, J.jsx)(`i`, { className: `fas fa-shield-halved text-rose-500` }),
+          ` + Thêm Firewall`,
+        ],
+      });
+    } else {
+      addBtn = (0, J.jsxs)(`button`, {
+        type: `button`,
+        onClick: () => a('router'),
+        className: `flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-xs font-bold transition-all cursor-pointer`,
+        title: `Thêm Gateway (Firewall / Router)`,
+        children: [
+          (0, J.jsx)(`i`, { className: `fas fa-plus text-slate-400` }),
+          ` Thêm Gateway`,
+        ],
+      });
+    }
+
+    controls = (0, J.jsxs)(`div`, {
+      className: `flex items-center gap-6 justify-center flex-wrap`,
+      children: [...deviceCards, addBtn],
+    });
+  }
+
+  return (0, J.jsxs)(`div`, {
+    className: `flex flex-col items-center gap-3`,
+    children: [wanCloudElements, controls],
+  });
 }
 function je(e) {
   let t = (0, H.c)(30),
@@ -3227,6 +3275,7 @@ function Fe() {
                         transform: `translate(-50%, -100%)`,
                       },
                       children: (0, J.jsx)(Ae, {
+                        firewalls: t,
                         firewall: X,
                         registerRef: F,
                         onManage: O,
@@ -3260,6 +3309,7 @@ function Fe() {
                   (0, J.jsx)(`div`, {
                     className: `mb-16 relative z-10`,
                     children: (0, J.jsx)(Ae, {
+                      firewalls: t,
                       firewall: X,
                       registerRef: F,
                       onManage: O,
