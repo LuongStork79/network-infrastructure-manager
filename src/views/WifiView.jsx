@@ -28,326 +28,317 @@ var D = e(t(), 1),
   O = C(),
   k = n();
 function A(e) {
-  let t = (0, O.c)(43),
-    {
-      db: n,
-      networkDB: i,
-      odfDB: a,
-      floorFilter: o,
-      onFloorFilterChange: l,
-      onSelectAp: u,
-      onShowLogs: d,
-      onDragApStart: p,
-      onNavigateToOdf: m,
-    } = e,
-    g,
-    _,
-    v,
-    y,
-    b,
-    x;
-  if (
-    t[0] !== n ||
-    t[1] !== o ||
-    t[2] !== i ||
-    t[3] !== a ||
-    t[4] !== p ||
-    t[5] !== l ||
-    t[6] !== m ||
-    t[7] !== u ||
-    t[8] !== d
-  ) {
-    let e = f(n),
-      S = r(i),
-      C = s(n, o);
-    ((v = `wifi-left-panel`),
-      (y = `view-sidebar w-[320px] shrink-0 bg-white border-r border-slate-200 flex flex-col overflow-hidden`));
-    let w;
-    t[15] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((w = (0, k.jsx)(`span`, {
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest`,
-          children: `Tổng quan`,
-        })),
-        (t[15] = w))
-      : (w = t[15]);
-    let T;
-    t[16] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((T = (0, k.jsx)(`span`, {
-          className: `text-xs font-bold text-slate-400`,
-          children: `AP`,
-        })),
-        (t[16] = T))
-      : (T = t[16]);
-    let E = (0, k.jsxs)(`div`, {
-        className: `flex items-center justify-between mb-3`,
+  let {
+    db: n,
+    networkDB: i,
+    odfDB: a,
+    floorFilter: o,
+    onFloorFilterChange: l,
+    onSelectAp: u,
+    onShowLogs: d,
+    onDragApStart: p,
+    onNavigateToOdf: m,
+    searchQuery = '',
+    onSearchChange,
+    sidebarTab = 'list',
+    onTabChange
+  } = e;
+
+  let stats = f(n),
+    floors = r(i),
+    apsByFloor = s(n, o);
+
+  let q = (searchQuery || '').trim().toLowerCase();
+  let displayAps = q
+    ? apsByFloor.filter(
+        (ap) =>
+          (ap.name && ap.name.toLowerCase().includes(q)) ||
+          (ap.ip && ap.ip.toLowerCase().includes(q)) ||
+          (ap.mac && ap.mac.toLowerCase().includes(q)) ||
+          (ap.floor && ap.floor.toLowerCase().includes(q)) ||
+          (ap.type && ap.type.toLowerCase().includes(q))
+      )
+    : apsByFloor;
+
+  // Header Tabs (Danh Sách AP vs Thống Kê)
+  let tabButtons = (0, k.jsxs)('div', {
+    className: 'flex items-center border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-2 pt-2 gap-1 shrink-0',
+    children: [
+      (0, k.jsxs)('button', {
+        type: 'button',
+        onClick: () => onTabChange && onTabChange('list'),
+        className: `flex-1 py-2 px-2 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          sidebarTab !== 'stats'
+            ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
+            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold'
+        }`,
         children: [
-          w,
-          (0, k.jsxs)(`span`, {
-            className: `text-lg font-black text-cyan-600`,
-            children: [e.total, ` `, T],
-          }),
-        ],
+          (0, k.jsx)('i', { className: 'fas fa-wifi text-xs' }),
+          ` Danh Sách AP (${displayAps.length})`
+        ]
       }),
-      D =
-        Object.keys(e.byType).length === 0
-          ? (0, k.jsx)(`span`, {
-              className: `text-[10px] text-slate-400 italic`,
-              children: `Chưa có AP nào`,
+      (0, k.jsxs)('button', {
+        type: 'button',
+        onClick: () => onTabChange && onTabChange('stats'),
+        className: `py-2 px-3 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          sidebarTab === 'stats'
+            ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
+            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold'
+        }`,
+        children: [
+          (0, k.jsx)('i', { className: 'fas fa-chart-pie text-xs' }),
+          ' Thống Kê'
+        ]
+      })
+    ]
+  });
+
+  // Search Bar & Filter Controls
+  let searchBar = (0, k.jsxs)('div', {
+    className: 'p-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-2 shrink-0',
+    children: [
+      (0, k.jsxs)('div', {
+        className: 'relative flex items-center',
+        children: [
+          (0, k.jsx)('i', { className: 'fas fa-search absolute left-2.5 text-xs text-slate-400' }),
+          (0, k.jsx)('input', {
+            type: 'text',
+            value: searchQuery || '',
+            onChange: (ev) => onSearchChange && onSearchChange(ev.target.value),
+            placeholder: '🔍 Tìm theo Tên, IP, MAC...',
+            className: 'w-full pl-8 pr-7 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 outline-none focus:border-cyan-500 font-medium placeholder:text-slate-400'
+          }),
+          searchQuery &&
+            (0, k.jsx)('button', {
+              type: 'button',
+              onClick: () => onSearchChange && onSearchChange(''),
+              className: 'absolute right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer',
+              title: 'Xóa tìm kiếm',
+              children: '✕'
             })
-          : Object.entries(e.byType).map(N),
-      O;
-    t[17] === D
-      ? (O = t[18])
-      : ((O = (0, k.jsx)(`div`, {
-          className: `flex flex-wrap gap-1.5`,
-          children: D,
-        })),
-        (t[17] = D),
-        (t[18] = O));
-    let A;
-    t[19] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((A = (0, k.jsx)(`div`, {
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2`,
-          children: `Theo tầng`,
-        })),
-        (t[19] = A))
-      : (A = t[19]);
-    let P =
-        e.byFloor.length === 0
-          ? (0, k.jsx)(`p`, {
-              className: `text-[10px] text-slate-400 italic`,
-              children: `Chưa có dữ liệu`,
-            })
-          : e.byFloor.map(M),
-      F;
-    (t[20] === P
-      ? (F = t[21])
-      : ((F = (0, k.jsxs)(`div`, {
-          className: `mt-3 pt-3 border-t border-slate-100`,
+        ]
+      }),
+      (0, k.jsxs)('div', {
+        className: 'flex items-center gap-2',
+        children: [
+          (0, k.jsx)('label', {
+            htmlFor: 'wifi-floor-filter',
+            className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0',
+            children: 'Tầng'
+          }),
+          (0, k.jsxs)('select', {
+            id: 'wifi-floor-filter',
+            value: o,
+            onChange: (ev) => l(ev.target.value),
+            className: 'flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 py-1 px-1.5 outline-none truncate cursor-pointer',
+            children: [
+              (0, k.jsx)('option', { value: 'all', children: 'Tất cả tầng' }),
+              floors.map(j)
+            ]
+          })
+        ]
+      })
+    ]
+  });
+
+  // Render AP card list
+  let apListContent =
+    displayAps.length === 0
+      ? (0, k.jsxs)('div', {
+          className: 'flex flex-col items-center justify-center py-12 opacity-40',
           children: [
-            A,
-            (0, k.jsx)(`div`, {
-              className: `space-y-1.5 max-h-28 overflow-y-auto custom-scroll`,
-              children: P,
-            }),
-          ],
-        })),
-        (t[20] = P),
-        (t[21] = F)),
-      t[22] !== O || t[23] !== F || t[24] !== E
-        ? ((b = (0, k.jsxs)(`div`, {
-            className: `p-4 border-b border-slate-100`,
-            children: [E, O, F],
-          })),
-          (t[22] = O),
-          (t[23] = F),
-          (t[24] = E),
-          (t[25] = b))
-        : (b = t[25]));
-    let I;
-    t[26] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((I = (0, k.jsx)(`label`, {
-          htmlFor: `wifi-floor-filter`,
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0`,
-          children: `Tầng`,
-        })),
-        (t[26] = I))
-      : (I = t[26]);
-    let L;
-    t[27] === l
-      ? (L = t[28])
-      : ((L = (e) => l(e.target.value)), (t[27] = l), (t[28] = L));
-    let R;
-    t[29] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((R = (0, k.jsx)(`option`, { value: `all`, children: `Tất cả tầng` })),
-        (t[29] = R))
-      : (R = t[29]);
-    let z = S.map(j);
-    (t[30] !== o || t[31] !== L || t[32] !== z
-      ? ((x = (0, k.jsxs)(`div`, {
-          className: `px-4 py-3 border-b border-slate-100 flex gap-2 items-center`,
-          children: [
-            I,
-            (0, k.jsxs)(`select`, {
-              id: `wifi-floor-filter`,
-              value: o,
-              onChange: L,
-              className: `flex-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 py-1.5 px-2 focus:outline-none focus:border-cyan-500`,
-              children: [R, z],
-            }),
-          ],
-        })),
-        (t[30] = o),
-        (t[31] = L),
-        (t[32] = z),
-        (t[33] = x))
-      : (x = t[33]),
-      (g = `flex-1 overflow-y-auto custom-scroll p-3 space-y-2`),
-      (_ =
-        C.length === 0
-          ? (0, k.jsxs)(`div`, {
-              className: `flex flex-col items-center justify-center py-10 opacity-40`,
+            (0, k.jsx)('i', { className: 'fas fa-wifi text-3xl text-slate-400 mb-3' }),
+            (0, k.jsxs)('p', {
+              className: 'text-xs font-bold text-slate-500 text-center px-4',
               children: [
-                (0, k.jsx)(`i`, {
-                  className: `fas fa-wifi text-3xl text-slate-400 mb-3`,
-                }),
-                (0, k.jsxs)(`p`, {
-                  className: `text-xs font-bold text-slate-500`,
-                  children: [
-                    `Chưa có AP nào`,
-                    o === `all` ? `` : ` ở tầng này`,
-                  ],
-                }),
-              ],
+                q ? `Không tìm thấy AP khớp với "${searchQuery}"` : 'Chưa có AP nào',
+                o === 'all' ? '' : ' ở tầng này'
+              ]
             })
-          : C.map((e) => {
-              let t = h(e.type),
-                n = e.x != null && !!e.floorplanId,
-                r = e.logs?.length ?? 0,
-                i = c(e, a);
-              return (0, k.jsxs)(
-                `div`,
-                {
-                  className: `wifi-device-card ${n ? `placed` : ``} select-none`,
-                  draggable: !0,
-                  onDragStart: (t) => {
-                    ((t.dataTransfer.effectAllowed = `move`), p(e.id));
-                  },
-                  onClick: () => u(e),
+          ]
+        })
+      : displayAps.map((ap) => {
+          let typeInfo = h(ap.type),
+            placed = ap.x != null && !!ap.floorplanId,
+            logCount = ap.logs?.length ?? 0,
+            odfInfo = c(ap, a);
+
+          return (0, k.jsxs)(
+            'div',
+            {
+              className: `wifi-device-card ${placed ? 'placed' : ''} select-none`,
+              draggable: true,
+              onDragStart: (ev) => {
+                ev.dataTransfer.effectAllowed = 'move';
+                p(ap.id);
+              },
+              onClick: () => u(ap),
+              children: [
+                // Top row: Icon + Name + Type/Placed
+                (0, k.jsxs)('div', {
+                  className: 'flex items-center gap-2.5',
                   children: [
-                    (0, k.jsxs)(`div`, {
-                      className: `flex items-center gap-3`,
-                      children: [
-                        (0, k.jsx)(`div`, {
-                          className: `w-8 h-8 rounded-full ${t.iconBg} flex items-center justify-center shrink-0`,
-                          children: (0, k.jsx)(`i`, {
-                            className: `fas fa-wifi ${t.iconText} text-xs`,
-                          }),
-                        }),
-                        (0, k.jsxs)(`div`, {
-                          className: `flex-1 min-w-0`,
-                          children: [
-                            (0, k.jsx)(`p`, {
-                              className: `text-xs font-black text-slate-800 truncate`,
-                              children: e.name,
-                            }),
-                            (0, k.jsxs)(`p`, {
-                              className: `text-[10px] font-bold text-slate-400 truncate`,
-                              children: [e.floor, e.zone ? ` · ` + e.zone : ``],
-                            }),
-                          ],
-                        }),
-                        (0, k.jsxs)(`div`, {
-                          className: `flex flex-col items-end gap-1 shrink-0`,
-                          children: [
-                            (0, k.jsx)(`span`, {
-                              className: `wifi-stat-badge ${t.badge}`,
-                              children: e.type,
-                            }),
-                            n &&
-                              (0, k.jsxs)(`span`, {
-                                className: `text-[8px] text-emerald-600 font-bold`,
-                                children: [
-                                  (0, k.jsx)(`i`, {
-                                    className: `fas fa-map-marker-alt mr-0.5`,
-                                  }),
-                                  `Đã định vị`,
-                                ],
-                              }),
-                          ],
-                        }),
-                      ],
+                    (0, k.jsx)('div', {
+                      className: `w-7 h-7 rounded-full ${typeInfo.iconBg} flex items-center justify-center shrink-0`,
+                      children: (0, k.jsx)('i', {
+                        className: `fas fa-wifi ${typeInfo.iconText} text-xs`
+                      })
                     }),
-                    (0, k.jsxs)(`div`, {
-                      className: `mt-2 pt-2 border-t border-slate-100 flex items-center gap-2 flex-wrap`,
+                    (0, k.jsxs)('div', {
+                      className: 'flex-1 min-w-0',
                       children: [
-                        e.ip &&
-                          (0, k.jsx)(`span`, {
-                            className: `text-[9px] font-mono text-indigo-600`,
-                            children: e.ip,
-                          }),
-                        e.mac &&
-                          (0, k.jsx)(`span`, {
-                            className: `text-[9px] font-mono text-slate-400 uppercase`,
-                            children: e.mac,
-                          }),
-                        i &&
-                          (0, k.jsxs)(`button`, {
-                            onClick: (e) => {
-                              (e.stopPropagation(), m());
-                            },
-                            title: `Xem trên ODF`,
-                            className: `flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded text-[8px] font-black text-amber-600 hover:bg-amber-100 transition-colors shrink-0`,
+                        (0, k.jsx)('p', {
+                          className: 'text-xs font-black text-slate-800 dark:text-slate-100 truncate',
+                          title: ap.name,
+                          children: ap.name
+                        }),
+                        (0, k.jsxs)('p', {
+                          className: 'text-[10px] font-bold text-slate-400 truncate',
+                          children: [ap.floor, ap.zone ? ' · ' + ap.zone : '']
+                        })
+                      ]
+                    }),
+                    (0, k.jsxs)('div', {
+                      className: 'flex flex-col items-end gap-1 shrink-0',
+                      children: [
+                        (0, k.jsx)('span', {
+                          className: `wifi-stat-badge ${typeInfo.badge} text-[9px] px-1.5 py-0.5 rounded`,
+                          children: ap.type
+                        }),
+                        placed &&
+                          (0, k.jsxs)('span', {
+                            className: 'text-[8px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center',
                             children: [
-                              (0, k.jsx)(`i`, {
-                                className: `fas fa-plug text-[7px]`,
-                              }),
-                              i.odfName,
-                              ` · P`,
-                              i.port,
-                            ],
-                          }),
-                        (0, k.jsxs)(`button`, {
-                          onClick: (t) => {
-                            (t.stopPropagation(), d(e));
-                          },
-                          className: `ml-auto px-2 py-0.5 bg-slate-100 hover:bg-indigo-100 text-slate-500 hover:text-indigo-600 rounded text-[9px] font-bold flex items-center gap-1 transition-colors`,
+                              (0, k.jsx)('i', { className: 'fas fa-map-marker-alt mr-0.5' }),
+                              'Đã định vị'
+                            ]
+                          })
+                      ]
+                    })
+                  ]
+                }),
+
+                // Middle row: PROMINENT IP ADDRESS BADGE
+                (0, k.jsxs)('div', {
+                  className: 'mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2',
+                  children: [
+                    ap.ip
+                      ? (0, k.jsxs)('span', {
+                          className: 'font-mono text-xs font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-950/70 px-2 py-0.5 rounded-md border border-cyan-200 dark:border-cyan-800 flex items-center gap-1.5 shadow-2xs',
+                          title: `IP AP: ${ap.ip}`,
                           children: [
-                            (0, k.jsx)(`i`, { className: `fas fa-history` }),
-                            ` `,
-                            r,
-                            ` log`,
-                          ],
+                            (0, k.jsx)('i', { className: 'fas fa-wifi text-[9px] text-cyan-500' }),
+                            ap.ip
+                          ]
+                        })
+                      : (0, k.jsx)('span', {
+                          className: 'text-[10px] text-slate-400 italic',
+                          children: 'Chưa có IP'
                         }),
-                      ],
-                    }),
-                  ],
-                },
-                e.id,
-              );
-            })),
-      (t[0] = n),
-      (t[1] = o),
-      (t[2] = i),
-      (t[3] = a),
-      (t[4] = p),
-      (t[5] = l),
-      (t[6] = m),
-      (t[7] = u),
-      (t[8] = d),
-      (t[9] = g),
-      (t[10] = _),
-      (t[11] = v),
-      (t[12] = y),
-      (t[13] = b),
-      (t[14] = x));
-  } else
-    ((g = t[9]),
-      (_ = t[10]),
-      (v = t[11]),
-      (y = t[12]),
-      (b = t[13]),
-      (x = t[14]));
-  let S;
-  t[34] !== g || t[35] !== _
-    ? ((S = (0, k.jsx)(`div`, { className: g, children: _ })),
-      (t[34] = g),
-      (t[35] = _),
-      (t[36] = S))
-    : (S = t[36]);
-  let C;
-  return (
-    t[37] !== v || t[38] !== y || t[39] !== b || t[40] !== x || t[41] !== S
-      ? ((C = (0, k.jsxs)(`div`, { id: v, className: y, children: [b, x, S] })),
-        (t[37] = v),
-        (t[38] = y),
-        (t[39] = b),
-        (t[40] = x),
-        (t[41] = S),
-        (t[42] = C))
-      : (C = t[42]),
-    C
-  );
+                    ap.mac &&
+                      (0, k.jsxs)('span', {
+                        className: 'font-mono text-[9px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded uppercase tracking-tight',
+                        title: `MAC: ${ap.mac}`,
+                        children: [
+                          (0, k.jsx)('i', { className: 'fas fa-barcode text-[8px] mr-1 opacity-60' }),
+                          ap.mac
+                        ]
+                      })
+                  ]
+                }),
+
+                // Bottom row: ODF link button / logs badges
+                (0, k.jsxs)('div', {
+                  className: 'mt-1.5 flex items-center gap-1.5 flex-wrap text-[10px]',
+                  children: [
+                    odfInfo &&
+                      (0, k.jsxs)('button', {
+                        type: 'button',
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          m();
+                        },
+                        title: 'Xem trên ODF',
+                        className: 'flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded text-[9px] font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors cursor-pointer',
+                        children: [
+                          (0, k.jsx)('i', { className: 'fas fa-plug text-[7px]' }),
+                          'ODF'
+                        ]
+                      }),
+                    (0, k.jsxs)('span', {
+                      className: 'ml-auto px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded text-[9px] font-bold flex items-center gap-1',
+                      children: [
+                        (0, k.jsx)('i', { className: 'fas fa-history text-[8px]' }),
+                        `${logCount} log`
+                      ]
+                    })
+                  ]
+                })
+              ]
+            },
+            ap.id
+          );
+        });
+
+  // Overview / Stats Panel Content
+  let statsOverviewContent = (0, k.jsxs)('div', {
+    className: 'p-4 space-y-3',
+    children: [
+      (0, k.jsxs)('div', {
+        className: 'flex items-center justify-between mb-2',
+        children: [
+          (0, k.jsx)('span', {
+            className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest',
+            children: 'Tổng quan'
+          }),
+          (0, k.jsxs)('span', {
+            className: 'text-lg font-black text-cyan-600',
+            children: [stats.total, ' ', (0, k.jsx)('span', { className: 'text-xs font-bold text-slate-400', children: 'AP' })]
+          })
+        ]
+      }),
+      (0, k.jsx)('div', {
+        className: 'flex flex-wrap gap-1.5',
+        children: Object.keys(stats.byType).length === 0
+          ? (0, k.jsx)('span', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có AP nào' })
+          : Object.entries(stats.byType).map(N)
+      }),
+      (0, k.jsxs)('div', {
+        className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
+        children: [
+          (0, k.jsx)('div', {
+            className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2',
+            children: 'Theo tầng'
+          }),
+          (0, k.jsx)('div', {
+            className: 'space-y-1.5 max-h-48 overflow-y-auto custom-scroll',
+            children: stats.byFloor.length === 0
+              ? (0, k.jsx)('p', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có dữ liệu' })
+              : stats.byFloor.map(M)
+          })
+        ]
+      })
+    ]
+  });
+
+  return (0, k.jsxs)('div', {
+    id: 'wifi-left-panel',
+    className: 'view-sidebar w-[320px] shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden',
+    children: [
+      tabButtons,
+      sidebarTab === 'stats'
+        ? (0, k.jsx)('div', { className: 'flex-1 overflow-y-auto custom-scroll', children: statsOverviewContent })
+        : (0, k.jsxs)(k.Fragment, {
+            children: [
+              searchBar,
+              (0, k.jsx)('div', {
+                className: 'flex-1 overflow-y-auto custom-scroll p-3 space-y-2',
+                children: apListContent
+              })
+            ]
+          })
+    ]
+  });
 }
 function j(e) {
   return (0, k.jsx)(`option`, { value: e, children: e }, e);
@@ -2166,6 +2157,8 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
     [F, I] = (0, D.useState)(!1),
     [R, B] = (0, D.useState)(`closed`),
     [V, ee] = (0, D.useState)(`floorplan`);
+  let [wifiSearch, setWifiSearch] = (0, D.useState)(''),
+    [wifiSidebarTab, setWifiSidebarTab] = (0, D.useState)('list');
   (0, D.useEffect)(() => {
     if (!w || w.module !== `wifi`) return;
     let e = s.find((e) => e.id === w.apId);
@@ -2336,6 +2329,10 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
             onShowLogs: ne,
             onDragApStart: G,
             onNavigateToOdf: t,
+            searchQuery: wifiSearch,
+            onSearchChange: setWifiSearch,
+            sidebarTab: wifiSidebarTab,
+            onTabChange: setWifiSidebarTab,
           }),
           (0, k.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,

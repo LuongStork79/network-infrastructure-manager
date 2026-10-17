@@ -42,423 +42,380 @@ var B = e(t(), 1),
   V = I(),
   H = n();
 function U(e) {
-  let t = (0, V.c)(50),
-    {
-      db: n,
-      networkDB: r,
-      nvrDB: i,
-      floorFilter: a,
-      onFloorFilterChange: s,
-      nvrFilter: c,
-      onNvrFilterChange: l,
-      onSelectCamera: u,
-      onDragCameraStart: d,
-      onNavigateToSwitch: f,
-    } = e,
-    p,
-    m,
-    h,
-    _,
-    v,
-    y;
-  if (
-    t[0] !== n ||
-    t[1] !== a ||
-    t[2] !== r ||
-    t[3] !== i ||
-    t[4] !== c ||
-    t[5] !== d ||
-    t[6] !== s ||
-    t[7] !== f ||
-    t[8] !== l ||
-    t[9] !== u
-  ) {
-    let e = N(n),
-      x = o(r),
-      C = S(n, i),
-      w = g(n, a, c);
-    ((h = `cctv-left-panel`),
-      (_ = `view-sidebar w-[320px] shrink-0 bg-white border-r border-slate-200 flex flex-col overflow-hidden`));
-    let T;
-    t[16] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((T = (0, H.jsx)(`span`, {
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest`,
-          children: `Tổng quan`,
-        })),
-        (t[16] = T))
-      : (T = t[16]);
-    let D;
-    t[17] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((D = (0, H.jsx)(`span`, {
-          className: `text-xs font-bold text-slate-400`,
-          children: `Camera`,
-        })),
-        (t[17] = D))
-      : (D = t[17]);
-    let O = (0, H.jsxs)(`div`, {
-        className: `flex items-center justify-between mb-3`,
+  let {
+    db: n,
+    networkDB: r,
+    nvrDB: i,
+    floorFilter: a,
+    onFloorFilterChange: s,
+    nvrFilter: c,
+    onNvrFilterChange: l,
+    onSelectCamera: u,
+    onDragCameraStart: d,
+    onNavigateToSwitch: f,
+    searchQuery = '',
+    onSearchChange,
+    sidebarTab = 'list',
+    onTabChange
+  } = e;
+
+  let stats = N(n),
+    floors = o(r),
+    nvrs = S(n, i),
+    rawCameras = g(n, a, c);
+
+  let q = (searchQuery || '').trim().toLowerCase();
+  let displayCameras = q
+    ? rawCameras.filter(
+        (cam) =>
+          (cam.name && cam.name.toLowerCase().includes(q)) ||
+          (cam.ip && cam.ip.toLowerCase().includes(q)) ||
+          (cam.mac && cam.mac.toLowerCase().includes(q)) ||
+          (cam.floor && cam.floor.toLowerCase().includes(q)) ||
+          (cam.zone && cam.zone.toLowerCase().includes(q))
+      )
+    : rawCameras;
+
+  // Header Tabs (Danh Sách vs Thống Kê NVR)
+  let tabButtons = (0, H.jsxs)('div', {
+    className: 'flex items-center border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-2 pt-2 gap-1 shrink-0',
+    children: [
+      (0, H.jsxs)('button', {
+        type: 'button',
+        onClick: () => onTabChange && onTabChange('list'),
+        className: `flex-1 py-2 px-2 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          sidebarTab !== 'stats'
+            ? 'bg-white dark:bg-slate-800 text-orange-600 dark:text-orange-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
+            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold'
+        }`,
         children: [
-          T,
-          (0, H.jsxs)(`span`, {
-            className: `text-lg font-black text-orange-600`,
-            children: [e.total, ` `, D],
-          }),
-        ],
+          (0, H.jsx)('i', { className: 'fas fa-video text-xs' }),
+          ` Danh Sách (${displayCameras.length})`
+        ]
       }),
-      k =
-        e.total === 0
-          ? (0, H.jsx)(`span`, {
-              className: `text-[10px] text-slate-400 italic`,
-              children: `Chưa có camera nào`,
-            })
-          : (0, H.jsxs)(`span`, {
-              className: `cctv-stat-badge bg-emerald-100 text-emerald-700`,
-              children: [`Đã định vị: `, e.placed, `/`, e.total],
-            }),
-      A =
-        e.total - e.placed > 0 &&
-        (0, H.jsxs)(`span`, {
-          className: `cctv-stat-badge bg-amber-100 text-amber-700`,
-          children: [
-            (0, H.jsx)(`i`, { className: `fas fa-triangle-exclamation` }),
-            ` Chưa định vị: `,
-            e.total - e.placed,
-          ],
-        }),
-      j;
-    t[18] !== k || t[19] !== A
-      ? ((j = (0, H.jsxs)(`div`, {
-          className: `flex flex-wrap gap-1.5`,
-          children: [k, A],
-        })),
-        (t[18] = k),
-        (t[19] = A),
-        (t[20] = j))
-      : (j = t[20]);
-    let M =
-        e.unplacedByFloor.length > 0 &&
-        (0, H.jsxs)(`div`, {
-          className: `mt-3 pt-3 border-t border-slate-100`,
-          children: [
-            (0, H.jsxs)(`div`, {
-              className: `text-[10px] font-black text-amber-600 uppercase tracking-widest mb-2`,
-              children: [
-                (0, H.jsx)(`i`, {
-                  className: `fas fa-triangle-exclamation mr-1`,
-                }),
-                `Cần sắp xếp (chưa định vị)`,
-              ],
-            }),
-            (0, H.jsx)(`div`, {
-              className: `space-y-1.5 max-h-24 overflow-y-auto custom-scroll`,
-              children: e.unplacedByFloor.map(J),
-            }),
-          ],
-        }),
-      P;
-    t[21] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((P = (0, H.jsx)(`div`, {
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2`,
-          children: `Theo tầng`,
-        })),
-        (t[21] = P))
-      : (P = t[21]);
-    let F =
-        e.byFloor.length === 0
-          ? (0, H.jsx)(`p`, {
-              className: `text-[10px] text-slate-400 italic`,
-              children: `Chưa có dữ liệu`,
-            })
-          : e.byFloor.map(q),
-      I;
-    t[22] === F
-      ? (I = t[23])
-      : ((I = (0, H.jsxs)(`div`, {
-          className: `mt-3 pt-3 border-t border-slate-100`,
-          children: [
-            P,
-            (0, H.jsx)(`div`, {
-              className: `space-y-1.5 max-h-28 overflow-y-auto custom-scroll`,
-              children: F,
-            }),
-          ],
-        })),
-        (t[22] = F),
-        (t[23] = I));
-    let L =
-      C.length > 0 &&
-      (0, H.jsxs)(`div`, {
-        className: `mt-3 pt-3 border-t border-slate-100`,
+      (0, H.jsxs)('button', {
+        type: 'button',
+        onClick: () => onTabChange && onTabChange('stats'),
+        className: `py-2 px-3 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+          sidebarTab === 'stats'
+            ? 'bg-white dark:bg-slate-800 text-orange-600 dark:text-orange-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
+            : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-bold'
+        }`,
         children: [
-          (0, H.jsx)(`div`, {
-            className: `text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2`,
-            children: `Đầu ghi (NVR)`,
-          }),
-          (0, H.jsx)(`div`, {
-            className: `space-y-1.5 max-h-32 overflow-y-auto custom-scroll`,
-            children: C.map(K),
-          }),
-        ],
-      });
-    t[24] !== j || t[25] !== M || t[26] !== I || t[27] !== L || t[28] !== O
-      ? ((v = (0, H.jsxs)(`div`, {
-          className: `p-4 border-b border-slate-100`,
-          children: [O, j, M, I, L],
-        })),
-        (t[24] = j),
-        (t[25] = M),
-        (t[26] = I),
-        (t[27] = L),
-        (t[28] = O),
-        (t[29] = v))
-      : (v = t[29]);
-    let R;
-    t[30] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((R = (0, H.jsx)(`label`, {
-          htmlFor: `cctv-floor-filter`,
-          className: `text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0`,
-          children: `Tầng`,
-        })),
-        (t[30] = R))
-      : (R = t[30]);
-    let z;
-    t[31] === s
-      ? (z = t[32])
-      : ((z = (e) => s(e.target.value)), (t[31] = s), (t[32] = z));
-    let B;
-    t[33] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((B = (0, H.jsx)(`option`, { value: `all`, children: `Tất cả tầng` })),
-        (t[33] = B))
-      : (B = t[33]);
-    let V = x.map(G),
-      U;
-    t[34] !== a || t[35] !== z || t[36] !== V
-      ? ((U = (0, H.jsxs)(`div`, {
-          className: `flex gap-2 items-center`,
-          children: [
-            R,
-            (0, H.jsxs)(`select`, {
-              id: `cctv-floor-filter`,
-              value: a,
-              onChange: z,
-              className: `flex-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 py-1.5 px-2 focus:outline-none focus:border-orange-500`,
-              children: [B, V],
-            }),
-          ],
-        })),
-        (t[34] = a),
-        (t[35] = z),
-        (t[36] = V),
-        (t[37] = U))
-      : (U = t[37]);
-    let Y =
-      C.length > 0 &&
-      (0, H.jsxs)(`div`, {
-        className: `flex gap-2 items-center`,
+          (0, H.jsx)('i', { className: 'fas fa-chart-pie text-xs' }),
+          ' Thống Kê NVR'
+        ]
+      })
+    ]
+  });
+
+  // Search Bar & Filter Controls
+  let searchBar = (0, H.jsxs)('div', {
+    className: 'p-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col gap-2 shrink-0',
+    children: [
+      (0, H.jsxs)('div', {
+        className: 'relative flex items-center',
         children: [
-          (0, H.jsx)(`label`, {
-            htmlFor: `cctv-nvr-filter`,
-            className: `text-[10px] font-black text-slate-400 uppercase tracking-widest shrink-0`,
-            children: `NVR`,
+          (0, H.jsx)('i', { className: 'fas fa-search absolute left-2.5 text-xs text-slate-400' }),
+          (0, H.jsx)('input', {
+            type: 'text',
+            value: searchQuery || '',
+            onChange: (ev) => onSearchChange && onSearchChange(ev.target.value),
+            placeholder: '🔍 Tìm theo Tên, IP, MAC...',
+            className: 'w-full pl-8 pr-7 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 outline-none focus:border-orange-500 font-medium placeholder:text-slate-400'
           }),
-          (0, H.jsxs)(`select`, {
-            id: `cctv-nvr-filter`,
-            value: c,
-            onChange: (e) => l(e.target.value),
-            className: `flex-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 py-1.5 px-2 focus:outline-none focus:border-orange-500`,
+          searchQuery &&
+            (0, H.jsx)('button', {
+              type: 'button',
+              onClick: () => onSearchChange && onSearchChange(''),
+              className: 'absolute right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer',
+              title: 'Xóa tìm kiếm',
+              children: '✕'
+            })
+        ]
+      }),
+      (0, H.jsxs)('div', {
+        className: 'flex items-center gap-2',
+        children: [
+          (0, H.jsxs)('select', {
+            id: 'cctv-floor-filter',
+            value: a,
+            onChange: (ev) => s(ev.target.value),
+            className: 'flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 py-1 px-1.5 outline-none truncate cursor-pointer',
+            title: 'Lọc theo tầng',
             children: [
-              (0, H.jsx)(`option`, { value: `all`, children: `Tất cả NVR` }),
-              C.map(W),
-            ],
+              (0, H.jsx)('option', { value: 'all', children: 'Tất cả tầng' }),
+              floors.map(G)
+            ]
           }),
-        ],
-      });
-    (t[38] !== U || t[39] !== Y
-      ? ((y = (0, H.jsxs)(`div`, {
-          className: `px-4 py-3 border-b border-slate-100 flex flex-col gap-2`,
-          children: [U, Y],
-        })),
-        (t[38] = U),
-        (t[39] = Y),
-        (t[40] = y))
-      : (y = t[40]),
-      (p = `flex-1 overflow-y-auto custom-scroll p-3 space-y-2`),
-      (m =
-        w.length === 0
-          ? (0, H.jsxs)(`div`, {
-              className: `flex flex-col items-center justify-center py-10 opacity-40`,
+          (0, H.jsxs)('select', {
+            id: 'cctv-nvr-filter',
+            value: c,
+            onChange: (ev) => l(ev.target.value),
+            className: 'flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-[11px] font-bold text-slate-600 dark:text-slate-300 py-1 px-1.5 outline-none truncate cursor-pointer',
+            title: 'Lọc theo NVR',
+            children: [
+              (0, H.jsx)('option', { value: 'all', children: 'Tất cả NVR' }),
+              nvrs.map(W)
+            ]
+          })
+        ]
+      })
+    ]
+  });
+
+  // Render camera card list
+  let cameraListContent =
+    displayCameras.length === 0
+      ? (0, H.jsxs)('div', {
+          className: 'flex flex-col items-center justify-center py-12 opacity-40',
+          children: [
+            (0, H.jsx)('i', { className: 'fas fa-video text-3xl text-slate-400 mb-3' }),
+            (0, H.jsxs)('p', {
+              className: 'text-xs font-bold text-slate-500 text-center px-4',
               children: [
-                (0, H.jsx)(`i`, {
-                  className: `fas fa-video text-3xl text-slate-400 mb-3`,
-                }),
-                (0, H.jsxs)(`p`, {
-                  className: `text-xs font-bold text-slate-500`,
-                  children: [
-                    `Chưa có camera nào`,
-                    a === `all` ? `` : ` ở tầng này`,
-                    c === `all` ? `` : ` thuộc NVR này`,
-                  ],
-                }),
-              ],
+                q ? `Không tìm thấy camera khớp với "${searchQuery}"` : 'Chưa có camera nào',
+                a === 'all' ? '' : ' ở tầng này',
+                c === 'all' ? '' : ' thuộc NVR này'
+              ]
             })
-          : w.map((e) => {
-              let t = e.x != null && !!e.floorplanId,
-                n = e.logs?.length ?? 0,
-                i = b(e),
-                a = E(e, r);
-              return (0, H.jsxs)(
-                `div`,
-                {
-                  className: `cctv-device-card ${t ? `placed` : ``} select-none`,
-                  draggable: !0,
-                  onDragStart: (t) => {
-                    ((t.dataTransfer.effectAllowed = `move`), d(e.id));
-                  },
-                  onClick: () => u(e),
+          ]
+        })
+      : displayCameras.map((cam) => {
+          let placed = cam.x != null && !!cam.floorplanId,
+            logCount = cam.logs?.length ?? 0,
+            badgeInfo = b(cam),
+            switchInfo = E(cam, r);
+
+          return (0, H.jsxs)(
+            'div',
+            {
+              className: `cctv-device-card ${placed ? 'placed' : ''} select-none`,
+              draggable: true,
+              onDragStart: (ev) => {
+                ev.dataTransfer.effectAllowed = 'move';
+                d(cam.id);
+              },
+              onClick: () => u(cam),
+              children: [
+                // Top row: Icon + Name + Angle/Placed
+                (0, H.jsxs)('div', {
+                  className: 'flex items-center gap-2.5',
                   children: [
-                    (0, H.jsxs)(`div`, {
-                      className: `flex items-center gap-3`,
-                      children: [
-                        (0, H.jsx)(`div`, {
-                          className: `w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0`,
-                          children: (0, H.jsx)(`i`, {
-                            className: `fas ${i.icon} text-orange-600 text-xs`,
-                          }),
-                        }),
-                        (0, H.jsxs)(`div`, {
-                          className: `flex-1 min-w-0`,
-                          children: [
-                            (0, H.jsx)(`p`, {
-                              className: `text-xs font-black text-slate-800 truncate`,
-                              children: e.name,
-                            }),
-                            (0, H.jsxs)(`p`, {
-                              className: `text-[10px] font-bold text-slate-400 truncate`,
-                              children: [e.floor, e.zone ? ` · ` + e.zone : ``],
-                            }),
-                          ],
-                        }),
-                        (0, H.jsxs)(`div`, {
-                          className: `flex flex-col items-end gap-1 shrink-0`,
-                          children: [
-                            (0, H.jsxs)(`span`, {
-                              className: `cctv-stat-badge bg-orange-100 text-orange-700`,
-                              children: [
-                                (0, H.jsx)(`i`, {
-                                  className: `fas fa-location-arrow`,
-                                  style: { rotate: `${e.angle}deg` },
-                                }),
-                                ` `,
-                                e.angle,
-                                `°`,
-                              ],
-                            }),
-                            t &&
-                              (0, H.jsxs)(`span`, {
-                                className: `text-[8px] text-emerald-600 font-bold`,
-                                children: [
-                                  (0, H.jsx)(`i`, {
-                                    className: `fas fa-map-marker-alt mr-0.5`,
-                                  }),
-                                  `Đã định vị`,
-                                ],
-                              }),
-                          ],
-                        }),
-                      ],
+                    (0, H.jsx)('div', {
+                      className: 'w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-950/60 flex items-center justify-center shrink-0',
+                      children: (0, H.jsx)('i', {
+                        className: `fas ${badgeInfo.icon} text-orange-600 dark:text-orange-400 text-xs`
+                      })
                     }),
-                    (0, H.jsxs)(`div`, {
-                      className: `mt-2 pt-2 border-t border-slate-100 flex items-center gap-2 flex-wrap`,
+                    (0, H.jsxs)('div', {
+                      className: 'flex-1 min-w-0',
                       children: [
-                        i.label &&
-                          (0, H.jsx)(`span`, {
-                            className: `cctv-stat-badge ${i.badge}`,
-                            children: i.label,
-                          }),
-                        e.ip &&
-                          (0, H.jsx)(`span`, {
-                            className: `text-[9px] font-mono text-indigo-600`,
-                            children: e.ip,
-                          }),
-                        e.mac &&
-                          (0, H.jsx)(`span`, {
-                            className: `text-[9px] font-mono text-slate-400 uppercase`,
-                            children: e.mac,
-                          }),
-                        a &&
-                          (0, H.jsxs)(`button`, {
-                            onClick: (e) => {
-                              (e.stopPropagation(), f(a.switchId, a.port));
-                            },
-                            title: `Xem trên sơ đồ Switch`,
-                            className: `flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 border border-indigo-200 rounded text-[8px] font-black text-indigo-600 hover:bg-indigo-100 transition-colors shrink-0`,
+                        (0, H.jsx)('p', {
+                          className: 'text-xs font-black text-slate-800 dark:text-slate-100 truncate',
+                          title: cam.name,
+                          children: cam.name
+                        }),
+                        (0, H.jsxs)('p', {
+                          className: 'text-[10px] font-bold text-slate-400 truncate',
+                          children: [cam.floor, cam.zone ? ' · ' + cam.zone : '']
+                        })
+                      ]
+                    }),
+                    (0, H.jsxs)('div', {
+                      className: 'flex flex-col items-end gap-1 shrink-0',
+                      children: [
+                        (0, H.jsxs)('span', {
+                          className: 'cctv-stat-badge bg-orange-100 dark:bg-orange-950/80 text-orange-700 dark:text-orange-300 text-[9px] px-1.5 py-0.5 rounded',
+                          children: [
+                            (0, H.jsx)('i', {
+                              className: 'fas fa-location-arrow text-[8px] mr-0.5',
+                              style: { rotate: `${cam.angle}deg` }
+                            }),
+                            `${cam.angle}°`
+                          ]
+                        }),
+                        placed &&
+                          (0, H.jsxs)('span', {
+                            className: 'text-[8px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center',
                             children: [
-                              (0, H.jsx)(`i`, {
-                                className: `fas fa-server text-[7px]`,
-                              }),
-                              a.switchName,
-                              a.port == null ? `` : ` · P${a.port}`,
-                            ],
-                          }),
-                        (0, H.jsxs)(`span`, {
-                          className: `ml-auto px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-bold flex items-center gap-1`,
+                              (0, H.jsx)('i', { className: 'fas fa-map-marker-alt mr-0.5' }),
+                              'Đã định vị'
+                            ]
+                          })
+                      ]
+                    })
+                  ]
+                }),
+
+                // Middle row: PROMINENT IP ADDRESS BADGE
+                (0, H.jsxs)('div', {
+                  className: 'mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2',
+                  children: [
+                    cam.ip
+                      ? (0, H.jsxs)('span', {
+                          className: 'font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 shadow-2xs',
+                          title: `IP Camera: ${cam.ip}`,
                           children: [
-                            (0, H.jsx)(`i`, { className: `fas fa-history` }),
-                            ` `,
-                            n,
-                            ` log`,
-                          ],
+                            (0, H.jsx)('i', { className: 'fas fa-network-wired text-[9px] text-indigo-500' }),
+                            cam.ip
+                          ]
+                        })
+                      : (0, H.jsx)('span', {
+                          className: 'text-[10px] text-slate-400 italic',
+                          children: 'Chưa có IP'
                         }),
-                      ],
-                    }),
-                  ],
-                },
-                e.id,
-              );
-            })),
-      (t[0] = n),
-      (t[1] = a),
-      (t[2] = r),
-      (t[3] = i),
-      (t[4] = c),
-      (t[5] = d),
-      (t[6] = s),
-      (t[7] = f),
-      (t[8] = l),
-      (t[9] = u),
-      (t[10] = p),
-      (t[11] = m),
-      (t[12] = h),
-      (t[13] = _),
-      (t[14] = v),
-      (t[15] = y));
-  } else
-    ((p = t[10]),
-      (m = t[11]),
-      (h = t[12]),
-      (_ = t[13]),
-      (v = t[14]),
-      (y = t[15]));
-  let x;
-  t[41] !== p || t[42] !== m
-    ? ((x = (0, H.jsx)(`div`, { className: p, children: m })),
-      (t[41] = p),
-      (t[42] = m),
-      (t[43] = x))
-    : (x = t[43]);
-  let C;
-  return (
-    t[44] !== h || t[45] !== _ || t[46] !== v || t[47] !== y || t[48] !== x
-      ? ((C = (0, H.jsxs)(`div`, { id: h, className: _, children: [v, y, x] })),
-        (t[44] = h),
-        (t[45] = _),
-        (t[46] = v),
-        (t[47] = y),
-        (t[48] = x),
-        (t[49] = C))
-      : (C = t[49]),
-    C
-  );
+                    cam.mac &&
+                      (0, H.jsxs)('span', {
+                        className: 'font-mono text-[9px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded uppercase tracking-tight',
+                        title: `MAC: ${cam.mac}`,
+                        children: [
+                          (0, H.jsx)('i', { className: 'fas fa-barcode text-[8px] mr-1 opacity-60' }),
+                          cam.mac
+                        ]
+                      })
+                  ]
+                }),
+
+                // Bottom row: Switch port / logs badges
+                (0, H.jsxs)('div', {
+                  className: 'mt-1.5 flex items-center gap-1.5 flex-wrap text-[10px]',
+                  children: [
+                    badgeInfo.label &&
+                      (0, H.jsx)('span', {
+                        className: `cctv-stat-badge ${badgeInfo.badge}`,
+                        children: badgeInfo.label
+                      }),
+                    switchInfo &&
+                      (0, H.jsxs)('button', {
+                        type: 'button',
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          f(switchInfo.switchId, switchInfo.port);
+                        },
+                        title: 'Xem trên sơ đồ Switch',
+                        className: 'flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded text-[9px] font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors cursor-pointer',
+                        children: [
+                          (0, H.jsx)('i', { className: 'fas fa-diagram-project text-[7px]' }),
+                          `${switchInfo.port}`
+                        ]
+                      }),
+                    (0, H.jsxs)('span', {
+                      className: 'ml-auto px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded text-[9px] font-bold flex items-center gap-1',
+                      children: [
+                        (0, H.jsx)('i', { className: 'fas fa-history text-[8px]' }),
+                        `${logCount} log`
+                      ]
+                    })
+                  ]
+                })
+              ]
+            },
+            cam.id
+          );
+        });
+
+  // Overview / Stats Panel Content
+  let statsOverviewContent = (0, H.jsxs)('div', {
+    className: 'p-4 space-y-3',
+    children: [
+      (0, H.jsxs)('div', {
+        className: 'flex items-center justify-between mb-2',
+        children: [
+          (0, H.jsx)('span', {
+            className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest',
+            children: 'Tổng quan'
+          }),
+          (0, H.jsxs)('span', {
+            className: 'text-lg font-black text-orange-600',
+            children: [stats.total, ' ', (0, H.jsx)('span', { className: 'text-xs font-bold text-slate-400', children: 'Camera' })]
+          })
+        ]
+      }),
+      (0, H.jsxs)('div', {
+        className: 'flex flex-wrap gap-1.5',
+        children: [
+          stats.total === 0
+            ? (0, H.jsx)('span', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có camera nào' })
+            : (0, H.jsxs)('span', { className: 'cctv-stat-badge bg-emerald-100 text-emerald-700', children: ['Đã định vị: ', stats.placed, '/', stats.total] }),
+          stats.total - stats.placed > 0 &&
+            (0, H.jsxs)('span', {
+              className: 'cctv-stat-badge bg-amber-100 text-amber-700',
+              children: [
+                (0, H.jsx)('i', { className: 'fas fa-triangle-exclamation' }),
+                ' Chưa định vị: ',
+                stats.total - stats.placed
+              ]
+            })
+        ]
+      }),
+      stats.unplacedByFloor.length > 0 &&
+        (0, H.jsxs)('div', {
+          className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
+          children: [
+            (0, H.jsxs)('div', {
+              className: 'text-[10px] font-black text-amber-600 uppercase tracking-widest mb-2',
+              children: [
+                (0, H.jsx)('i', { className: 'fas fa-triangle-exclamation mr-1' }),
+                'Cần sắp xếp (chưa định vị)'
+              ]
+            }),
+            (0, H.jsx)('div', {
+              className: 'space-y-1.5 max-h-36 overflow-y-auto custom-scroll',
+              children: stats.unplacedByFloor.map(J)
+            })
+          ]
+        }),
+      (0, H.jsxs)('div', {
+        className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
+        children: [
+          (0, H.jsx)('div', {
+            className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2',
+            children: 'Theo tầng'
+          }),
+          (0, H.jsx)('div', {
+            className: 'space-y-1.5 max-h-48 overflow-y-auto custom-scroll',
+            children: stats.byFloor.length === 0
+              ? (0, H.jsx)('p', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có dữ liệu' })
+              : stats.byFloor.map(q)
+          })
+        ]
+      }),
+      nvrs.length > 0 &&
+        (0, H.jsxs)('div', {
+          className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
+          children: [
+            (0, H.jsx)('div', {
+              className: 'text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2',
+              children: 'Đầu ghi (NVR)'
+            }),
+            (0, H.jsx)('div', {
+              className: 'space-y-1.5 max-h-48 overflow-y-auto custom-scroll',
+              children: nvrs.map(K)
+            })
+          ]
+        })
+    ]
+  });
+
+  return (0, H.jsxs)('div', {
+    id: 'cctv-left-panel',
+    className: 'view-sidebar w-[320px] shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden',
+    children: [
+      tabButtons,
+      sidebarTab === 'stats'
+        ? (0, H.jsx)('div', { className: 'flex-1 overflow-y-auto custom-scroll', children: statsOverviewContent })
+        : (0, H.jsxs)(H.Fragment, {
+            children: [
+              searchBar,
+              (0, H.jsx)('div', {
+                className: 'flex-1 overflow-y-auto custom-scroll p-3 space-y-2',
+                children: cameraListContent
+              })
+            ]
+          })
+    ]
+  });
 }
 function W(e) {
   return (0, H.jsx)(`option`, { value: e.nvrId, children: e.name }, e.nvrId);
@@ -4166,6 +4123,8 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
     [K, q] = (0, B.useState)(!1),
     [J, ee] = (0, B.useState)(null),
     [te, ne] = (0, B.useState)(null),
+    [cameraSearch, setCameraSearch] = (0, B.useState)(''),
+    [cctvSidebarTab, setCctvSidebarTab] = (0, B.useState)('list'),
     [re, ie] = (0, B.useState)(null),
     [ae, X] = (0, B.useState)(!1),
     [se, ce] = (0, B.useState)(null),
@@ -4447,6 +4406,10 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
             onSelectCamera: V,
             onDragCameraStart: ee,
             onNavigateToSwitch: $e,
+            searchQuery: cameraSearch,
+            onSearchChange: setCameraSearch,
+            sidebarTab: cctvSidebarTab,
+            onTabChange: setCctvSidebarTab,
           }),
           (0, H.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,

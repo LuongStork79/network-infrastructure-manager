@@ -463,3 +463,114 @@ html.dark .pv-modal-card h3 {
   color: #f8fafc !important;
 }
 
+/* ==========================================================================
+   Topology Legend & Zoom Controls in Dark Mode (Fix invisible text)
+   ========================================================================== */
+html.dark .map-legend,
+html.dark #map-legend-ui {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+html.dark .map-legend h4 {
+  color: #94a3b8 !important;
+}
+
+html.dark .map-legend p,
+html.dark .map-legend span,
+html.dark .map-legend .text-slate-700,
+html.dark .map-legend .text-slate-500 {
+  color: #f8fafc !important;
+}
+
+html.dark .zoom-controls,
+html.dark .cctv-zoom-controls {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .zoom-controls button,
+html.dark .cctv-zoom-controls button {
+  color: #e2e8f0 !important;
+  background-color: transparent !important;
+}
+
+html.dark .zoom-controls button:hover:not(:disabled),
+html.dark .cctv-zoom-controls button:hover:not(:disabled) {
+  background-color: #334155 !important;
+  color: #818cf8 !important;
+}
+
+html.dark .zoom-controls-value,
+html.dark .cctv-zoom-controls-value {
+  color: #cbd5e1 !important;
+  border-top-color: #334155 !important;
+  border-bottom-color: #334155 !important;
+}
+
+/* ==========================================================================
+   CCTV & Wifi Views in Dark Mode
+   ========================================================================== */
+html.dark .view-sidebar,
+html.dark #cctv-left-panel,
+html.dark #wifi-left-panel {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .view-body {
+  background-color: #090d16 !important;
+}
+
+html.dark .cctv-device-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .cctv-device-card:hover {
+  background-color: #271c17 !important;
+  border-color: #ea580c !important;
+}
+
+html.dark .cctv-device-card.placed {
+  background-color: #0e271c !important;
+  border-color: #059669 !important;
+}
+
+html.dark .wifi-device-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .wifi-device-card:hover {
+  background-color: #152331 !important;
+  border-color: #06b6d4 !important;
+}
+
+html.dark .wifi-device-card.placed {
+  background-color: #0e271c !important;
+  border-color: #059669 !important;
+}
+
+html.dark .cctv-device-card .text-slate-800,
+html.dark .wifi-device-card .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .cctv-device-card .text-slate-400,
+html.dark .wifi-device-card .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .cctv-floorplan-area,
+html.dark .wifi-floorplan-area {
+  background-color: #0b0f19 !important;
+}
+
+
