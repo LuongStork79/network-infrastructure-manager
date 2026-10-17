@@ -12,6 +12,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^react$/,
+        replacement: path.resolve(__dirname, 'src/core/react-adapter.js')
+      },
+      {
         find: /.*index-QE6I14Fy\.js$/,
         replacement: path.resolve(__dirname, 'src/core/app-bundle.js')
       },
