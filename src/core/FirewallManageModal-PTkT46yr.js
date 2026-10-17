@@ -108,6 +108,11 @@ function u(e) {
     [C, w] = (0, o.useState)(a?.notes ?? ``),
     [T, Oe] = (0, o.useState)(a?.lanUplinkTarget ?? ``),
     [E, ke] = (0, o.useState)(String(a?.lanUplinkPort ?? ``)),
+    [deviceType, setDeviceType] = (0, o.useState)(() => {
+      if (a?.deviceType) return a.deviceType;
+      if (a?.name?.toLowerCase().includes('router') || a?.model?.toLowerCase().includes('router')) return 'router';
+      return 'firewall';
+    }),
     D;
   t[0] === a?.wanLinks
     ? (D = t[1])
@@ -202,11 +207,14 @@ function u(e) {
             xe(te, `error`);
             return;
           }
-          let ne = e || `Firewall`,
-            r = n === `add` ? ue(ne) : de(ne),
+          let isRt = deviceType === 'router',
+            defName = isRt ? 'Router Gateway' : 'Firewall',
+            ne = e || defName,
+            r = n === `add` ? (isRt ? `Thêm mới Router [${ne}]` : ue(ne)) : (isRt ? `Cập nhật thông tin Router [${ne}]` : de(ne)),
             i = {
               id: a?.id ?? `fw-${Date.now()}`,
               name: ne,
+              deviceType: deviceType,
               brand: v.trim(),
               model: y.trim(),
               ip: b.trim(),
@@ -219,7 +227,7 @@ function u(e) {
               ...(C.trim() ? { notes: C.trim() } : {}),
               ...(a?.backup ? { backup: a.backup } : {}),
             };
-          (ve(i), g(`Firewall: ${ne}`, r, u));
+          (ve(i), g(`${isRt ? 'Router' : 'Firewall'}: ${ne}`, r, u));
         }),
         (t[49] = g),
         (t[50] = v),
@@ -307,6 +315,37 @@ function u(e) {
         : (H = t[81]),
       (z = `flex-1 overflow-y-auto custom-scroll`),
       (F = `space-y-4`));
+    let deviceTypeSelector = (0, l.jsxs)(`div`, {
+      className: `flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl mb-4`,
+      children: [
+        (0, l.jsxs)(`button`, {
+          type: `button`,
+          onClick: () => {
+            setDeviceType('router');
+            if (!_ || _ === 'FW-Core-01' || _ === 'Firewall') Se('Router-01');
+          },
+          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer \${
+            deviceType === 'router'
+              ? 'bg-sky-500 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+          }`,
+          children: [(0, l.jsx)(`i`, { className: `fas fa-route` }), ' Router Gateway']
+        }),
+        (0, l.jsxs)(`button`, {
+          type: `button`,
+          onClick: () => {
+            setDeviceType('firewall');
+            if (!_ || _ === 'Router-01' || _ === 'Router Gateway') Se('FW-Core-01');
+          },
+          className: `flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer \${
+            deviceType === 'firewall'
+              ? 'bg-rose-500 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+          }`,
+          children: [(0, l.jsx)(`i`, { className: `fas fa-fire` }), ' Firewall']
+        })
+      ]
+    });
     let pe;
     t[82] === Symbol.for(`react.memo_cache_sentinel`)
       ? ((pe = (0, l.jsx)(`label`, {
@@ -878,7 +917,7 @@ function u(e) {
   t[169] !== $e
     ? ((et = (0, l.jsxs)(`div`, {
         className: F,
-        children: [I, L, R, Ue, Ye, Qe, $e],
+        children: [deviceTypeSelector, I, L, R, Ue, Ye, Qe, $e],
       })),
       (t[162] = F),
       (t[163] = I),

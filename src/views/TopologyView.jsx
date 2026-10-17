@@ -1296,7 +1296,50 @@ var J = n(),
               className: `sw-brand-badge`,
               style: { background: e.color },
               children: [
-                h(e.brand),
+                (0, J.jsxs)(`div`, {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    height: "100%",
+                    boxSizing: "border-box",
+                    padding: "4px 2px"
+                  },
+                  children: [
+                    (0, J.jsxs)(`svg`, {
+                      viewBox: `0 0 24 24`,
+                      style: { width: "22px", height: "20px", color: "#ffffff", filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" },
+                      fill: `none`,
+                      stroke: `currentColor`,
+                      strokeWidth: `2.2`,
+                      strokeLinecap: `round`,
+                      strokeLinejoin: `round`,
+                      children: [
+                        (0, J.jsx)(`path`, { d: `M3 8h14M14 5l4 3-4 3` }),
+                        (0, J.jsx)(`path`, { d: `M21 16H7M10 13l-4 3 4 3` }),
+                        (0, J.jsx)(`circle`, { cx: `7`, cy: `12`, r: `1`, fill: `currentColor` }),
+                        (0, J.jsx)(`circle`, { cx: `12`, cy: `12`, r: `1`, fill: `currentColor` }),
+                        (0, J.jsx)(`circle`, { cx: `17`, cy: `12`, r: `1`, fill: `currentColor` })
+                      ]
+                    }),
+                    (0, J.jsx)(`span`, {
+                      style: {
+                        fontSize: "8.5px",
+                        fontWeight: "900",
+                        letterSpacing: "0.5px",
+                        lineHeight: "1",
+                        whiteSpace: "nowrap",
+                        textAlign: "center",
+                        marginTop: "3px",
+                        color: "#ffffff",
+                        textShadow: "0 1px 2px rgba(0,0,0,0.4)"
+                      },
+                      children: e.isCore ? `CORE` : `SW`
+                    })
+                  ]
+                }),
                 e.isCore &&
                   (0, J.jsx)(`span`, {
                     className: `sw-crown-badge`,
@@ -2313,146 +2356,104 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     let n = (0, H.c)(27),
       { fw: r, onManage: i } = e,
       a;
-    n[0] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((a = (0, J.jsx)(`div`, {
-          className: `firewall-icon-badge`,
-          children: (0, J.jsx)(`i`, { className: `fas fa-shield-halved` }),
-        })),
-        (n[0] = a))
-      : (a = n[0]);
-    let o;
-    n[1] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((o = (0, J.jsxs)(`div`, {
-          className: `firewall-node-top`,
+
+    let isRouter = r.deviceType === 'router' || 
+                   (r.name && r.name.toLowerCase().includes('router')) || 
+                   (r.model && r.model.toLowerCase().includes('router')) ||
+                   (r.brand && r.brand.toLowerCase().includes('router'));
+
+    a = (0, J.jsxs)(`div`, {
+      className: `firewall-icon-badge ${isRouter ? 'router-badge' : ''}`,
+      style: {
+        background: isRouter ? `linear-gradient(135deg, #0284c7, #0369a1)` : `linear-gradient(135deg, #ef4444, #b91c1c)`,
+        borderRadius: `12px`,
+        display: `flex`,
+        flexDirection: `column`,
+        alignItems: `center`,
+        justifyContent: `center`,
+        width: `44px`,
+        height: `44px`,
+        boxShadow: isRouter ? `0 4px 12px rgba(2, 132, 199, 0.45)` : `0 4px 12px rgba(220, 38, 38, 0.45)`,
+        border: isRouter ? `2px solid #7dd3fc` : `2px solid #fca5a5`
+      },
+      children: [
+        (0, J.jsx)(`i`, { className: `fas ${isRouter ? 'fa-route' : 'fa-fire'} text-lg text-white drop-shadow` }),
+        (0, J.jsx)(`span`, {
+          className: `text-[7.5px] font-black text-white/95 uppercase tracking-wider`,
+          children: isRouter ? `ROUTER` : `FW`
+        })
+      ],
+    });
+
+    let o = (0, J.jsxs)(`div`, {
+      className: `firewall-node-top`,
+      children: [
+        a,
+        (0, J.jsxs)(`div`, {
+          className: `firewall-status-row`,
           children: [
-            a,
-            (0, J.jsxs)(`div`, {
-              className: `firewall-status-row`,
-              children: [
-                (0, J.jsx)(`span`, { className: `firewall-status-dot` }),
-                (0, J.jsx)(`span`, { children: `Protected` }),
-              ],
-            }),
+            (0, J.jsx)(`span`, { className: `firewall-status-dot ${isRouter ? 'bg-emerald-500' : ''}` }),
+            (0, J.jsx)(`span`, { children: isRouter ? `Online` : `Protected` }),
           ],
-        })),
-        (n[1] = o))
-      : (o = n[1]);
-    let s = r.brand || `Firewall`,
-      c;
-    n[2] === s
-      ? (c = n[3])
-      : ((c = (0, J.jsx)(`p`, {
-          className: `firewall-node-brand`,
-          children: s,
-        })),
-        (n[2] = s),
-        (n[3] = c));
-    let l;
-    n[4] === r.name
-      ? (l = n[5])
-      : ((l = (0, J.jsx)(`h4`, {
-          className: `firewall-node-name`,
-          title: r.name,
-          children: r.name,
-        })),
-        (n[4] = r.name),
-        (n[5] = l));
-    let u;
-    n[6] === r.model
-      ? (u = n[7])
-      : ((u =
-          r.model &&
-          (0, J.jsx)(`p`, {
-            className: `firewall-node-model`,
-            children: r.model,
-          })),
-        (n[6] = r.model),
-        (n[7] = u));
-    let d;
-    n[8] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((d = (0, J.jsx)(`i`, { className: `fas fa-network-wired` })),
-        (n[8] = d))
-      : (d = n[8]);
+        }),
+      ],
+    });
+
+    let s = r.brand || (isRouter ? `Router` : `Firewall`),
+      c = (0, J.jsx)(`p`, {
+        className: `firewall-node-brand`,
+        children: s,
+      });
+
+    let l = (0, J.jsx)(`h4`, {
+      className: `firewall-node-name`,
+      title: r.name,
+      children: r.name,
+    });
+
+    let u = r.model && (0, J.jsx)(`p`, {
+      className: `firewall-node-model`,
+      children: r.model,
+    });
+
+    let d = (0, J.jsx)(`i`, { className: isRouter ? `fas fa-route` : `fas fa-network-wired` });
     let f = r.ip || `—`,
-      p;
-    n[9] === f
-      ? (p = n[10])
-      : ((p = (0, J.jsxs)(`span`, {
-          className: `firewall-spec-chip`,
-          children: [d, ` `, f],
-        })),
-        (n[9] = f),
-        (n[10] = p));
-    let m;
-    n[11] === r.mac
-      ? (m = n[12])
-      : ((m =
-          r.mac &&
-          (0, J.jsxs)(`span`, {
-            className: `firewall-spec-chip`,
-            children: [
-              (0, J.jsx)(`i`, { className: `fas fa-tag` }),
-              ` `,
-              r.mac,
-            ],
-          })),
-        (n[11] = r.mac),
-        (n[12] = m));
-    let h;
-    n[13] !== m || n[14] !== p
-      ? ((h = (0, J.jsxs)(`div`, {
-          className: `firewall-node-specs`,
-          children: [p, m],
-        })),
-        (n[13] = m),
-        (n[14] = p),
-        (n[15] = h))
-      : (h = n[15]);
-    let g;
-    n[16] === r.wanLinks.length
-      ? (g = n[17])
-      : ((g =
-          r.wanLinks.length > 0 &&
-          (0, J.jsxs)(`div`, {
-            className: `firewall-wan-badge`,
-            children: [
-              (0, J.jsx)(`i`, { className: `fas fa-globe` }),
-              ` WAN ×`,
-              r.wanLinks.length,
-            ],
-          })),
-        (n[16] = r.wanLinks.length),
-        (n[17] = g));
-    let _;
-    return (
-      n[18] !== r.id ||
-      n[19] !== i ||
-      n[20] !== t ||
-      n[21] !== h ||
-      n[22] !== g ||
-      n[23] !== c ||
-      n[24] !== l ||
-      n[25] !== u
-        ? ((_ = (0, J.jsxs)(`div`, {
-            ref: t,
-            id: r.id,
-            className: `firewall-node-ui`,
-            onClick: i,
-            title: `Bấm để xem/sửa thông tin Firewall`,
-            children: [o, c, l, u, h, g],
-          })),
-          (n[18] = r.id),
-          (n[19] = i),
-          (n[20] = t),
-          (n[21] = h),
-          (n[22] = g),
-          (n[23] = c),
-          (n[24] = l),
-          (n[25] = u),
-          (n[26] = _))
-        : (_ = n[26]),
-      _
-    );
+      p = (0, J.jsxs)(`span`, {
+        className: `firewall-spec-chip`,
+        children: [d, ` `, f],
+      });
+
+    let m = r.mac && (0, J.jsxs)(`span`, {
+      className: `firewall-spec-chip`,
+      children: [
+        (0, J.jsx)(`i`, { className: `fas fa-tag` }),
+        ` `,
+        r.mac,
+      ],
+    });
+
+    let h = (0, J.jsxs)(`div`, {
+      className: `firewall-node-specs`,
+      children: [p, m],
+    });
+
+    let g = r.wanLinks.length > 0 && (0, J.jsxs)(`div`, {
+      className: `firewall-wan-badge`,
+      children: [
+        (0, J.jsx)(`i`, { className: `fas fa-globe` }),
+        ` WAN ×`,
+        r.wanLinks.length,
+      ],
+    });
+
+    return (0, J.jsxs)(`div`, {
+      ref: t,
+      id: r.id,
+      className: `firewall-node-ui ${isRouter ? 'is-router' : ''}`,
+      onClick: i,
+      title: `Bấm để xem/sửa thông tin ${isRouter ? 'Router' : 'Firewall'}`,
+      children: [o, c, l, u, h, g],
+    });
   }),
   ke = (0, g.forwardRef)(function (e, t) {
     let n = (0, H.c)(11),
@@ -2461,7 +2462,20 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       a = r.notes || void 0,
       o;
     n[0] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((o = (0, J.jsx)(`i`, { className: `fas fa-cloud` })), (n[0] = o))
+      ? ((o = (0, J.jsx)(`div`, {
+          style: {
+            width: `40px`,
+            height: `40px`,
+            borderRadius: `50%`,
+            background: `radial-gradient(circle at 35% 35%, #38bdf8, #0284c7 60%, #0369a1)`,
+            display: `flex`,
+            alignItems: `center`,
+            justifyContent: `center`,
+            boxShadow: `0 4px 14px rgba(2, 132, 199, 0.45)`,
+            border: `2px solid #bae6fd`
+          },
+          children: (0, J.jsx)(`i`, { className: `fas fa-globe-americas text-white text-xl` })
+        })), (n[0] = o))
       : (o = n[0]);
     let s = r.isp || `Internet`,
       c;
@@ -2538,10 +2552,10 @@ function Ae(e) {
             type: `button`,
             onClick: a,
             className: `firewall-add-ghost-btn`,
-            title: `Thêm thiết bị Firewall kết nối ra Internet`,
+            title: `Thêm thiết bị Router / Firewall kết nối ra Internet`,
             children: [
-              (0, J.jsx)(`i`, { className: `fas fa-plus` }),
-              ` Thêm Firewall`,
+              (0, J.jsx)(`i`, { className: `fas fa-plus mr-1` }),
+              ` Thêm Router / Firewall`,
             ],
           })),
       (t[3] = n),

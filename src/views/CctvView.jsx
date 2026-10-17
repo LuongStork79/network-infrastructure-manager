@@ -41,39 +41,80 @@ import { t as z } from "./elevator-BpwH_0-s.js";
 var B = e(t(), 1),
   V = I(),
   H = n();
+function matchMacAddress(itemMac, searchStr) {
+  if (!itemMac || !searchStr) return false;
+  let rawQ = searchStr.trim().toLowerCase();
+  let cleanQ = rawQ.replace(/[:\-\.\s]/g, '');
+  let rawMac = itemMac.toLowerCase();
+  let cleanMac = rawMac.replace(/[:\-\.\s]/g, '');
+  if (!cleanQ) return false;
+  if (rawMac.includes(rawQ)) return true;
+  if (cleanMac.includes(cleanQ)) return true;
+  if (cleanQ.length <= 4 && cleanMac.endsWith(cleanQ)) return true;
+  return false;
+}
+
 function U(e) {
   let {
-    db: n,
-    networkDB: r,
-    nvrDB: i,
-    floorFilter: a,
+    db: rawN,
+    networkDB: rawR,
+    nvrDB: rawI,
+    floorFilter: a = 'all',
     onFloorFilterChange: s,
-    nvrFilter: c,
+    nvrFilter: c = 'all',
     onNvrFilterChange: l,
     onSelectCamera: u,
     onDragCameraStart: d,
     onNavigateToSwitch: f,
-    searchQuery = '',
-    onSearchChange,
-    sidebarTab = 'list',
-    onTabChange
   } = e;
 
-  let stats = N(n),
-    floors = o(r),
-    nvrs = S(n, i),
-    rawCameras = g(n, a, c);
+  let [searchQuery, setSearchQuery] = (0, B.useState)('');
+  let [sidebarTab, setSidebarTab] = (0, B.useState)('list');
 
-  let q = (searchQuery || '').trim().toLowerCase();
-  let displayCameras = q
-    ? rawCameras.filter(
-        (cam) =>
-          (cam.name && cam.name.toLowerCase().includes(q)) ||
-          (cam.ip && cam.ip.toLowerCase().includes(q)) ||
-          (cam.mac && cam.mac.toLowerCase().includes(q)) ||
-          (cam.floor && cam.floor.toLowerCase().includes(q)) ||
-          (cam.zone && cam.zone.toLowerCase().includes(q))
-      )
+  let n = Array.isArray(rawN) ? rawN : [];
+  let r = Array.isArray(rawR) ? rawR : [];
+  let i = Array.isArray(rawI) ? rawI : [];
+
+  let stats = { total: 0, placed: 0, byFloor: [], unplacedByFloor: [] };
+  try {
+    stats = N(n);
+  } catch (err) {
+    stats = { total: 0, placed: 0, byFloor: [], unplacedByFloor: [] };
+  }
+
+  let floors = [];
+  try {
+    floors = o(r);
+  } catch (err) {
+    floors = [];
+  }
+
+  let nvrs = [];
+  try {
+    nvrs = S(n, i);
+  } catch (err) {
+    nvrs = [];
+  }
+
+  let rawCameras = [];
+  try {
+    rawCameras = g(n, a, c);
+  } catch (err) {
+    rawCameras = [];
+  }
+
+  let searchQ = (searchQuery || '').trim().toLowerCase();
+  let displayCameras = searchQ
+    ? rawCameras.filter((cam) => {
+        if (!cam) return false;
+        if (cam.name && cam.name.toLowerCase().includes(searchQ)) return true;
+        if (cam.ip && cam.ip.toLowerCase().includes(searchQ)) return true;
+        if (cam.floor && cam.floor.toLowerCase().includes(searchQ)) return true;
+        if (cam.zone && cam.zone.toLowerCase().includes(searchQ)) return true;
+        if (cam.model && cam.model.toLowerCase().includes(searchQ)) return true;
+        if (matchMacAddress(cam.mac, searchQ)) return true;
+        return false;
+      })
     : rawCameras;
 
   // Header Tabs (Danh Sách vs Thống Kê NVR)
@@ -82,7 +123,7 @@ function U(e) {
     children: [
       (0, H.jsxs)('button', {
         type: 'button',
-        onClick: () => onTabChange && onTabChange('list'),
+        onClick: () => setSidebarTab('list'),
         className: `flex-1 py-2 px-2 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
           sidebarTab !== 'stats'
             ? 'bg-white dark:bg-slate-800 text-orange-600 dark:text-orange-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
@@ -95,7 +136,7 @@ function U(e) {
       }),
       (0, H.jsxs)('button', {
         type: 'button',
-        onClick: () => onTabChange && onTabChange('stats'),
+        onClick: () => setSidebarTab('stats'),
         className: `py-2 px-3 text-xs rounded-t-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
           sidebarTab === 'stats'
             ? 'bg-white dark:bg-slate-800 text-orange-600 dark:text-orange-400 border-t border-x border-slate-200 dark:border-slate-700 shadow-xs font-black'
@@ -119,15 +160,15 @@ function U(e) {
           (0, H.jsx)('i', { className: 'fas fa-search absolute left-2.5 text-xs text-slate-400' }),
           (0, H.jsx)('input', {
             type: 'text',
-            value: searchQuery || '',
-            onChange: (ev) => onSearchChange && onSearchChange(ev.target.value),
-            placeholder: '🔍 Tìm theo Tên, IP, MAC...',
+            value: searchQuery,
+            onChange: (ev) => setSearchQuery(ev.target.value),
+            placeholder: '🔍 Tìm theo Tên, IP, MAC (4 số cuối hoặc đủ)...',
             className: 'w-full pl-8 pr-7 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 outline-none focus:border-orange-500 font-medium placeholder:text-slate-400'
           }),
           searchQuery &&
             (0, H.jsx)('button', {
               type: 'button',
-              onClick: () => onSearchChange && onSearchChange(''),
+              onClick: () => setSearchQuery(''),
               className: 'absolute right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer',
               title: 'Xóa tìm kiếm',
               children: '✕'
@@ -174,7 +215,7 @@ function U(e) {
             (0, H.jsxs)('p', {
               className: 'text-xs font-bold text-slate-500 text-center px-4',
               children: [
-                q ? `Không tìm thấy camera khớp với "${searchQuery}"` : 'Chưa có camera nào',
+                searchQ ? `Không tìm thấy camera khớp với "${searchQuery}"` : 'Chưa có camera nào',
                 a === 'all' ? '' : ' ở tầng này',
                 c === 'all' ? '' : ' thuộc NVR này'
               ]
@@ -184,8 +225,17 @@ function U(e) {
       : displayCameras.map((cam) => {
           let placed = cam.x != null && !!cam.floorplanId,
             logCount = cam.logs?.length ?? 0,
-            badgeInfo = b(cam),
+            badgeInfo = { icon: 'fa-video', label: '', badge: '' },
+            switchInfo = null;
+
+          try {
+            let bi = b(cam);
+            if (bi) badgeInfo = bi;
+          } catch (err) {}
+
+          try {
             switchInfo = E(cam, r);
+          } catch (err) {}
 
           return (0, H.jsxs)(
             'div',
@@ -205,7 +255,7 @@ function U(e) {
                     (0, H.jsx)('div', {
                       className: 'w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-950/60 flex items-center justify-center shrink-0',
                       children: (0, H.jsx)('i', {
-                        className: `fas ${badgeInfo.icon} text-orange-600 dark:text-orange-400 text-xs`
+                        className: `fas ${badgeInfo.icon || 'fa-video'} text-orange-600 dark:text-orange-400 text-xs`
                       })
                     }),
                     (0, H.jsxs)('div', {
@@ -218,7 +268,7 @@ function U(e) {
                         }),
                         (0, H.jsxs)('p', {
                           className: 'text-[10px] font-bold text-slate-400 truncate',
-                          children: [cam.floor, cam.zone ? ' · ' + cam.zone : '']
+                          children: [cam.floor || 'Chưa gán tầng', cam.zone ? ' · ' + cam.zone : '']
                         })
                       ]
                     }),
@@ -230,9 +280,9 @@ function U(e) {
                           children: [
                             (0, H.jsx)('i', {
                               className: 'fas fa-location-arrow text-[8px] mr-0.5',
-                              style: { rotate: `${cam.angle}deg` }
+                              style: { rotate: `${cam.angle || 0}deg` }
                             }),
-                            `${cam.angle}°`
+                            `${cam.angle || 0}°`
                           ]
                         }),
                         placed &&
@@ -248,23 +298,18 @@ function U(e) {
                   ]
                 }),
 
-                // Middle row: PROMINENT IP ADDRESS BADGE
+                // Middle row: IP + MAC address
                 (0, H.jsxs)('div', {
-                  className: 'mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2',
+                  className: 'mt-2 flex items-center gap-2 flex-wrap text-[10px]',
                   children: [
-                    cam.ip
-                      ? (0, H.jsxs)('span', {
-                          className: 'font-mono text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 shadow-2xs',
-                          title: `IP Camera: ${cam.ip}`,
-                          children: [
-                            (0, H.jsx)('i', { className: 'fas fa-network-wired text-[9px] text-indigo-500' }),
-                            cam.ip
-                          ]
-                        })
-                      : (0, H.jsx)('span', {
-                          className: 'text-[10px] text-slate-400 italic',
-                          children: 'Chưa có IP'
-                        }),
+                    cam.ip &&
+                      (0, H.jsxs)('span', {
+                        className: 'font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded font-bold flex items-center gap-1',
+                        children: [
+                          (0, H.jsx)('i', { className: 'fas fa-network-wired text-[8px] opacity-70' }),
+                          cam.ip
+                        ]
+                      }),
                     cam.mac &&
                       (0, H.jsxs)('span', {
                         className: 'font-mono text-[9px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded uppercase tracking-tight',
@@ -283,7 +328,7 @@ function U(e) {
                   children: [
                     badgeInfo.label &&
                       (0, H.jsx)('span', {
-                        className: `cctv-stat-badge ${badgeInfo.badge}`,
+                        className: `cctv-stat-badge ${badgeInfo.badge || ''}`,
                         children: badgeInfo.label
                       }),
                     switchInfo &&
@@ -328,28 +373,28 @@ function U(e) {
           }),
           (0, H.jsxs)('span', {
             className: 'text-lg font-black text-orange-600',
-            children: [stats.total, ' ', (0, H.jsx)('span', { className: 'text-xs font-bold text-slate-400', children: 'Camera' })]
+            children: [stats.total || 0, ' ', (0, H.jsx)('span', { className: 'text-xs font-bold text-slate-400', children: 'Camera' })]
           })
         ]
       }),
       (0, H.jsxs)('div', {
         className: 'flex flex-wrap gap-1.5',
         children: [
-          stats.total === 0
+          (stats.total || 0) === 0
             ? (0, H.jsx)('span', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có camera nào' })
-            : (0, H.jsxs)('span', { className: 'cctv-stat-badge bg-emerald-100 text-emerald-700', children: ['Đã định vị: ', stats.placed, '/', stats.total] }),
-          stats.total - stats.placed > 0 &&
+            : (0, H.jsxs)('span', { className: 'cctv-stat-badge bg-emerald-100 text-emerald-700', children: ['Đã định vị: ', stats.placed || 0, '/', stats.total || 0] }),
+          (stats.total || 0) - (stats.placed || 0) > 0 &&
             (0, H.jsxs)('span', {
               className: 'cctv-stat-badge bg-amber-100 text-amber-700',
               children: [
                 (0, H.jsx)('i', { className: 'fas fa-triangle-exclamation' }),
                 ' Chưa định vị: ',
-                stats.total - stats.placed
+                (stats.total || 0) - (stats.placed || 0)
               ]
             })
         ]
       }),
-      stats.unplacedByFloor.length > 0 &&
+      stats.unplacedByFloor && stats.unplacedByFloor.length > 0 &&
         (0, H.jsxs)('div', {
           className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
           children: [
@@ -375,13 +420,13 @@ function U(e) {
           }),
           (0, H.jsx)('div', {
             className: 'space-y-1.5 max-h-48 overflow-y-auto custom-scroll',
-            children: stats.byFloor.length === 0
+            children: (!stats.byFloor || stats.byFloor.length === 0)
               ? (0, H.jsx)('p', { className: 'text-[10px] text-slate-400 italic', children: 'Chưa có dữ liệu' })
               : stats.byFloor.map(q)
           })
         ]
       }),
-      nvrs.length > 0 &&
+      nvrs && nvrs.length > 0 &&
         (0, H.jsxs)('div', {
           className: 'mt-3 pt-3 border-t border-slate-100 dark:border-slate-800',
           children: [
@@ -4138,7 +4183,7 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
     let e = c.find((e) => e.id === S.cameraId);
     (e && V(e), w());
   }, [S, w, c]);
-  let ve = l.find((e) => e.id === F) ?? null;
+  let ve = (l || []).find((e) => e.id === F) ?? null;
   function ye() {
     if (!t) {
       x(`Bạn không có quyền thêm Camera!`, `error`);
@@ -4182,7 +4227,7 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
       x(`Chưa chọn bản vẽ nào!`, `error`);
       return;
     }
-    let e = l.find((e) => e.id === F);
+    let e = (l || []).find((e) => e.id === F);
     x(
       `Xóa bản vẽ "${e?.name}"? Các Camera đã định vị trên bản vẽ này sẽ mất vị trí.`,
       `confirm`,
@@ -4196,7 +4241,7 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
             d({ ...e, x: null, y: null, floorplanId: null });
         }),
           v(F),
-          I(l.find((e) => e.id !== F)?.id ?? null),
+          I((l || []).find((e) => e.id !== F)?.id ?? null),
           Ue());
       },
     );
@@ -4406,16 +4451,13 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
             onSelectCamera: V,
             onDragCameraStart: ee,
             onNavigateToSwitch: $e,
-            searchQuery: cameraSearch,
-            onSearchChange: setCameraSearch,
-            sidebarTab: cctvSidebarTab,
-            onTabChange: setCctvSidebarTab,
+            
           }),
           (0, H.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,
             children: [
               (0, H.jsx)(Y, {
-                floorplans: l,
+                floorplans: Array.isArray(l) ? l : [],
                 currentFloorplanId: F,
                 isUploading: L,
                 onSelectFloorplan: Be,

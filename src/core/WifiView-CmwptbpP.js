@@ -44,20 +44,34 @@ function A(e) {
     onTabChange
   } = e;
 
-  let stats = f(n),
-    floors = r(i),
-    apsByFloor = s(n, o);
+  let nArr = Array.isArray(n) ? n : [];
+  let iArr = Array.isArray(i) ? i : [];
+  let stats = { byType: {}, byFloor: [] };
+  try { stats = f(nArr) || { byType: {}, byFloor: [] }; } catch(e){}
+  let floors = [];
+  try { floors = r(iArr) || []; } catch(e){}
+  let apsByFloor = [];
+  try { apsByFloor = s(nArr, o) || []; } catch(e){}
 
-  let q = (searchQuery || '').trim().toLowerCase();
-  let displayAps = q
-    ? apsByFloor.filter(
-        (ap) =>
-          (ap.name && ap.name.toLowerCase().includes(q)) ||
-          (ap.ip && ap.ip.toLowerCase().includes(q)) ||
-          (ap.mac && ap.mac.toLowerCase().includes(q)) ||
-          (ap.floor && ap.floor.toLowerCase().includes(q)) ||
-          (ap.type && ap.type.toLowerCase().includes(q))
-      )
+  let searchQ = (searchQuery || '').trim().toLowerCase();
+  let cleanQ = searchQ.replace(/[:\-\.\s]/g, '');
+  let displayAps = searchQ
+    ? apsByFloor.filter((ap) => {
+        if (!ap) return false;
+        if (ap.name && ap.name.toLowerCase().includes(searchQ)) return true;
+        if (ap.ip && ap.ip.toLowerCase().includes(searchQ)) return true;
+        if (ap.floor && ap.floor.toLowerCase().includes(searchQ)) return true;
+        if (ap.type && ap.type.toLowerCase().includes(searchQ)) return true;
+        if (ap.model && ap.model.toLowerCase().includes(searchQ)) return true;
+        if (ap.mac) {
+          let rawMac = ap.mac.toLowerCase();
+          let cleanMac = rawMac.replace(/[:\-\.\s]/g, '');
+          if (rawMac.includes(searchQ)) return true;
+          if (cleanQ && cleanMac.includes(cleanQ)) return true;
+          if (cleanQ && cleanQ.length <= 4 && cleanMac.endsWith(cleanQ)) return true;
+        }
+        return false;
+      })
     : apsByFloor;
 
   // Header Tabs (Danh Sách AP vs Thống Kê)
@@ -105,7 +119,7 @@ function A(e) {
             type: 'text',
             value: searchQuery || '',
             onChange: (ev) => onSearchChange && onSearchChange(ev.target.value),
-            placeholder: '🔍 Tìm theo Tên, IP, MAC...',
+            placeholder: '🔍 Tìm theo Tên, IP, MAC (4 số cuối hoặc đủ)...',
             className: 'w-full pl-8 pr-7 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 outline-none focus:border-cyan-500 font-medium placeholder:text-slate-400'
           }),
           searchQuery &&
@@ -151,7 +165,7 @@ function A(e) {
             (0, k.jsxs)('p', {
               className: 'text-xs font-bold text-slate-500 text-center px-4',
               children: [
-                q ? `Không tìm thấy AP khớp với "${searchQuery}"` : 'Chưa có AP nào',
+                searchQ ? `Không tìm thấy AP khớp với "${searchQuery}"` : 'Chưa có AP nào',
                 o === 'all' ? '' : ' ở tầng này'
               ]
             })
@@ -2139,10 +2153,10 @@ function $(e, t) {
   );
 }
 function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
-  let i = b((e) => e.DB),
-    a = b((e) => e.ODFDB),
-    s = b((e) => e.WifiDB),
-    c = b((e) => e.WifiFloorplans),
+  let i = b((e) => e.DB) || [],
+    a = b((e) => e.ODFDB) || [],
+    s = b((e) => e.WifiDB) || [],
+    c = b((e) => e.WifiFloorplans) || [],
     l = b((e) => e.saveWifiAP),
     u = b((e) => e.deleteWifiAP),
     f = b((e) => e.addGlobalLog),
@@ -2161,13 +2175,13 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
     [wifiSidebarTab, setWifiSidebarTab] = (0, D.useState)('list');
   (0, D.useEffect)(() => {
     if (!w || w.module !== `wifi`) return;
-    let e = s.find((e) => e.id === w.apId);
+    let e = (s || []).find((e) => e.id === w.apId);
     (e && B(e), E());
   }, [w, E, s]);
   let [te, H] = (0, D.useState)(!1),
     [U, ne] = (0, D.useState)(null),
     [W, G] = (0, D.useState)(null),
-    K = c.find((e) => e.id === M) ?? null;
+    K = (c || []).find((e) => e.id === M) ?? null;
   function re() {
     if (!n) {
       y(`Bạn không có quyền thêm AP!`, `error`);
@@ -2362,7 +2376,7 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
                 ? (0, k.jsxs)(k.Fragment, {
                     children: [
                       (0, k.jsx)(P, {
-                        floorplans: c,
+                        floorplans: Array.isArray(c) ? c : [],
                         currentFloorplanId: M,
                         isUploading: F,
                         onSelectFloorplan: N,

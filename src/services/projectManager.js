@@ -108,15 +108,9 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
         }
       }
     } else if (templateMode === 'empty') {
-      // Dự án hoàn toàn trống với các tầng cơ bản - sẵn sàng thêm mới thiết bị Switch từ đầu
+      // Dự án hoàn toàn trống - người dùng tự thêm vị trí/tầng và thiết bị từ đầu
       const emptyInfrastructure = {
-        DB: [
-          { floor: 'Server Room', switches: [] },
-          { floor: 'Tầng 01', switches: [] },
-          { floor: 'Tầng 02', switches: [] },
-          { floor: 'Tầng 03', switches: [] },
-          { floor: 'Outside', switches: [] }
-        ]
+        DB: []
       };
       await setDoc(doc(db, 'networkData', `${newId}_switches`), emptyInfrastructure);
       await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [] });
@@ -207,11 +201,7 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
                 logs: [{ time: '17/10/2026', msg: 'Khởi tạo Access Switch Tầng 2' }]
               }
             ]
-          },
-          { floor: 'Tầng 03', switches: [] },
-          { floor: 'Tầng 04', switches: [] },
-          { floor: 'Tầng 05', switches: [] },
-          { floor: 'Outside', switches: [] }
+          }
         ]
       };
       await setDoc(doc(db, 'networkData', `${newId}_switches`), standardInfrastructure);

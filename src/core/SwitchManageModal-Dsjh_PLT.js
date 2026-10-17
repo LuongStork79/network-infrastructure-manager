@@ -40,7 +40,7 @@ function p({
     }),
     [isAddingBrand, setIsAddingBrand] = (0, u.useState)(false),
     [newBrandInput, setNewBrandInput] = (0, u.useState)(''),
-    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),[isAddingFloor, setIsAddingFloor] = (0, u.useState)(false),[newFloorInput, setNewFloorInput] = (0, u.useState)(''),
+    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),[isAddingFloor, setIsAddingFloor] = (0, u.useState)(() => !n || n.length === 0),[newFloorInput, setNewFloorInput] = (0, u.useState)(''),
     [w, T] = (0, u.useState)(t?.isCore ?? !1),
     [E, D] = (0, u.useState)(t?.name ?? ``),
     [O, k] = (0, u.useState)(t?.mac ?? ``),
@@ -85,6 +85,20 @@ function p({
       C = Number.isNaN(g) ? 0 : g;
     if (C > x) {
       _(`Số cổng Combo không được lớn hơn Tổng số Port (RJ45)!`, `error`);
+      return;
+    }
+    if (isAddingFloor && newFloorInput.trim()) {
+      const floorName = newFloorInput.trim();
+      const existingIdx = n.findIndex((r) => r.floor.toLowerCase() === floorName.toLowerCase());
+      if (existingIdx !== -1) {
+        b = existingIdx;
+      } else {
+        n.push({ floor: floorName, switches: [] });
+        b = n.length - 1;
+      }
+    }
+    if (!n || n.length === 0 || b < 0 || b >= n.length) {
+      _(`Vui lòng nhập hoặc chọn Tầng / Vị trí cho thiết bị!`, `error`);
       return;
     }
     let T = new Set(f(x, C)),
@@ -220,7 +234,7 @@ function p({
                             type: `button`,
                             onClick: () => setIsAddingFloor(!isAddingFloor),
                             className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer`,
-                            children: isAddingFloor ? `✕ Đóng` : `+ Thêm tầng`,
+                            children: isAddingFloor ? (n && n.length > 0 ? `✕ Đóng` : ``) : `+ Thêm tầng`,
                           }),
                         ],
                       }),

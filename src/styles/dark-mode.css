@@ -180,6 +180,22 @@ html.dark .firewall-spec-chip {
   border-color: #7c2d12 !important;
 }
 
+html.dark .firewall-node-ui.is-router,
+html.dark .firewall-node-ui:has(.router-badge) {
+  background: 
+    linear-gradient(90deg, #0284c7, #0369a1) top/100% 5px no-repeat,
+    linear-gradient(#1e293b 0%, #0f172a 100%) top/100% 100% no-repeat !important;
+  border-color: #0369a1 !important;
+  box-shadow: 0 14px 32px -12px rgba(2, 132, 199, 0.35) !important;
+}
+
+html.dark .firewall-node-ui.is-router .firewall-spec-chip,
+html.dark .firewall-node-ui:has(.router-badge) .firewall-spec-chip {
+  background-color: #082f49 !important;
+  color: #7dd3fc !important;
+  border-color: #0369a1 !important;
+}
+
 html.dark .firewall-add-ghost-btn {
   border-color: #475569 !important;
   color: #94a3b8 !important;
