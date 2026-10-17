@@ -3,13 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyA_DbmcwaEX1zKGeVPN1X5KG2cc2CU9nvE",
-  authDomain: "aquamarine-networking.firebaseapp.com",
-  projectId: "aquamarine-networking",
-  storageBucket: "aquamarine-networking.firebasestorage.app",
-  messagingSenderId: "418558744740",
-  appId: "1:418558744740:web:62c7c35e71b79bfa5f6e31",
-  measurementId: "G-Z45DR76HTV"
+  apiKey: "AIzaSyCeMCbszR4QXoIXm6KIXuYy384p0IVaOvw",
+  authDomain: "clgnetwork-manager.firebaseapp.com",
+  databaseURL: "https://clgnetwork-manager-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "clgnetwork-manager",
+  storageBucket: "clgnetwork-manager.firebasestorage.app",
+  messagingSenderId: "817430734193",
+  appId: "1:817430734193:web:abaef68c2910bcbd3902d0",
+  measurementId: "G-KJVYWKQ3SP"
 };
 
 export const app = initializeApp(firebaseConfig);
