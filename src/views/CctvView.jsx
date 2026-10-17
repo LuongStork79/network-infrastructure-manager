@@ -552,8 +552,11 @@ function J(e) {
 function Y(e) {
   let t = (0, V.c)(48),
     {
-      floorplans: n,
+      floorplans: rawFloorplans,
       currentFloorplanId: r,
+    } = e;
+  let n = Array.isArray(rawFloorplans) ? rawFloorplans : [];
+  let {
       isUploading: i,
       onSelectFloorplan: a,
       onUpload: o,
@@ -1340,6 +1343,10 @@ function ue(e) {
     [_, v] = (0, B.useState)(n?.name ?? ``),
     [y, b] = (0, B.useState)(n?.ip ?? ``),
     [S, C] = (0, B.useState)(n?.mac ?? ``),
+    [camSn, setCamSn] = (0, B.useState)(n?.sn ?? n?.serialNumber ?? ``),
+    [camUser, setCamUser] = (0, B.useState)(n?.user ?? n?.username ?? n?.deviceUser ?? ``),
+    [camDefPass, setCamDefPass] = (0, B.useState)(n?.defaultPassword ?? n?.defaultPass ?? ``),
+    [camNewPass, setCamNewPass] = (0, B.useState)(n?.passwordNew ?? n?.newPassword ?? ``),
     [w, E] = (0, B.useState)(n?.floor ?? g[0] ?? ``),
     [D, O] = (0, B.useState)(n?.zone ?? ``),
     [k, A] = (0, B.useState)(n?.brand ?? ``),
@@ -1395,6 +1402,10 @@ function ue(e) {
           name: e,
           ip: y.trim(),
           mac: S.trim(),
+          sn: camSn.trim(),
+          user: camUser.trim(),
+          defaultPassword: camDefPass.trim(),
+          passwordNew: camNewPass.trim(),
           floor: w,
           zone: D.trim(),
           brand: k.trim(),
@@ -2022,44 +2033,42 @@ function ue(e) {
       (t[124] = vt),
       (t[125] = yt))
     : (yt = t[125]);
-  let bt;
-  t[126] !== Ee ||
-  t[127] !== ke ||
-  t[128] !== Me ||
-  t[129] !== Ie ||
-  t[130] !== ze ||
-  t[131] !== He ||
-  t[132] !== Ge ||
-  t[133] !== Je ||
-  t[134] !== Ze ||
-  t[135] !== rt ||
-  t[136] !== ot ||
-  t[137] !== pt ||
-  t[138] !== gt ||
-  t[139] !== yt
-    ? ((bt = (0, H.jsx)(`div`, {
-        className: `flex-1 overflow-y-auto custom-scroll`,
-        children: (0, H.jsxs)(`div`, {
-          className: `grid grid-cols-2 gap-4`,
-          children: [Ee, ke, Me, Ie, ze, He, Ge, Je, Ze, rt, ot, pt, gt, yt],
-        }),
-      })),
-      (t[126] = Ee),
-      (t[127] = ke),
-      (t[128] = Me),
-      (t[129] = Ie),
-      (t[130] = ze),
-      (t[131] = He),
-      (t[132] = Ge),
-      (t[133] = Je),
-      (t[134] = Ze),
-      (t[135] = rt),
-      (t[136] = ot),
-      (t[137] = pt),
-      (t[138] = gt),
-      (t[139] = yt),
-      (t[140] = bt))
-    : (bt = t[140]);
+  let camCredsBlock = (0, H.jsxs)(`div`, {
+    className: `col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/80`,
+    children: [
+      (0, H.jsxs)(`div`, {
+        children: [
+          (0, H.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Số Serial (S/N)` }),
+          (0, H.jsx)(`input`, { type: `text`, value: camSn, onChange: (e) => setCamSn(e.target.value), placeholder: `SN...`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-slate-800 dark:text-slate-100` }),
+        ],
+      }),
+      (0, H.jsxs)(`div`, {
+        children: [
+          (0, H.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Tài khoản (User)` }),
+          (0, H.jsx)(`input`, { type: `text`, value: camUser, onChange: (e) => setCamUser(e.target.value), placeholder: `admin`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-slate-800 dark:text-slate-100` }),
+        ],
+      }),
+      (0, H.jsxs)(`div`, {
+        children: [
+          (0, H.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Default Password` }),
+          (0, H.jsx)(`input`, { type: `text`, value: camDefPass, onChange: (e) => setCamDefPass(e.target.value), placeholder: `admin@123`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-amber-600 dark:text-amber-400` }),
+        ],
+      }),
+      (0, H.jsxs)(`div`, {
+        children: [
+          (0, H.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `PasswordNew` }),
+          (0, H.jsx)(`input`, { type: `text`, value: camNewPass, onChange: (e) => setCamNewPass(e.target.value), placeholder: `Mật khẩu mới`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-emerald-600 dark:text-emerald-400` }),
+        ],
+      }),
+    ],
+  });
+  let bt = (0, H.jsx)(`div`, {
+    className: `flex-1 overflow-y-auto custom-scroll`,
+    children: (0, H.jsxs)(`div`, {
+      className: `grid grid-cols-2 gap-4`,
+      children: [Ee, ke, Me, camCredsBlock, Ie, ze, He, Ge, Je, Ze, rt, ot, pt, gt, yt],
+    }),
+  });
   let xt;
   t[141] !== n || t[142] !== le
     ? ((xt =
@@ -4141,12 +4150,304 @@ function Ne(e) {
     e.index,
   );
 }
+
+function CctvTableView(props) {
+  let { db = [], networkDB = [], nvrDB = [], floorFilter = 'all', onSelectCamera } = props;
+
+  let [searchQuery, setSearchQuery] = (0, B.useState)('');
+  let [filterFloor, setFilterFloor] = (0, B.useState)(floorFilter || 'all');
+  let [filterNvr, setFilterNvr] = (0, B.useState)('all');
+  let [filterSwitch, setFilterSwitch] = (0, B.useState)('all');
+  let [filterPlaced, setFilterPlaced] = (0, B.useState)('all');
+  let [sortField, setSortField] = (0, B.useState)('name');
+  let [sortAsc, setSortAsc] = (0, B.useState)(true);
+
+  let camerasWithInfo = (db || []).map((cam) => {
+    let swInfo = null;
+    try { swInfo = E(cam, networkDB); } catch (e) {}
+    if (!swInfo && cam.switchId && Array.isArray(networkDB)) {
+      for (let fl of networkDB) {
+        let sw = (fl.switches || []).find((s) => s.id === cam.switchId);
+        if (sw) {
+          swInfo = { switchId: sw.id, switchName: sw.name, port: cam.switchPort };
+          break;
+        }
+      }
+    }
+    let nvrObj = (nvrDB || []).find((n) => n.id === cam.nvrId);
+    let nvrName = nvrObj?.name || (cam.nvrId ? 'NVR #' + cam.nvrId : '—');
+    return {
+      cam,
+      swInfo,
+      nvrName,
+      isPlaced: cam.x != null && !!cam.floorplanId,
+    };
+  });
+
+  let allFloors = [...new Set((db || []).map((c) => c.floor).filter(Boolean))].sort();
+  let allNvrs = [...new Set((nvrDB || []).map((n) => ({ id: n.id, name: n.name })))];
+  let allSwitchesMap = new Map();
+  camerasWithInfo.forEach((item) => {
+    if (item.swInfo) allSwitchesMap.set(item.swInfo.switchId, item.swInfo.switchName);
+  });
+  let allSwitches = [...allSwitchesMap.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+
+  let cleanQ = (searchQuery || '').trim().toLowerCase();
+  let cleanQNoPunct = cleanQ.replace(/[:\-\.\s]/g, '');
+
+  let filtered = camerasWithInfo.filter((item) => {
+    let { cam, swInfo, nvrName, isPlaced } = item;
+
+    if (filterFloor !== 'all' && cam.floor !== filterFloor) return false;
+    if (filterNvr !== 'all' && cam.nvrId !== filterNvr) return false;
+    if (filterSwitch !== 'all' && swInfo?.switchId !== filterSwitch) return false;
+    if (filterPlaced === 'placed' && !isPlaced) return false;
+    if (filterPlaced === 'unplaced' && isPlaced) return false;
+
+    if (cleanQ) {
+      let matched = false;
+      let fields = [
+        cam.name,
+        cam.ip,
+        cam.sn,
+        cam.serialNumber,
+        cam.user,
+        cam.username,
+        cam.defaultPassword,
+        cam.passwordNew,
+        cam.floor,
+        cam.zone,
+        cam.brand,
+        cam.model,
+        nvrName,
+        swInfo?.switchName,
+      ];
+      if (fields.some((val) => val && String(val).toLowerCase().includes(cleanQ))) matched = true;
+      if (cam.mac) {
+        let rawMac = cam.mac.toLowerCase();
+        let cMac = rawMac.replace(/[:\-\.\s]/g, '');
+        if (rawMac.includes(cleanQ) || (cleanQNoPunct && cMac.includes(cleanQNoPunct))) matched = true;
+        if (cleanQNoPunct && cleanQNoPunct.length <= 4 && cMac.endsWith(cleanQNoPunct)) matched = true;
+      }
+      if (!matched) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    let factor = sortAsc ? 1 : -1;
+    let vA = '', vB = '';
+    switch (sortField) {
+      case 'name': vA = a.cam.name || ''; vB = b.cam.name || ''; break;
+      case 'sn': vA = a.cam.sn || a.cam.serialNumber || ''; vB = b.cam.sn || b.cam.serialNumber || ''; break;
+      case 'user': vA = a.cam.user || a.cam.username || ''; vB = b.cam.user || b.cam.username || ''; break;
+      case 'ip': vA = a.cam.ip || ''; vB = b.cam.ip || ''; break;
+      case 'mac': vA = a.cam.mac || ''; vB = b.cam.mac || ''; break;
+      case 'floor': vA = a.cam.floor || ''; vB = b.cam.floor || ''; break;
+      case 'nvr': vA = a.nvrName || ''; vB = b.nvrName || ''; break;
+      case 'switch': vA = a.swInfo?.switchName || ''; vB = b.swInfo?.switchName || ''; break;
+      default: vA = a.cam.name || ''; vB = b.cam.name || '';
+    }
+    return factor * vA.localeCompare(vB, 'vi', { numeric: true });
+  });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortField(field);
+      setSortAsc(true);
+    }
+  };
+
+  const sortIcon = (field) => {
+    if (sortField !== field) return null;
+    return (0, H.jsx)('i', { className: `fas fa-chevron-${sortAsc ? 'up' : 'down'} text-[8px] ml-1 text-orange-500` });
+  };
+
+  return (0, H.jsxs)('div', {
+    className: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0',
+    children: [
+      (0, H.jsxs)('div', {
+        className: 'p-4 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0',
+        children: [
+          (0, H.jsxs)('h4', {
+            className: 'text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest flex items-center gap-2 shrink-0',
+            children: [
+              (0, H.jsx)('i', { className: 'fas fa-video text-orange-500' }),
+              ' Danh Sách Camera',
+            ],
+          }),
+          (0, H.jsxs)('div', {
+            className: 'relative flex-1 min-w-[180px] max-w-xs',
+            children: [
+              (0, H.jsx)('i', { className: 'fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]' }),
+              (0, H.jsx)('input', {
+                type: 'text',
+                value: searchQuery,
+                onChange: (e) => setSearchQuery(e.target.value),
+                placeholder: 'Tìm theo tên, IP, MAC, S/N, switch, tầng, NVR...',
+                className: 'w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-100 outline-none focus:border-orange-500 font-medium',
+              }),
+            ],
+          }),
+          (0, H.jsxs)('div', {
+            className: 'flex items-center gap-2 flex-wrap text-xs',
+            children: [
+              (0, H.jsxs)('select', {
+                value: filterFloor,
+                onChange: (e) => setFilterFloor(e.target.value),
+                className: 'py-1.5 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 outline-none cursor-pointer',
+                children: [
+                  (0, H.jsx)('option', { value: 'all', children: 'Tất cả Tầng' }),
+                  allFloors.map((f) => (0, H.jsx)('option', { value: f, children: f }, f)),
+                ],
+              }),
+              (0, H.jsxs)('select', {
+                value: filterNvr,
+                onChange: (e) => setFilterNvr(e.target.value),
+                className: 'py-1.5 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 outline-none cursor-pointer',
+                children: [
+                  (0, H.jsx)('option', { value: 'all', children: 'Tất cả NVR' }),
+                  allNvrs.map((n) => (0, H.jsx)('option', { value: n.id, children: n.name }, n.id)),
+                ],
+              }),
+              (0, H.jsxs)('select', {
+                value: filterSwitch,
+                onChange: (e) => setFilterSwitch(e.target.value),
+                className: 'py-1.5 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 outline-none cursor-pointer',
+                children: [
+                  (0, H.jsx)('option', { value: 'all', children: 'Tất cả Switch' }),
+                  allSwitches.map(([swId, swName]) => (0, H.jsx)('option', { value: swId, children: swName }, swId)),
+                ],
+              }),
+              (0, H.jsxs)('select', {
+                value: filterPlaced,
+                onChange: (e) => setFilterPlaced(e.target.value),
+                className: 'py-1.5 px-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 outline-none cursor-pointer',
+                children: [
+                  (0, H.jsx)('option', { value: 'all', children: 'Tất cả vị trí' }),
+                  (0, H.jsx)('option', { value: 'placed', children: 'Đã định vị' }),
+                  (0, H.jsx)('option', { value: 'unplaced', children: 'Chưa định vị' }),
+                ],
+              }),
+              (0, H.jsxs)('span', {
+                className: 'text-[11px] font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/60 px-2 py-1 rounded-lg border border-orange-200 dark:border-orange-900',
+                children: [filtered.length, ' / ', db.length, ' Camera'],
+              }),
+            ],
+          }),
+        ],
+      }),
+      (0, H.jsx)('div', {
+        className: 'flex-1 overflow-auto custom-scroll',
+        children: (0, H.jsxs)('table', {
+          className: 'w-full text-left border-collapse',
+          children: [
+            (0, H.jsx)('thead', {
+              children: (0, H.jsxs)('tr', {
+                className: 'bg-slate-50 dark:bg-slate-800/80 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10',
+                children: [
+                  (0, H.jsx)('th', { className: 'p-3 pl-4 w-12', children: 'STT' }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('name'), children: ['Tên Camera', sortIcon('name')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('sn'), children: ['S/N', sortIcon('sn')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('user'), children: ['User', sortIcon('user')] }),
+                  (0, H.jsx)('th', { className: 'p-3 whitespace-nowrap', children: 'Default Password' }),
+                  (0, H.jsx)('th', { className: 'p-3 whitespace-nowrap', children: 'PasswordNew' }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('ip'), children: ['IP', sortIcon('ip')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('mac'), children: ['MAC', sortIcon('mac')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('floor'), children: ['Tầng', sortIcon('floor')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('nvr'), children: ['NVR', sortIcon('nvr')] }),
+                  (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('switch'), children: ['Switch', sortIcon('switch')] }),
+                  (0, H.jsx)('th', { className: 'p-3', children: 'Port' }),
+                  (0, H.jsx)('th', { className: 'p-3', children: 'Trạng thái' }),
+                ],
+              }),
+            }),
+            (0, H.jsx)('tbody', {
+              children: filtered.length === 0
+                ? (0, H.jsx)('tr', {
+                    children: (0, H.jsx)('td', {
+                      colSpan: 13,
+                      className: 'p-12 text-center text-xs text-slate-400 italic',
+                      children: 'Không tìm thấy camera nào khớp bộ lọc.',
+                    }),
+                  })
+                : filtered.map((item, idx) => {
+                    let { cam, swInfo, nvrName, isPlaced } = item;
+                    return (0, H.jsxs)(
+                      'tr',
+                      {
+                        onClick: () => onSelectCamera && onSelectCamera(cam),
+                        className: 'border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-orange-50/50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors',
+                        children: [
+                          (0, H.jsx)('td', { className: 'p-3 pl-4 text-[10px] text-slate-400 font-bold tabular-nums', children: idx + 1 }),
+                          (0, H.jsxs)('td', {
+                            className: 'p-3 text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2',
+                            children: [
+                              (0, H.jsx)('i', { className: 'fas fa-video text-[10px] text-orange-500 shrink-0' }),
+                              (0, H.jsx)('span', { className: 'truncate max-w-[160px]', title: cam.name, children: cam.name }),
+                            ],
+                          }),
+                          (0, H.jsx)('td', { className: 'p-3 text-[10px] font-mono text-slate-600 dark:text-slate-300 font-bold', children: cam.sn || cam.serialNumber || (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600', children: '—' }) }),
+                          (0, H.jsx)('td', { className: 'p-3 text-[10px] font-mono text-slate-700 dark:text-slate-200 font-bold', children: cam.user || cam.username || cam.deviceUser || (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600', children: '—' }) }),
+                          (0, H.jsx)('td', { className: 'p-3 text-[10px] font-mono text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/30', children: cam.defaultPassword || cam.defaultPass || (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600', children: '—' }) }),
+                          (0, H.jsx)('td', { className: 'p-3 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30 font-bold', children: cam.passwordNew || cam.newPassword || (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600', children: '—' }) }),
+                          (0, H.jsx)('td', { className: 'p-3 text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold tabular-nums', children: cam.ip || '—' }),
+                          (0, H.jsx)('td', { className: 'p-3 text-xs font-mono text-slate-500 dark:text-slate-400 uppercase', children: cam.mac || '—' }),
+                          (0, H.jsx)('td', {
+                            className: 'p-3',
+                            children: cam.floor
+                              ? (0, H.jsxs)('span', {
+                                  className: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 whitespace-nowrap',
+                                  children: [(0, H.jsx)('i', { className: 'fas fa-building text-[8px]' }), ' ', cam.floor],
+                                })
+                              : (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600 text-xs', children: '—' }),
+                          }),
+                          (0, H.jsx)('td', {
+                            className: 'p-3',
+                            children: nvrName !== '—'
+                              ? (0, H.jsxs)('span', {
+                                  className: 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-900 whitespace-nowrap',
+                                  children: [(0, H.jsx)('i', { className: 'fas fa-hdd text-[8px]' }), ' ', nvrName],
+                                })
+                              : (0, H.jsx)('span', { className: 'text-slate-300 dark:text-slate-600 text-xs', children: '—' }),
+                          }),
+                          (0, H.jsx)('td', {
+                            className: 'p-3 text-[10px] font-bold',
+                            children: swInfo
+                              ? (0, H.jsx)('span', { className: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full whitespace-nowrap', children: swInfo.switchName })
+                              : (0, H.jsx)('span', { className: 'text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-full text-[9px]', children: 'Chưa gán' }),
+                          }),
+                          (0, H.jsx)('td', {
+                            className: 'p-3 text-[10px] font-bold text-slate-600 dark:text-slate-300',
+                            children: swInfo?.port != null ? (0, H.jsxs)('span', { className: 'px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono', children: ['P', swInfo.port] }) : '—',
+                          }),
+                          (0, H.jsx)('td', {
+                            className: 'p-3',
+                            children: isPlaced
+                              ? (0, H.jsxs)('span', { className: 'inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900 px-2 py-0.5 rounded-full', children: [(0, H.jsx)('i', { className: 'fas fa-map-marker-alt text-[8px]' }), ' Đã định vị'] })
+                              : (0, H.jsxs)('span', { className: 'inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-900 px-2 py-0.5 rounded-full', children: [(0, H.jsx)('i', { className: 'fas fa-triangle-exclamation text-[8px]' }), ' Chưa định vị'] }),
+                          }),
+                        ],
+                      },
+                      cam.id,
+                    );
+                  }),
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
+}
+
 function Pe({ onBack: e, isAdmin: t, username: n }) {
-  let r = T((e) => e.DB),
-    o = T((e) => e.NVRDB),
-    c = T((e) => e.CctvCameraDB),
-    l = T((e) => e.CctvFloorplans),
-    u = T((e) => e.CctvFloorConnectors),
+  let r = T((e) => e.DB) || [],
+    o = T((e) => e.NVRDB) || [],
+    c = T((e) => e.CctvCameraDB) || [],
+    l = T((e) => e.CctvFloorplans) || [],
+    u = T((e) => e.CctvFloorConnectors) || [],
     d = T((e) => e.saveCctvCamera),
     p = T((e) => e.deleteCctvCamera),
     m = T((e) => e.addGlobalLog),
@@ -4168,8 +4469,6 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
     [K, q] = (0, B.useState)(!1),
     [J, ee] = (0, B.useState)(null),
     [te, ne] = (0, B.useState)(null),
-    [cameraSearch, setCameraSearch] = (0, B.useState)(''),
-    [cctvSidebarTab, setCctvSidebarTab] = (0, B.useState)('list'),
     [re, ie] = (0, B.useState)(null),
     [ae, X] = (0, B.useState)(!1),
     [se, ce] = (0, B.useState)(null),
@@ -4177,7 +4476,8 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
     [fe, pe] = (0, B.useState)(null),
     [me, he] = (0, B.useState)(!1),
     [ge, Z] = (0, B.useState)([]),
-    [Q, $] = (0, B.useState)(!1);
+    [Q, $] = (0, B.useState)(!1),
+    [cctvViewMode, setCctvViewMode] = (0, B.useState)('floorplan');
   (0, B.useEffect)(() => {
     if (!S || S.module !== `cctv`) return;
     let e = c.find((e) => e.id === S.cameraId);
@@ -4456,31 +4756,66 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
           (0, H.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,
             children: [
-              (0, H.jsx)(Y, {
-                floorplans: Array.isArray(l) ? l : [],
-                currentFloorplanId: F,
-                isUploading: L,
-                onSelectFloorplan: Be,
-                onUpload: we,
-                onDelete: Te,
-                onOpenCopyLayout: () => q(!0),
-                investigateMode: ae,
-                onToggleInvestigateMode: Ve,
+              (0, H.jsxs)(`div`, {
+                className: `flex items-center gap-1 shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1 w-fit`,
+                children: [
+                  (0, H.jsxs)(`button`, {
+                    type: `button`,
+                    onClick: () => setCctvViewMode(`floorplan`),
+                    className: `px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${cctvViewMode === `floorplan` ? `bg-white dark:bg-slate-700 text-orange-600 dark:text-orange-400 shadow-sm` : `text-slate-500 hover:text-slate-700 dark:hover:text-slate-300`}`,
+                    children: [
+                      (0, H.jsx)(`i`, { className: `fas fa-map` }),
+                      ` Mặt bằng`,
+                    ],
+                  }),
+                  (0, H.jsxs)(`button`, {
+                    type: `button`,
+                    onClick: () => setCctvViewMode(`table`),
+                    className: `px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${cctvViewMode === `table` ? `bg-white dark:bg-slate-700 text-orange-600 dark:text-orange-400 shadow-sm` : `text-slate-500 hover:text-slate-700 dark:hover:text-slate-300`}`,
+                    children: [
+                      (0, H.jsx)(`i`, { className: `fas fa-list-ol` }),
+                      ` Danh sách`,
+                    ],
+                  }),
+                ],
               }),
-              (0, H.jsx)(oe, {
-                floorplan: ve,
-                cameras: c,
-                nvrDB: o,
-                onDropCamera: Ee,
-                onMoveCamera: Ne,
-                onEditCamera: V,
-                onRotateCamera: De,
-                onOpenAngleMenu: Ie,
-                onToggleLock: Oe,
-                investigateMode: ae,
-                investigatePoint: se,
-                onInvestigatePoint: He,
-              }),
+              cctvViewMode === `table`
+                ? (0, H.jsx)(CctvTableView, {
+                    db: c,
+                    networkDB: r,
+                    nvrDB: o,
+                    floorFilter: A,
+                    onSelectCamera: V,
+                  })
+                : (0, H.jsxs)(H.Fragment, {
+                    children: [
+                      (0, H.jsx)(Y, {
+                        floorplans: Array.isArray(l) ? l : [],
+                        currentFloorplanId: F,
+                        isUploading: L,
+                        onSelectFloorplan: Be,
+                        onUpload: we,
+                        onDelete: Te,
+                        onOpenCopyLayout: () => q(!0),
+                        investigateMode: ae,
+                        onToggleInvestigateMode: Ve,
+                      }),
+                      (0, H.jsx)(oe, {
+                        floorplan: ve,
+                        cameras: c,
+                        nvrDB: o,
+                        onDropCamera: Ee,
+                        onMoveCamera: Ne,
+                        onEditCamera: V,
+                        onRotateCamera: De,
+                        onOpenAngleMenu: Ie,
+                        onToggleLock: Oe,
+                        investigateMode: ae,
+                        investigatePoint: se,
+                        onInvestigatePoint: He,
+                      }),
+                    ],
+                  }),
             ],
           }),
         ],

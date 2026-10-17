@@ -889,19 +889,34 @@ function z(e) {
         (t[43] = x),
         (t[44] = s))
       : (s = t[44]),
-      (le = A.filter(
-        (t) =>
-          !e ||
-          [
-            t.ap.name,
-            t.ap.ip,
-            t.ap.mac,
-            t.ap.floor,
-            t.ap.brand,
-            t.ap.model,
-            t.link?.switchName ?? ``,
-          ].some((t) => t.toLowerCase().includes(e)),
-      )
+      (le = A.filter((t) => {
+        if (!e) return true;
+        let q = e.toLowerCase().trim();
+        let cleanQ = q.replace(/[:\-\.\s]/g, "");
+        let fields = [
+          t.ap.name,
+          t.ap.ip,
+          t.ap.sn,
+          t.ap.serialNumber,
+          t.ap.user,
+          t.ap.username,
+          t.ap.defaultPassword,
+          t.ap.passwordNew,
+          t.ap.floor,
+          t.ap.brand,
+          t.ap.model,
+          t.link?.switchName ?? ``,
+        ];
+        if (fields.some((val) => val && String(val).toLowerCase().includes(q))) return true;
+        if (t.ap.mac) {
+          let rawMac = t.ap.mac.toLowerCase();
+          let cleanMac = rawMac.replace(/[:\-\.\s]/g, "");
+          if (rawMac.includes(q)) return true;
+          if (cleanQ && cleanMac.includes(cleanQ)) return true;
+          if (cleanQ && cleanQ.length <= 4 && cleanMac.endsWith(cleanQ)) return true;
+        }
+        return false;
+      })
         .filter(n)
         .filter(r)
         .filter(i)
@@ -1191,8 +1206,16 @@ function z(e) {
   t[129] !== Ue
     ? ((Ge = (0, k.jsx)(`thead`, {
         children: (0, k.jsxs)(`tr`, {
-          className: `bg-slate-50 text-[10px] font-black text-slate-400 uppercase border-b border-slate-200 sticky top-0`,
-          children: [Ce, Ee, ke, Me, Ne, Ie, ze, Be, Ue, We],
+          className: `bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0`,
+          children: [
+            Ce,
+            Ee,
+            (0, k.jsx)(`th`, { className: `p-3`, children: `S/N` }),
+            (0, k.jsx)(`th`, { className: `p-3`, children: `User` }),
+            (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `Default Password` }),
+            (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `PasswordNew` }),
+            ke, Me, Ne, Ie, ze, Be, Ue, We
+          ],
         }),
       })),
       (t[124] = Ee),
@@ -1209,7 +1232,7 @@ function z(e) {
         Z.length === 0
           ? (0, k.jsx)(`tr`, {
               children: (0, k.jsx)(`td`, {
-                colSpan: 10,
+                colSpan: 14,
                 className: `p-8 text-center text-xs text-slate-400 italic`,
                 children: `Không tìm thấy AP nào khớp bộ lọc.`,
               }),
@@ -1447,36 +1470,28 @@ function ae(e) {
       (t[24] = S),
       (t[25] = C));
   let w;
+  let cellSn = (0, k.jsx)(`td`, {
+    className: `p-3 text-[10px] font-mono text-slate-600 dark:text-slate-300 font-bold`,
+    children: n.sn || n.serialNumber || (0, k.jsx)(`span`, { className: `text-slate-300 dark:text-slate-600`, children: `—` }),
+  });
+  let cellUser = (0, k.jsx)(`td`, {
+    className: `p-3 text-[10px] font-mono text-slate-700 dark:text-slate-200 font-bold`,
+    children: n.user || n.username || n.deviceUser || (0, k.jsx)(`span`, { className: `text-slate-300 dark:text-slate-600`, children: `—` }),
+  });
+  let cellDefPass = (0, k.jsx)(`td`, {
+    className: `p-3 text-[10px] font-mono text-amber-700 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/30`,
+    children: n.defaultPassword || n.defaultPass || (0, k.jsx)(`span`, { className: `text-slate-300 dark:text-slate-600`, children: `—` }),
+  });
+  let cellNewPass = (0, k.jsx)(`td`, {
+    className: `p-3 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/30 font-bold`,
+    children: n.passwordNew || n.newPassword || (0, k.jsx)(`span`, { className: `text-slate-300 dark:text-slate-600`, children: `—` }),
+  });
   return (
-    t[26] !== v ||
-    t[27] !== y ||
-    t[28] !== x ||
-    t[29] !== C ||
-    t[30] !== l ||
-    t[31] !== u ||
-    t[32] !== d ||
-    t[33] !== p ||
-    t[34] !== m ||
-    t[35] !== g ||
-    t[36] !== _
-      ? ((w = (0, k.jsxs)(`tr`, {
-          onClick: l,
-          className: `border-b border-slate-100 last:border-0 hover:bg-cyan-50/40 cursor-pointer transition-colors`,
-          children: [u, d, p, m, g, _, v, y, x, C],
-        })),
-        (t[26] = v),
-        (t[27] = y),
-        (t[28] = x),
-        (t[29] = C),
-        (t[30] = l),
-        (t[31] = u),
-        (t[32] = d),
-        (t[33] = p),
-        (t[34] = m),
-        (t[35] = g),
-        (t[36] = _),
-        (t[37] = w))
-      : (w = t[37]),
+    (w = (0, k.jsxs)(`tr`, {
+      onClick: l,
+      className: `border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-cyan-50/40 dark:hover:bg-slate-800/50 cursor-pointer transition-colors`,
+      children: [u, d, cellSn, cellUser, cellDefPass, cellNewPass, p, m, g, _, v, y, x, C],
+    })),
     w
   );
 }
@@ -2153,10 +2168,10 @@ function $(e, t) {
   );
 }
 function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
-  let i = b((e) => e.DB),
-    a = b((e) => e.ODFDB),
-    s = b((e) => e.WifiDB),
-    c = b((e) => e.WifiFloorplans),
+  let i = b((e) => e.DB) || [],
+    a = b((e) => e.ODFDB) || [],
+    s = b((e) => e.WifiDB) || [],
+    c = b((e) => e.WifiFloorplans) || [],
     l = b((e) => e.saveWifiAP),
     u = b((e) => e.deleteWifiAP),
     f = b((e) => e.addGlobalLog),

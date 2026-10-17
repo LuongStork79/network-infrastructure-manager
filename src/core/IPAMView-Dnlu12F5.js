@@ -48,7 +48,12 @@ function y(e) {
           }),
         ],
       }),
-      Object.entries(currentSubnets).map((entry) => {
+      Object.keys(currentSubnets).length === 0
+        ? (0, v.jsx)(`div`, {
+            className: `p-6 text-center text-xs text-slate-400 italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200 mt-2`,
+            children: `Chưa có Subnet nào. Bấm "+ Thêm Subnet" để bắt đầu quy hoạch IP.`,
+          })
+        : Object.entries(currentSubnets).map((entry) => {
         let [t, o] = entry,
           s = u(t, n, r),
           { totalIps: c, usedCount: l, percent: d } = f(o.subnet, s);

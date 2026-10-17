@@ -107,8 +107,19 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
           console.warn(`Could not clone ${mod}:`, e);
         }
       }
+      // Clone IPAM if clone mode
+      try {
+        const defaultSubnetsRaw = localStorage.getItem('nim_custom_ipam_subnets');
+        const defaultAllocationsRaw = localStorage.getItem('nim_custom_ip_allocations');
+        if (defaultSubnetsRaw) localStorage.setItem(`nim_custom_ipam_subnets_${newId}`, defaultSubnetsRaw);
+        if (defaultAllocationsRaw) localStorage.setItem(`nim_custom_ip_allocations_${newId}`, defaultAllocationsRaw);
+      } catch (e) {}
     } else if (templateMode === 'empty') {
       // Dự án hoàn toàn trống - người dùng tự thêm vị trí/tầng và thiết bị từ đầu
+      try {
+        localStorage.setItem(`nim_custom_ipam_subnets_${newId}`, JSON.stringify({}));
+        localStorage.setItem(`nim_custom_ip_allocations_${newId}`, JSON.stringify({}));
+      } catch (e) {}
       const emptyInfrastructure = {
         DB: []
       };
@@ -120,6 +131,10 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
       await setDoc(doc(db, 'networkData', `${newId}_ipphone`), { IPPhoneDB: [] });
     } else {
       // Tạo khung hạ tầng chuẩn với Core Switch và 2 Access Switch hoạt động sẵn
+      try {
+        localStorage.setItem(`nim_custom_ipam_subnets_${newId}`, JSON.stringify({}));
+        localStorage.setItem(`nim_custom_ip_allocations_${newId}`, JSON.stringify({}));
+      } catch (e) {}
       const coreId = `sw-${Date.now()}-core`;
       const standardInfrastructure = {
         DB: [

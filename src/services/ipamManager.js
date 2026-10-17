@@ -50,12 +50,24 @@ export function saveCustomSubnets(subnets) {
   }
 }
 
-// Lấy toàn bộ Subnets (gồm mặc định, chỉnh sửa, và thêm mới - loại trừ đã xóa)
+// Lấy toàn bộ Subnets (Dự án Trung Tâm có dải mạng mẫu, dự án mới tạo hoàn toàn trống)
 export function getAllSubnets() {
+  const pid = getActiveProjectId();
   const custom = getCustomSubnets();
-  const result = { ...DEFAULT_SUBNETS };
 
-  // Áp dụng các thay đổi từ custom
+  // Đối với các dự án mới / khác dự án mặc định: khởi đầu hoàn toàn trống
+  if (pid !== 'default') {
+    const result = {};
+    for (const [key, val] of Object.entries(custom)) {
+      if (val && !val._deleted) {
+        result[key] = val;
+      }
+    }
+    return result;
+  }
+
+  // Đối với dự án Trung Tâm ('default'), nạp sẵn dải mạng mặc định
+  const result = { ...DEFAULT_SUBNETS };
   for (const [key, val] of Object.entries(custom)) {
     if (val === null || val._deleted) {
       delete result[key];

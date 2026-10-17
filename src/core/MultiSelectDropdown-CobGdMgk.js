@@ -32,6 +32,10 @@ function ce(e) {
     [l, xe] = (0, i.useState)(n?.name ?? ``),
     [u, Se] = (0, i.useState)(n?.ip ?? ``),
     [d, Ce] = (0, i.useState)(n?.mac ?? ``),
+    [snVal, setSnVal] = (0, i.useState)(n?.sn ?? n?.serialNumber ?? ``),
+    [userVal, setUserVal] = (0, i.useState)(n?.user ?? n?.username ?? n?.deviceUser ?? ``),
+    [defPassVal, setDefPassVal] = (0, i.useState)(n?.defaultPassword ?? n?.defaultPass ?? ``),
+    [newPassVal, setNewPassVal] = (0, i.useState)(n?.passwordNew ?? n?.newPassword ?? ``),
     [f, we] = (0, i.useState)(n?.floor ?? ge ?? be[0] ?? ``),
     [p, Te] = (0, i.useState)(n?.zone ?? ``),
     [m, Ee] = (0, i.useState)(n?.type ?? `Dual-band`),
@@ -85,6 +89,10 @@ function ce(e) {
           name: e,
           ip: u.trim(),
           mac: d.trim(),
+          sn: snVal.trim(),
+          user: userVal.trim(),
+          defaultPassword: defPassVal.trim(),
+          passwordNew: newPassVal.trim(),
           floor: f,
           zone: p.trim(),
           type: m,
@@ -653,44 +661,42 @@ function ce(e) {
       (t[107] = K),
       (t[108] = q))
     : (q = t[108]);
-  let J;
-  t[109] !== O ||
-  t[110] !== k ||
-  t[111] !== A ||
-  t[112] !== j ||
-  t[113] !== M ||
-  t[114] !== N ||
-  t[115] !== P ||
-  t[116] !== F ||
-  t[117] !== I ||
-  t[118] !== L ||
-  t[119] !== R ||
-  t[120] !== U ||
-  t[121] !== G ||
-  t[122] !== q
-    ? ((J = (0, a.jsx)(`div`, {
-        className: `flex-1 overflow-y-auto custom-scroll`,
-        children: (0, a.jsxs)(`div`, {
-          className: `grid grid-cols-2 gap-4`,
-          children: [O, k, A, j, M, N, P, F, I, L, R, U, G, q],
-        }),
-      })),
-      (t[109] = O),
-      (t[110] = k),
-      (t[111] = A),
-      (t[112] = j),
-      (t[113] = M),
-      (t[114] = N),
-      (t[115] = P),
-      (t[116] = F),
-      (t[117] = I),
-      (t[118] = L),
-      (t[119] = R),
-      (t[120] = U),
-      (t[121] = G),
-      (t[122] = q),
-      (t[123] = J))
-    : (J = t[123]);
+  let credsUI = (0, a.jsxs)(`div`, {
+    className: `col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/80`,
+    children: [
+      (0, a.jsxs)(`div`, {
+        children: [
+          (0, a.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Số Serial (S/N)` }),
+          (0, a.jsx)(`input`, { type: `text`, value: snVal, onChange: (e) => setSnVal(e.target.value), placeholder: `SN...`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-slate-800 dark:text-slate-100` }),
+        ],
+      }),
+      (0, a.jsxs)(`div`, {
+        children: [
+          (0, a.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Tài khoản (User)` }),
+          (0, a.jsx)(`input`, { type: `text`, value: userVal, onChange: (e) => setUserVal(e.target.value), placeholder: `admin`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-slate-800 dark:text-slate-100` }),
+        ],
+      }),
+      (0, a.jsxs)(`div`, {
+        children: [
+          (0, a.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `Default Password` }),
+          (0, a.jsx)(`input`, { type: `text`, value: defPassVal, onChange: (e) => setDefPassVal(e.target.value), placeholder: `admin@123`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-amber-600 dark:text-amber-400` }),
+        ],
+      }),
+      (0, a.jsxs)(`div`, {
+        children: [
+          (0, a.jsx)(`label`, { className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1`, children: `PasswordNew` }),
+          (0, a.jsx)(`input`, { type: `text`, value: newPassVal, onChange: (e) => setNewPassVal(e.target.value), placeholder: `Mật khẩu mới`, className: `w-full p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-mono font-bold outline-none text-emerald-600 dark:text-emerald-400` }),
+        ],
+      }),
+    ],
+  });
+  let J = (0, a.jsx)(`div`, {
+    className: `flex-1 overflow-y-auto custom-scroll`,
+    children: (0, a.jsxs)(`div`, {
+      className: `grid grid-cols-2 gap-4`,
+      children: [O, k, A, credsUI, j, M, N, P, F, I, L, R, U, G, q],
+    }),
+  });
   let Y;
   t[124] !== n || t[125] !== ze
     ? ((Y =

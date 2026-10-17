@@ -10,103 +10,147 @@ import {
 } from "./index-QE6I14Fy.js";
 import { i as u, n as d, r as f, t as p } from "./Vlan120Picker-mRn3H8_7.js";
 import { n as m, t as h } from "./BackupHistoryModal-DIkefmZZ.js";
+import {
+  getAllSubnets,
+  saveSubnet,
+  deleteSubnet,
+  getCustomIpAllocations,
+  setIpAllocation,
+  deleteIpAllocation,
+} from "../services/ipamManager.js";
+import SubnetManageModal from "../components/modals/SubnetManageModal.jsx";
+import IpAllocationModal from "../components/modals/IpAllocationModal.jsx";
 var g = e(t(), 1),
   _ = l(),
   v = n();
 function y(e) {
-  let t = (0, _.c)(6),
-    { db: n, elevatorDB: r, activeVlanId: i, onSelect: a } = e,
-    s;
-  t[0] === Symbol.for(`react.memo_cache_sentinel`)
-    ? ((s = (0, v.jsx)(`h3`, {
-        className: `text-xs font-black text-slate-800 uppercase tracking-widest px-2 pt-2 mb-2`,
-        children: `Subnets List`,
-      })),
-      (t[0] = s))
-    : (s = t[0]);
-  let c;
-  return (
-    t[1] !== i || t[2] !== n || t[3] !== r || t[4] !== a
-      ? ((c = (0, v.jsxs)(`div`, {
-          id: `ipam-subnet-list`,
-          className: `view-sidebar w-[380px] bg-white border-r border-slate-200 overflow-y-auto custom-scroll p-4 space-y-2`,
-          children: [
-            s,
-            Object.entries(o).map((e) => {
-              let [t, o] = e,
-                s = u(t, n, r),
-                { totalIps: c, usedCount: l, percent: d } = f(o.subnet, s);
-              return (0, v.jsxs)(
-                `div`,
-                {
-                  className: `subnet-card p-3 rounded-xl border border-slate-100 bg-white cursor-pointer ${i === t ? `active` : ``}`,
-                  onClick: () => a(t),
-                  children: [
-                    (0, v.jsxs)(`div`, {
-                      className: `flex items-center gap-3`,
-                      children: [
-                        (0, v.jsx)(`div`, {
-                          className: `w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm`,
-                          style: { backgroundColor: o.color },
-                          children: (0, v.jsx)(`i`, {
-                            className: `fas ${o.icon}`,
+  let { db: n, elevatorDB: r, activeVlanId: i, onSelect: a, subnets: subMap, onAddSubnet, onEditSubnet, onDeleteSubnet } = e;
+  let currentSubnets = subMap || getAllSubnets();
+  return (0, v.jsxs)(`div`, {
+    id: `ipam-subnet-list`,
+    className: `view-sidebar w-[380px] bg-white border-r border-slate-200 overflow-y-auto custom-scroll p-4 space-y-2`,
+    children: [
+      (0, v.jsxs)(`div`, {
+        className: `flex justify-between items-center px-2 pt-2 mb-3`,
+        children: [
+          (0, v.jsx)(`h3`, {
+            className: `text-xs font-black text-slate-800 uppercase tracking-widest`,
+            children: `Subnets List`,
+          }),
+          (0, v.jsxs)(`button`, {
+            type: `button`,
+            onClick: () => onAddSubnet && onAddSubnet(),
+            className: `text-[11px] font-bold px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all`,
+            children: [
+              (0, v.jsx)(`i`, { className: `fas fa-plus text-[9px]` }),
+              `Thêm Subnet`,
+            ],
+          }),
+        ],
+      }),
+      Object.keys(currentSubnets).length === 0
+        ? (0, v.jsx)(`div`, {
+            className: `p-6 text-center text-xs text-slate-400 italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200 mt-2`,
+            children: `Chưa có Subnet nào. Bấm "+ Thêm Subnet" để bắt đầu quy hoạch IP.`,
+          })
+        : Object.entries(currentSubnets).map((entry) => {
+        let [t, o] = entry,
+          s = u(t, n, r),
+          { totalIps: c, usedCount: l, percent: d } = f(o.subnet, s);
+        return (0, v.jsxs)(
+          `div`,
+          {
+            className: `subnet-card p-3 rounded-xl border border-slate-100 bg-white cursor-pointer relative group ${i === t ? `active` : ``}`,
+            onClick: () => a(t),
+            children: [
+              (0, v.jsxs)(`div`, {
+                className: `flex items-center justify-between gap-2`,
+                children: [
+                  (0, v.jsxs)(`div`, {
+                    className: `flex items-center gap-3 min-w-0 flex-1`,
+                    children: [
+                      (0, v.jsx)(`div`, {
+                        className: `w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm shrink-0`,
+                        style: { backgroundColor: o.color },
+                        children: (0, v.jsx)(`i`, {
+                          className: `fas ${o.icon}`,
+                        }),
+                      }),
+                      (0, v.jsxs)(`div`, {
+                        className: `flex-1 min-w-0`,
+                        children: [
+                          (0, v.jsxs)(`h4`, {
+                            className: `text-xs font-black text-slate-800 truncate`,
+                            children: [`VLAN `, t, ` - `, o.name],
                           }),
-                        }),
-                        (0, v.jsxs)(`div`, {
-                          className: `flex-1 min-w-0`,
-                          children: [
-                            (0, v.jsxs)(`h4`, {
-                              className: `text-xs font-black text-slate-800 truncate`,
-                              children: [`VLAN `, t, ` - `, o.name],
-                            }),
-                            (0, v.jsx)(`p`, {
-                              className: `text-[10px] font-mono text-slate-500 font-bold bg-slate-50 inline-block px-1 rounded border border-slate-100 mt-1`,
-                              children: o.subnet,
-                            }),
-                          ],
-                        }),
-                      ],
-                    }),
-                    (0, v.jsxs)(`div`, {
-                      className: `mt-3`,
-                      children: [
-                        (0, v.jsxs)(`div`, {
-                          className: `flex justify-between text-[9px] font-bold text-slate-500 mb-1`,
-                          children: [
-                            (0, v.jsxs)(`span`, {
-                              children: [`Used: `, l, `/`, c || `-`],
-                            }),
-                            (0, v.jsxs)(`span`, { children: [d, `%`] }),
-                          ],
-                        }),
-                        (0, v.jsx)(`div`, {
-                          className: `w-full h-1.5 bg-slate-100 rounded-full overflow-hidden`,
-                          children: (0, v.jsx)(`div`, {
-                            className: `h-full rounded-full transition-all`,
-                            style: { width: `${d}%`, backgroundColor: o.color },
+                          (0, v.jsx)(`p`, {
+                            className: `text-[10px] font-mono text-slate-500 font-bold bg-slate-50 inline-block px-1 rounded border border-slate-100 mt-1`,
+                            children: o.subnet,
                           }),
-                        }),
-                      ],
+                        ],
+                      }),
+                    ],
+                  }),
+                  (0, v.jsxs)(`div`, {
+                    className: `flex items-center gap-1 shrink-0`,
+                    onClick: (ev) => ev.stopPropagation(),
+                    children: [
+                      (0, v.jsx)(`button`, {
+                        type: `button`,
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          onEditSubnet && onEditSubnet(t, o);
+                        },
+                        title: `Chỉnh sửa Subnet`,
+                        className: `w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 flex items-center justify-center text-xs transition-colors`,
+                        children: (0, v.jsx)(`i`, { className: `fas fa-pen` }),
+                      }),
+                      (0, v.jsx)(`button`, {
+                        type: `button`,
+                        onClick: (ev) => {
+                          ev.stopPropagation();
+                          onDeleteSubnet && onDeleteSubnet(t, o);
+                        },
+                        title: `Xóa Subnet`,
+                        className: `w-7 h-7 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs transition-colors`,
+                        children: (0, v.jsx)(`i`, { className: `fas fa-trash-alt` }),
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              (0, v.jsxs)(`div`, {
+                className: `mt-3`,
+                children: [
+                  (0, v.jsxs)(`div`, {
+                    className: `flex justify-between text-[9px] font-bold text-slate-500 mb-1`,
+                    children: [
+                      (0, v.jsxs)(`span`, {
+                        children: [`Used: `, l, `/`, c || `-`],
+                      }),
+                      (0, v.jsxs)(`span`, { children: [d, `%`] }),
+                    ],
+                  }),
+                  (0, v.jsx)(`div`, {
+                    className: `w-full h-1.5 bg-slate-100 rounded-full overflow-hidden`,
+                    children: (0, v.jsx)(`div`, {
+                      className: `h-full rounded-full transition-all`,
+                      style: { width: `${d}%`, backgroundColor: o.color },
                     }),
-                  ],
-                },
-                t,
-              );
-            }),
-          ],
-        })),
-        (t[1] = i),
-        (t[2] = n),
-        (t[3] = r),
-        (t[4] = a),
-        (t[5] = c))
-      : (c = t[5]),
-    c
-  );
+                  }),
+                ],
+              }),
+            ],
+          },
+          t,
+        );
+      }),
+    ],
+  });
 }
 function b(e) {
   let t = (0, _.c)(18),
-    { subnet: n, page: r, usedMap: i, onPageChange: a } = e,
+    { subnet: n, page: r, usedMap: i, onPageChange: a, onIpClick } = e,
     o,
     s,
     c,
@@ -145,11 +189,15 @@ function b(e) {
                 }),
                 (0, v.jsx)(`div`, {
                   className: `ip-grid`,
-                  children: e.ips.map((e) =>
+                  children: e.ips.map((ipObj) =>
                     (0, v.jsx)(
                       `div`,
-                      { className: `ip-box ${f[e.status]}`, title: e.title },
-                      e.ip,
+                      {
+                        className: `ip-box ${f[ipObj.status] || ''} cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all`,
+                        title: `${ipObj.title || ipObj.ip} (Click để gán/chỉnh sửa)`,
+                        onClick: () => onIpClick && onIpClick(ipObj.ip, i[ipObj.ip] || ipObj),
+                      },
+                      ipObj.ip,
                     ),
                   ),
                 }),
@@ -235,21 +283,30 @@ function S(e, t) {
 }
 function C(e) {
   let t = (0, _.c)(49),
-    { vid: n, db: r, elevatorDB: i, nvrSlot: a } = e,
+    { vid: n, db: r, elevatorDB: i, nvrSlot: a, subnets: subMap, ipAllocations, onIpClick } = e,
     [s, c] = (0, g.useState)(1),
-    l = o[Number(n)],
-    d,
-    p;
-  t[0] !== r || t[1] !== i || t[2] !== l.subnet || t[3] !== n
-    ? ((p = u(n, r, i)),
-      (d = f(l.subnet, p)),
-      (t[0] = r),
-      (t[1] = i),
-      (t[2] = l.subnet),
-      (t[3] = n),
-      (t[4] = d),
-      (t[5] = p))
-    : ((d = t[4]), (p = t[5]));
+    currentSubnets = subMap || getAllSubnets(),
+    l = currentSubnets[n] || currentSubnets[Number(n)] || o[Number(n)] || { name: `VLAN ${n}`, color: '#4f46e5', icon: 'fa-network-wired', subnet: '192.168.1.0/24' };
+  let rawP = u(n, r, i),
+    p = { ...rawP };
+  if (ipAllocations) {
+    for (let [allocIp, alloc] of Object.entries(ipAllocations)) {
+      if (alloc.vlan == null || String(alloc.vlan) === String(n)) {
+        p[allocIp] = {
+          ip: allocIp,
+          n: alloc.name,
+          swName: alloc.status === 'reserved' ? 'Đặt trước (Reserved)' : 'Gán thủ công',
+          port: 'Static',
+          icon: alloc.icon || 'fa-desktop',
+          mac: alloc.mac,
+          note: alloc.note,
+          status: alloc.status,
+          isManual: true,
+        };
+      }
+    }
+  }
+  let d = f(l.subnet, p);
   let { totalIps: m, usedCount: h } = d;
   if (l.subnet === `N/A`) {
     let e;
@@ -490,6 +547,7 @@ function C(e) {
             page: s,
             usedMap: p,
             onPageChange: c,
+            onIpClick: onIpClick,
           }),
         ],
       })),
@@ -1944,9 +2002,64 @@ function re(e) {
     d = a(ie),
     f = s(B),
     [p, m] = (0, g.useState)(null),
+    [subnets, setSubnets] = (0, g.useState)(getAllSubnets),
+    [ipAllocations, setIpAllocations] = (0, g.useState)(getCustomIpAllocations),
+    [subnetModal, setSubnetModal] = (0, g.useState)(null),
+    [ipModal, setIpModal] = (0, g.useState)(null),
     [h, b] = (0, g.useState)(`closed`),
-    [x, S] = (0, g.useState)(null),
-    w;
+    [x, S] = (0, g.useState)(null);
+
+  (0, g.useEffect)(() => {
+    function handleSubnets() {
+      setSubnets(getAllSubnets());
+    }
+    function handleIps() {
+      setIpAllocations(getCustomIpAllocations());
+    }
+    window.addEventListener(`nim:subnets_updated`, handleSubnets);
+    window.addEventListener(`nim:ip_allocations_updated`, handleIps);
+    return () => {
+      window.removeEventListener(`nim:subnets_updated`, handleSubnets);
+      window.removeEventListener(`nim:ip_allocations_updated`, handleIps);
+    };
+  }, []);
+
+  function handleAddSubnet() {
+    setSubnetModal({ isOpen: true, isEdit: false, data: null });
+  }
+
+  function handleEditSubnet(vid, data) {
+    setSubnetModal({ isOpen: true, isEdit: true, data: { vid, ...data } });
+  }
+
+  function handleDeleteSubnet(vid, data) {
+    f(`Bạn có chắc chắn muốn xóa Subnet VLAN ${vid} (${data.name}) không?`, `confirm`, () => {
+      deleteSubnet(vid);
+      setSubnets(getAllSubnets());
+      if (p === vid) m(null);
+    });
+  }
+
+  function handleSaveSubnet(vid, data) {
+    saveSubnet(vid, data);
+    setSubnets(getAllSubnets());
+  }
+
+  function handleIpClick(clickedIp, existingData) {
+    setIpModal({ isOpen: true, ip: clickedIp, data: existingData });
+  }
+
+  function handleSaveIp(ip, data) {
+    setIpAllocation(ip, { ...data, vlan: p });
+    setIpAllocations(getCustomIpAllocations());
+  }
+
+  function handleDeleteIp(ip) {
+    deleteIpAllocation(ip);
+    setIpAllocations(getCustomIpAllocations());
+  }
+
+  let w;
   t[0] !== d || t[1] !== c || t[2] !== f
     ? ((w = function (e) {
         let t = c.find((t) => t.id === e);
@@ -2007,81 +2120,60 @@ function re(e) {
       })),
       (t[9] = n),
       (t[10] = M));
-  let N;
-  t[11] !== p || t[12] !== i || t[13] !== o
-    ? ((N = (0, v.jsx)(y, {
-        db: i,
-        elevatorDB: o,
-        activeVlanId: p,
-        onSelect: m,
-      })),
-      (t[11] = p),
-      (t[12] = i),
-      (t[13] = o),
-      (t[14] = N))
-    : (N = t[14]);
-  let P;
-  t[15] !== p ||
-  t[16] !== T ||
-  t[17] !== i ||
-  t[18] !== o ||
-  t[19] !== c ||
-  t[20] !== O
-    ? ((P = (0, v.jsx)(`div`, {
-        className: `flex-1 overflow-y-auto custom-scroll bg-slate-50/50 p-8 relative`,
-        children: p
-          ? (0, v.jsx)(
-              C,
-              {
-                vid: p,
-                db: i,
-                elevatorDB: o,
-                nvrSlot:
-                  p === `120`
-                    ? (0, v.jsx)(E, {
-                        nvrDB: c,
-                        usedMap: O,
-                        onAddNew: () => b(null),
-                        onEdit: (e) => b(c.find((t) => t.id === e) ?? null),
-                        onDelete: T,
-                        onViewChannels: S,
-                      })
-                    : null,
-              },
-              p,
-            )
-          : (0, v.jsxs)(`div`, {
-              className: `h-full flex flex-col items-center justify-center text-center opacity-40`,
-              children: [
-                (0, v.jsx)(`i`, {
-                  className: `fas fa-th text-5xl mb-4 text-slate-400`,
-                }),
-                (0, v.jsx)(`p`, {
-                  className: `text-sm font-bold text-slate-500 uppercase tracking-widest`,
-                  children: `Chọn một Subnet bên trái để xem chi tiết`,
-                }),
-              ],
+  let N = (0, v.jsx)(y, {
+    db: i,
+    elevatorDB: o,
+    activeVlanId: p,
+    onSelect: m,
+    subnets: subnets,
+    onAddSubnet: handleAddSubnet,
+    onEditSubnet: handleEditSubnet,
+    onDeleteSubnet: handleDeleteSubnet,
+  });
+  let P = (0, v.jsx)(`div`, {
+    className: `flex-1 overflow-y-auto custom-scroll bg-slate-50/50 p-8 relative`,
+    children: p
+      ? (0, v.jsx)(
+          C,
+          {
+            vid: p,
+            db: i,
+            elevatorDB: o,
+            subnets: subnets,
+            ipAllocations: ipAllocations,
+            onIpClick: handleIpClick,
+            nvrSlot:
+              p === `120`
+                ? (0, v.jsx)(E, {
+                    nvrDB: c,
+                    usedMap: O,
+                    onAddNew: () => b(null),
+                    onEdit: (e) => b(c.find((t) => t.id === e) ?? null),
+                    onDelete: T,
+                    onViewChannels: S,
+                  })
+                : null,
+          },
+          p,
+        )
+      : (0, v.jsxs)(`div`, {
+          className: `h-full flex flex-col items-center justify-center text-center opacity-40`,
+          children: [
+            (0, v.jsx)(`i`, {
+              className: `fas fa-th text-5xl mb-4 text-slate-400`,
             }),
-      })),
-      (t[15] = p),
-      (t[16] = T),
-      (t[17] = i),
-      (t[18] = o),
-      (t[19] = c),
-      (t[20] = O),
-      (t[21] = P))
-    : (P = t[21]);
-  let F;
-  t[22] !== N || t[23] !== P
-    ? ((F = (0, v.jsxs)(`div`, {
-        id: `ipam-body`,
-        className: `view-body flex-1 flex overflow-hidden`,
-        children: [N, P],
-      })),
-      (t[22] = N),
-      (t[23] = P),
-      (t[24] = F))
-    : (F = t[24]);
+            (0, v.jsx)(`p`, {
+              className: `text-sm font-bold text-slate-500 uppercase tracking-widest`,
+              children: `Chọn một Subnet bên trái để xem chi tiết`,
+            }),
+          ],
+        }),
+  });
+  let F = (0, v.jsxs)(`div`, {
+    id: `ipam-body`,
+    className: `view-body flex-1 flex overflow-hidden`,
+    children: [N, P],
+  });
   let L;
   t[25] !== i ||
   t[26] !== d ||
@@ -2126,22 +2218,31 @@ function re(e) {
       (t[34] = O),
       (t[35] = R))
     : (R = t[35]);
-  let z;
-  return (
-    t[36] !== R || t[37] !== M || t[38] !== F || t[39] !== L
-      ? ((z = (0, v.jsxs)(`div`, {
-          id: `ipam-view`,
-          className: `w-full h-full flex flex-col`,
-          children: [M, F, L, R],
-        })),
-        (t[36] = R),
-        (t[37] = M),
-        (t[38] = F),
-        (t[39] = L),
-        (t[40] = z))
-      : (z = t[40]),
-    z
-  );
+  return (0, v.jsxs)(`div`, {
+    id: `ipam-view`,
+    className: `w-full h-full flex flex-col relative`,
+    children: [
+      M,
+      F,
+      L,
+      R,
+      subnetModal?.isOpen &&
+        (0, v.jsx)(SubnetManageModal, {
+          initialData: subnetModal.data,
+          isEdit: subnetModal.isEdit,
+          onSave: handleSaveSubnet,
+          onClose: () => setSubnetModal(null),
+        }),
+      ipModal?.isOpen &&
+        (0, v.jsx)(IpAllocationModal, {
+          ip: ipModal.ip,
+          existingData: ipModal.data,
+          onSave: handleSaveIp,
+          onDelete: handleDeleteIp,
+          onClose: () => setIpModal(null),
+        }),
+    ],
+  });
 }
 function B(e) {
   return e.showDialog;
