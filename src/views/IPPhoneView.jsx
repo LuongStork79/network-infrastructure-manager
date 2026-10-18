@@ -420,8 +420,10 @@ function A(e) {
       onEdit: o,
       onDeleteId: s,
       onShowLogsId: c,
+      onBulkDelete: onBulkDel,
     } = e,
     [l, d] = (0, p.useState)(``),
+    [selectedIds, setSelectedIds] = (0, p.useState)(() => new Set()),
     f,
     h,
     g,
@@ -470,12 +472,49 @@ function A(e) {
         (t[16] = l),
         (t[17] = b)),
       (y = (0, S.jsxs)(`div`, {
-        className: `px-6 py-3 bg-white border-b border-slate-100 flex items-center gap-3 shrink-0`,
+        className: `px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between gap-3 shrink-0`,
         children: [
-          b,
-          (0, S.jsxs)(`span`, {
-            className: `text-[10px] font-black text-slate-400`,
-            children: [e.length, ` / `, r.length, ` máy`],
+          (0, S.jsxs)(`div`, {
+            className: `flex items-center gap-3 flex-1`,
+            children: [
+              b,
+              (0, S.jsxs)(`span`, {
+                className: `text-[10px] font-black text-slate-400`,
+                children: [e.length, ` / `, r.length, ` máy`],
+              }),
+            ]
+          }),
+          selectedIds.size > 0 && (0, S.jsxs)(`div`, {
+            className: `flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold shrink-0`,
+            children: [
+              (0, S.jsxs)(`span`, {
+                className: `text-rose-700 text-[11px] font-bold flex items-center gap-1`,
+                children: [
+                  (0, S.jsx)(`i`, { className: `fas fa-check-square text-rose-500` }),
+                  `Đã chọn ${selectedIds.size} máy`,
+                ],
+              }),
+              (0, S.jsxs)(`button`, {
+                type: `button`,
+                onClick: () => {
+                  if (onBulkDel) {
+                    onBulkDel([...selectedIds]);
+                    setSelectedIds(new Set());
+                  }
+                },
+                className: `px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all`,
+                children: [
+                  (0, S.jsx)(`i`, { className: `fas fa-trash-alt` }),
+                  `Xóa hàng loạt`,
+                ],
+              }),
+              (0, S.jsx)(`button`, {
+                type: `button`,
+                onClick: () => setSelectedIds(new Set()),
+                className: `px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-50`,
+                children: `Bỏ chọn`,
+              }),
+            ],
           }),
         ],
       })),
@@ -487,6 +526,24 @@ function A(e) {
             children: (0, S.jsxs)(`tr`, {
               className: `bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
               children: [
+                (0, S.jsx)(`th`, {
+                  className: `px-3 py-3 w-10 text-center`,
+                  children: (0, S.jsx)(`input`, {
+                    type: `checkbox`,
+                    checked: e.length > 0 && e.every((ph) => selectedIds.has(ph.id)),
+                    ref: (el) => { if (el) el.indeterminate = e.some((ph) => selectedIds.has(ph.id)) && !e.every((ph) => selectedIds.has(ph.id)); },
+                    onChange: () => {
+                      let isAll = e.length > 0 && e.every((ph) => selectedIds.has(ph.id));
+                      if (isAll) {
+                        setSelectedIds(new Set());
+                      } else {
+                        setSelectedIds(new Set(e.map((ph) => ph.id)));
+                      }
+                    },
+                    className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                    title: e.length > 0 && e.every((ph) => selectedIds.has(ph.id)) ? `Bỏ chọn tất cả` : `Chọn tất cả`,
+                  }),
+                }),
                 (0, S.jsx)(`th`, {
                   className: `px-4 py-3 w-20`,
                   children: `Nhánh`,
@@ -527,13 +584,31 @@ function A(e) {
                     : `Không tìm thấy kết quả phù hợp.`,
               }),
             })
-          : e.map((e) =>
-              (0, S.jsxs)(
+          : e.map((e) => {
+              let isRowSel = selectedIds.has(e.id);
+              return (0, S.jsxs)(
                 `tr`,
                 {
                   onClick: () => o(e),
-                  className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors cursor-pointer`,
+                  className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors cursor-pointer ${isRowSel ? 'bg-green-50/60' : ''}`,
                   children: [
+                    (0, S.jsx)(`td`, {
+                      className: `px-3 py-3 w-10 text-center`,
+                      onClick: (ev) => ev.stopPropagation(),
+                      children: (0, S.jsx)(`input`, {
+                        type: `checkbox`,
+                        checked: isRowSel,
+                        onChange: () => {
+                          setSelectedIds((prev) => {
+                            let next = new Set(prev);
+                            if (next.has(e.id)) next.delete(e.id);
+                            else next.add(e.id);
+                            return next;
+                          });
+                        },
+                        className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                      }),
+                    }),
                     (0, S.jsx)(`td`, {
                       className: `px-4 py-3`,
                       children: (0, S.jsx)(`span`, {
@@ -619,8 +694,8 @@ function A(e) {
                   ],
                 },
                 e.id,
-              ),
-            )),
+              );
+            })),
       (t[0] = n),
       (t[1] = a),
       (t[2] = s),
@@ -2528,6 +2603,15 @@ function H(e) {
                     onEdit: V,
                     onDeleteId: me,
                     onShowLogsId: ge,
+                    onBulkDelete: (ids) => {
+                      if (!ids || ids.length === 0) return;
+                      let count = ids.length;
+                      C(`Bạn có chắc chắn muốn xóa ${count} điện thoại IP đã chọn khỏi danh bạ?`, `confirm`, () => {
+                        ids.forEach((id) => h(id));
+                        v(`Điện thoại IP: Xóa hàng loạt`, `Đã xóa ${count} điện thoại IP`, o);
+                        C(`Đã xóa thành công ${count} điện thoại IP!`, `success`);
+                      });
+                    },
                   }),
                 ],
               })

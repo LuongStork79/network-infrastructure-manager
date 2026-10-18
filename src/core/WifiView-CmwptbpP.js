@@ -41,7 +41,12 @@ function A(e) {
     searchQuery = '',
     onSearchChange,
     sidebarTab = 'list',
-    onTabChange
+    onTabChange,
+    selectedIds,
+    onToggleAp,
+    onToggleAllAps,
+    onBulkDelete,
+    onClearSelection
   } = e;
 
   let nArr = Array.isArray(n) ? n : [];
@@ -149,6 +154,27 @@ function A(e) {
               (0, k.jsx)('option', { value: 'all', children: 'Tất cả tầng' }),
               floors.map(j)
             ]
+          }),
+          (0, k.jsxs)('div', {
+            className: 'flex items-center justify-between gap-2 mt-1 px-1 text-[11px]',
+            children: [
+              (0, k.jsxs)('label', {
+                className: 'flex items-center gap-1.5 cursor-pointer text-slate-500 dark:text-slate-400 select-none font-bold text-[10px]',
+                children: [
+                  (0, k.jsx)('input', {
+                    type: 'checkbox',
+                    checked: displayAps.length > 0 && displayAps.every((ap) => selectedIds?.has(ap.id)),
+                    onChange: () => onToggleAllAps && onToggleAllAps(displayAps.map((ap) => ap.id)),
+                    className: 'rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-3.5 h-3.5 cursor-pointer'
+                  }),
+                  'Chọn tất cả'
+                ]
+              }),
+              selectedIds && selectedIds.size > 0 && (0, k.jsxs)('span', {
+                className: 'text-[10px] text-cyan-600 dark:text-cyan-400 font-bold',
+                children: [`Đã chọn: `, selectedIds.size, `/`, displayAps.length]
+              })
+            ]
           })
         ]
       })
@@ -188,10 +214,17 @@ function A(e) {
               },
               onClick: () => u(ap),
               children: [
-                // Top row: Icon + Name + Type/Placed
+                // Top row: Checkbox + Icon + Name + Type/Placed
                 (0, k.jsxs)('div', {
                   className: 'flex items-center gap-2.5',
                   children: [
+                    (0, k.jsx)('input', {
+                      type: 'checkbox',
+                      checked: !!(selectedIds && selectedIds.has(ap.id)),
+                      onClick: (ev) => ev.stopPropagation(),
+                      onChange: () => onToggleAp && onToggleAp(ap.id),
+                      className: 'rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-4 h-4 cursor-pointer shrink-0'
+                    }),
                     (0, k.jsx)('div', {
                       className: `w-7 h-7 rounded-full ${typeInfo.iconBg} flex items-center justify-center shrink-0`,
                       children: (0, k.jsx)('i', {
@@ -345,6 +378,35 @@ function A(e) {
         : (0, k.jsxs)(k.Fragment, {
             children: [
               searchBar,
+              (selectedIds && selectedIds.size > 0) && (0, k.jsxs)('div', {
+                className: 'p-2 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-200 dark:border-rose-800 flex items-center justify-between text-xs shrink-0',
+                children: [
+                  (0, k.jsxs)('span', {
+                    className: 'font-bold text-rose-600 dark:text-rose-400 text-[11px] flex items-center gap-1.5',
+                    children: [
+                      (0, k.jsx)('i', { className: 'fas fa-check-square' }),
+                      `Đã chọn: `, (0, k.jsx)('b', { children: selectedIds.size }), ` AP`
+                    ]
+                  }),
+                  (0, k.jsxs)('div', {
+                    className: 'flex items-center gap-1.5',
+                    children: [
+                      (0, k.jsxs)('button', {
+                        type: 'button',
+                        onClick: onBulkDelete,
+                        className: 'px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer shadow-xs transition-all',
+                        children: [(0, k.jsx)('i', { className: 'fas fa-trash-alt text-[10px]' }), 'Xóa']
+                      }),
+                      (0, k.jsx)('button', {
+                        type: 'button',
+                        onClick: onClearSelection,
+                        className: 'px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-medium cursor-pointer hover:bg-slate-100',
+                        children: 'Bỏ'
+                      })
+                    ]
+                  })
+                ]
+              }),
               (0, k.jsx)('div', {
                 className: 'flex-1 overflow-y-auto custom-scroll p-3 space-y-2',
                 children: apListContent
@@ -723,8 +785,19 @@ function R(e) {
 }
 function z(e) {
   let t = (0, O.c)(142),
-    { db: n, networkDB: r, floorFilter: i, onSelectAp: a } = e,
-    [o, c] = (0, D.useState)(``),
+    { db: n, networkDB: r, floorFilter: i, onSelectAp: a, selectedIds, onToggleAp, onToggleAllAps, onBulkDelete, onClearSelection } = e;
+  let [localSelectedIds, setLocalSelectedIds] = (0, D.useState)(() => new Set());
+  let selIds = selectedIds !== undefined ? selectedIds : localSelectedIds;
+  let toggleOne = onToggleAp || ((id) => {
+    setLocalSelectedIds(prev => {
+      let next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  });
+  let clearSel = onClearSelection || (() => setLocalSelectedIds(new Set()));
+  let [o, c] = (0, D.useState)(``),
     u;
   t[0] === Symbol.for(`react.memo_cache_sentinel`)
     ? ((u = []), (t[0] = u))
@@ -1060,8 +1133,38 @@ function z(e) {
   t[75] !== be ||
   t[76] !== xe
     ? ((Se = (0, k.jsxs)(`div`, {
-        className: `p-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3 flex-wrap shrink-0`,
-        children: [Q, de, fe, me, ge, be, xe],
+        className: `p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-3 flex-wrap shrink-0`,
+        children: [
+          Q, de, fe, me, ge, be,
+          selIds.size > 0 && (0, k.jsxs)(`div`, {
+            className: `flex items-center gap-2 px-3 py-1 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold shrink-0`,
+            children: [
+              (0, k.jsxs)(`span`, {
+                className: `text-rose-700 dark:text-rose-300 text-[11px] font-bold flex items-center gap-1`,
+                children: [
+                  (0, k.jsx)(`i`, { className: `fas fa-check-square text-rose-500` }),
+                  `Đã chọn ${selIds.size} AP`,
+                ],
+              }),
+              (0, k.jsxs)(`button`, {
+                type: `button`,
+                onClick: () => onBulkDelete ? onBulkDelete([...selIds]) : null,
+                className: `px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all`,
+                children: [
+                  (0, k.jsx)(`i`, { className: `fas fa-trash-alt` }),
+                  `Xóa hàng loạt`,
+                ],
+              }),
+              (0, k.jsx)(`button`, {
+                type: `button`,
+                onClick: clearSel,
+                className: `px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700`,
+                children: `Bỏ chọn`,
+              }),
+            ],
+          }),
+          xe
+        ],
       })),
       (t[71] = de),
       (t[72] = fe),
@@ -1208,6 +1311,25 @@ function z(e) {
         children: (0, k.jsxs)(`tr`, {
           className: `bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0`,
           children: [
+            (0, k.jsx)(`th`, {
+              className: `p-3 pl-4 w-10 text-center`,
+              children: (0, k.jsx)(`input`, {
+                type: `checkbox`,
+                checked: Z.length > 0 && Z.every((item) => selIds.has(item.ap.id)),
+                ref: (el) => { if (el) el.indeterminate = Z.some((item) => selIds.has(item.ap.id)) && !Z.every((item) => selIds.has(item.ap.id)); },
+                onChange: () => {
+                  if (onToggleAllAps) {
+                    onToggleAllAps(Z.map((item) => item.ap.id));
+                  } else {
+                    let isAll = Z.length > 0 && Z.every((item) => selIds.has(item.ap.id));
+                    if (isAll) clearSel();
+                    else setLocalSelectedIds(new Set(Z.map((item) => item.ap.id)));
+                  }
+                },
+                className: `rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-4 h-4 cursor-pointer`,
+                title: Z.length > 0 && Z.every((item) => selIds.has(item.ap.id)) ? `Bỏ chọn tất cả` : `Chọn tất cả`,
+              }),
+            }),
             Ce,
             Ee,
             (0, k.jsx)(`th`, { className: `p-3`, children: `S/N` }),
@@ -1241,7 +1363,14 @@ function z(e) {
               let { ap: n, link: r } = e;
               return (0, k.jsx)(
                 ae,
-                { ap: n, link: r, stt: t + 1, onSelectAp: a },
+                {
+                  ap: n,
+                  link: r,
+                  stt: t + 1,
+                  onSelectAp: a,
+                  isSelected: selIds.has(n.id),
+                  onToggle: toggleOne,
+                },
                 n.id,
               );
             })),
@@ -1324,8 +1453,18 @@ function ie(e) {
 }
 function ae(e) {
   let t = (0, O.c)(38),
-    { ap: n, link: r, stt: i, onSelectAp: o } = e,
+    { ap: n, link: r, stt: i, onSelectAp: o, isSelected: isSel, onToggle: onTog } = e,
     s;
+  let cellChk = (0, k.jsx)(`td`, {
+    className: `p-3 pl-4 w-10 text-center`,
+    onClick: (ev) => ev.stopPropagation(),
+    children: (0, k.jsx)(`input`, {
+      type: `checkbox`,
+      checked: !!isSel,
+      onChange: () => onTog && onTog(n.id),
+      className: `rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-4 h-4 cursor-pointer`,
+    }),
+  });
   t[0] === n.type ? (s = t[1]) : ((s = h(n.type)), (t[0] = n.type), (t[1] = s));
   let c = s,
     l;
@@ -1489,8 +1628,8 @@ function ae(e) {
   return (
     (w = (0, k.jsxs)(`tr`, {
       onClick: l,
-      className: `border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-cyan-50/40 dark:hover:bg-slate-800/50 cursor-pointer transition-colors`,
-      children: [u, d, cellSn, cellUser, cellDefPass, cellNewPass, p, m, g, _, v, y, x, C],
+      className: `border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-cyan-50/40 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${isSel ? 'bg-cyan-50/60 dark:bg-cyan-950/40' : ''}`,
+      children: [cellChk, u, d, cellSn, cellUser, cellDefPass, cellNewPass, p, m, g, _, v, y, x, C],
     })),
     w
   );
@@ -2187,7 +2326,45 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
     [R, B] = (0, D.useState)(`closed`),
     [V, ee] = (0, D.useState)(`floorplan`);
   let [wifiSearch, setWifiSearch] = (0, D.useState)(''),
-    [wifiSidebarTab, setWifiSidebarTab] = (0, D.useState)('list');
+    [wifiSidebarTab, setWifiSidebarTab] = (0, D.useState)('list'),
+    [selectedApIds, setSelectedApIds] = (0, D.useState)(() => new Set());
+
+  let handleToggleAp = (id) => {
+    setSelectedApIds((prev) => {
+      let next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  let handleToggleAllAps = (allIds) => {
+    setSelectedApIds((prev) => {
+      let isAll = allIds.length > 0 && allIds.every((id) => prev.has(id));
+      if (isAll) {
+        let next = new Set(prev);
+        allIds.forEach((id) => next.delete(id));
+        return next;
+      } else {
+        let next = new Set(prev);
+        allIds.forEach((id) => next.add(id));
+        return next;
+      }
+    });
+  };
+
+  let handleBulkDeleteAps = (idsToDelete) => {
+    let targetIds = idsToDelete || [...selectedApIds];
+    if (targetIds.length === 0) return;
+    let count = targetIds.length;
+    let msg = `Bạn có chắc chắn muốn xóa ${count} thiết bị WiFi AP đã chọn khỏi hệ thống?`;
+    y(msg, `confirm`, () => {
+      targetIds.forEach((id) => u(id));
+      f(`WiFi AP: Xóa hàng loạt`, `Đã xóa ${count} thiết bị Access Point`, r);
+      setSelectedApIds(new Set());
+      y(`Đã xóa thành công ${count} thiết bị WiFi AP!`, `success`);
+    });
+  };
   (0, D.useEffect)(() => {
     if (!w || w.module !== `wifi`) return;
     let e = (s || []).find((e) => e.id === w.apId);
@@ -2362,6 +2539,11 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
             onSearchChange: setWifiSearch,
             sidebarTab: wifiSidebarTab,
             onTabChange: setWifiSidebarTab,
+            selectedIds: selectedApIds,
+            onToggleAp: handleToggleAp,
+            onToggleAllAps: handleToggleAllAps,
+            onBulkDelete: () => handleBulkDeleteAps(),
+            onClearSelection: () => setSelectedApIds(new Set()),
           }),
           (0, k.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,
@@ -2462,6 +2644,11 @@ function ue({ onBack: e, onNavigateToOdf: t, isAdmin: n, username: r }) {
                     networkDB: i,
                     floorFilter: O,
                     onSelectAp: B,
+                    selectedIds: selectedApIds,
+                    onToggleAp: handleToggleAp,
+                    onToggleAllAps: handleToggleAllAps,
+                    onBulkDelete: () => handleBulkDeleteAps(),
+                    onClearSelection: () => setSelectedApIds(new Set()),
                   }),
             ],
           }),

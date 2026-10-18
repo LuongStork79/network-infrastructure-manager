@@ -66,6 +66,11 @@ function U(e) {
     onSelectCamera: u,
     onDragCameraStart: d,
     onNavigateToSwitch: f,
+    selectedIds,
+    onToggleCamera,
+    onToggleAllCameras,
+    onBulkDelete,
+    onClearSelection,
   } = e;
 
   let [searchQuery, setSearchQuery] = (0, B.useState)('');
@@ -199,6 +204,27 @@ function U(e) {
               (0, H.jsx)('option', { value: 'all', children: 'Tất cả NVR' }),
               nvrs.map(W)
             ]
+          }),
+        ]
+      }),
+      (0, H.jsxs)('div', {
+        className: 'flex items-center justify-between gap-2 mt-1 px-1 text-[11px]',
+        children: [
+          (0, H.jsxs)('label', {
+            className: 'flex items-center gap-1.5 cursor-pointer text-slate-500 dark:text-slate-400 select-none font-bold text-[10px]',
+            children: [
+              (0, H.jsx)('input', {
+                type: 'checkbox',
+                checked: displayCameras.length > 0 && displayCameras.every((c) => selectedIds?.has(c.id)),
+                onChange: () => onToggleAllCameras && onToggleAllCameras(displayCameras.map((c) => c.id)),
+                className: 'rounded border-slate-300 dark:border-slate-600 text-orange-600 focus:ring-orange-500 w-3.5 h-3.5 cursor-pointer'
+              }),
+              'Chọn tất cả'
+            ]
+          }),
+          selectedIds && selectedIds.size > 0 && (0, H.jsxs)('span', {
+            className: 'text-[10px] text-orange-600 dark:text-orange-400 font-bold',
+            children: [`Đã chọn: `, selectedIds.size, `/`, displayCameras.length]
           })
         ]
       })
@@ -248,10 +274,17 @@ function U(e) {
               },
               onClick: () => u(cam),
               children: [
-                // Top row: Icon + Name + Angle/Placed
+                // Top row: Checkbox + Icon + Name + Angle/Placed
                 (0, H.jsxs)('div', {
                   className: 'flex items-center gap-2.5',
                   children: [
+                    (0, H.jsx)('input', {
+                      type: 'checkbox',
+                      checked: !!(selectedIds && selectedIds.has(cam.id)),
+                      onClick: (ev) => ev.stopPropagation(),
+                      onChange: () => onToggleCamera && onToggleCamera(cam.id),
+                      className: 'rounded border-slate-300 dark:border-slate-600 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer shrink-0'
+                    }),
                     (0, H.jsx)('div', {
                       className: 'w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-950/60 flex items-center justify-center shrink-0',
                       children: (0, H.jsx)('i', {
@@ -453,6 +486,35 @@ function U(e) {
         : (0, H.jsxs)(H.Fragment, {
             children: [
               searchBar,
+              (selectedIds && selectedIds.size > 0) && (0, H.jsxs)('div', {
+                className: 'p-2 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-200 dark:border-rose-800 flex items-center justify-between text-xs shrink-0',
+                children: [
+                  (0, H.jsxs)('span', {
+                    className: 'font-bold text-rose-600 dark:text-rose-400 text-[11px] flex items-center gap-1.5',
+                    children: [
+                      (0, H.jsx)('i', { className: 'fas fa-check-square' }),
+                      `Đã chọn: `, (0, H.jsx)('b', { children: selectedIds.size }), ` Camera`
+                    ]
+                  }),
+                  (0, H.jsxs)('div', {
+                    className: 'flex items-center gap-1.5',
+                    children: [
+                      (0, H.jsxs)('button', {
+                        type: 'button',
+                        onClick: onBulkDelete,
+                        className: 'px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer shadow-xs transition-all',
+                        children: [(0, H.jsx)('i', { className: 'fas fa-trash-alt text-[10px]' }), 'Xóa']
+                      }),
+                      (0, H.jsx)('button', {
+                        type: 'button',
+                        onClick: onClearSelection,
+                        className: 'px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-medium cursor-pointer hover:bg-slate-100',
+                        children: 'Bỏ'
+                      })
+                    ]
+                  })
+                ]
+              }),
               (0, H.jsx)('div', {
                 className: 'flex-1 overflow-y-auto custom-scroll p-3 space-y-2',
                 children: cameraListContent
@@ -4109,7 +4171,29 @@ function Ne(e) {
 }
 
 function CctvTableView(props) {
-  let { db = [], networkDB = [], nvrDB = [], floorFilter = 'all', onSelectCamera } = props;
+  let {
+    db = [],
+    networkDB = [],
+    nvrDB = [],
+    floorFilter = 'all',
+    onSelectCamera,
+    selectedCameraIds,
+    onToggleCamera,
+    onToggleAllCameras,
+    onBulkDelete,
+    onClearSelection,
+  } = props;
+  let [localSelectedIds, setLocalSelectedIds] = (0, B.useState)(() => new Set());
+  let selIds = selectedCameraIds !== undefined ? selectedCameraIds : localSelectedIds;
+  let toggleOne = onToggleCamera || ((id) => {
+    setLocalSelectedIds(prev => {
+      let next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  });
+  let clearSel = onClearSelection || (() => setLocalSelectedIds(new Set()));
 
   let [searchQuery, setSearchQuery] = (0, B.useState)('');
   let [filterFloor, setFilterFloor] = (0, B.useState)(floorFilter || 'all');
@@ -4288,6 +4372,33 @@ function CctvTableView(props) {
                   (0, H.jsx)('option', { value: 'unplaced', children: 'Chưa định vị' }),
                 ],
               }),
+              selIds.size > 0 && (0, H.jsxs)('div', {
+                className: 'flex items-center gap-2 px-3 py-1 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold shrink-0',
+                children: [
+                  (0, H.jsxs)('span', {
+                    className: 'text-rose-700 dark:text-rose-300 text-[11px] font-bold flex items-center gap-1',
+                    children: [
+                      (0, H.jsx)('i', { className: 'fas fa-check-square text-rose-500' }),
+                      `Đã chọn ${selIds.size} Camera`,
+                    ],
+                  }),
+                  (0, H.jsxs)('button', {
+                    type: 'button',
+                    onClick: () => onBulkDelete ? onBulkDelete([...selIds]) : null,
+                    className: 'px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all',
+                    children: [
+                      (0, H.jsx)('i', { className: 'fas fa-trash-alt' }),
+                      'Xóa hàng loạt',
+                    ],
+                  }),
+                  (0, H.jsx)('button', {
+                    type: 'button',
+                    onClick: clearSel,
+                    className: 'px-2 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700',
+                    children: 'Bỏ chọn',
+                  }),
+                ],
+              }),
               (0, H.jsxs)('span', {
                 className: 'text-[11px] font-black text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/60 px-2 py-1 rounded-lg border border-orange-200 dark:border-orange-900',
                 children: [filtered.length, ' / ', db.length, ' Camera'],
@@ -4305,6 +4416,25 @@ function CctvTableView(props) {
               children: (0, H.jsxs)('tr', {
                 className: 'bg-slate-50 dark:bg-slate-800/80 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10',
                 children: [
+                  (0, H.jsx)('th', {
+                    className: 'p-3 pl-4 w-10 text-center',
+                    children: (0, H.jsx)('input', {
+                      type: 'checkbox',
+                      checked: filtered.length > 0 && filtered.every((item) => selIds.has(item.cam.id)),
+                      ref: (el) => { if (el) el.indeterminate = filtered.some((item) => selIds.has(item.cam.id)) && !filtered.every((item) => selIds.has(item.cam.id)); },
+                      onChange: () => {
+                        if (onToggleAllCameras) {
+                          onToggleAllCameras(filtered.map((item) => item.cam.id));
+                        } else {
+                          let isAll = filtered.length > 0 && filtered.every((item) => selIds.has(item.cam.id));
+                          if (isAll) clearSel();
+                          else setLocalSelectedIds(new Set(filtered.map((item) => item.cam.id)));
+                        }
+                      },
+                      className: 'rounded border-slate-300 dark:border-slate-600 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer',
+                      title: filtered.length > 0 && filtered.every((item) => selIds.has(item.cam.id)) ? 'Bỏ chọn tất cả' : 'Chọn tất cả',
+                    }),
+                  }),
                   (0, H.jsx)('th', { className: 'p-3 pl-4 w-12', children: 'STT' }),
                   (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('name'), children: ['Tên Camera', sortIcon('name')] }),
                   (0, H.jsxs)('th', { className: 'p-3 cursor-pointer select-none hover:text-slate-700 dark:hover:text-slate-200', onClick: () => handleSort('sn'), children: ['S/N', sortIcon('sn')] }),
@@ -4332,12 +4462,23 @@ function CctvTableView(props) {
                   })
                 : filtered.map((item, idx) => {
                     let { cam, swInfo, nvrName, isPlaced } = item;
+                    let isRowChecked = selIds.has(cam.id);
                     return (0, H.jsxs)(
                       'tr',
                       {
                         onClick: () => onSelectCamera && onSelectCamera(cam),
-                        className: 'border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-orange-50/50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors',
+                        className: `border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-orange-50/50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors ${isRowChecked ? 'bg-orange-50/70 dark:bg-orange-950/40' : ''}`,
                         children: [
+                          (0, H.jsx)('td', {
+                            className: 'p-3 pl-4 w-10 text-center',
+                            onClick: (ev) => ev.stopPropagation(),
+                            children: (0, H.jsx)('input', {
+                              type: 'checkbox',
+                              checked: isRowChecked,
+                              onChange: () => toggleOne(cam.id),
+                              className: 'rounded border-slate-300 dark:border-slate-600 text-orange-600 focus:ring-orange-500 w-4 h-4 cursor-pointer',
+                            }),
+                          }),
                           (0, H.jsx)('td', { className: 'p-3 pl-4 text-[10px] text-slate-400 font-bold tabular-nums', children: idx + 1 }),
                           (0, H.jsxs)('td', {
                             className: 'p-3 text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2',
@@ -4434,7 +4575,45 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
     [me, he] = (0, B.useState)(!1),
     [ge, Z] = (0, B.useState)([]),
     [Q, $] = (0, B.useState)(!1),
-    [cctvViewMode, setCctvViewMode] = (0, B.useState)('floorplan');
+    [cctvViewMode, setCctvViewMode] = (0, B.useState)('floorplan'),
+    [selectedCameraIds, setSelectedCameraIds] = (0, B.useState)(() => new Set());
+
+  let handleToggleCamera = (id) => {
+    setSelectedCameraIds((prev) => {
+      let next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  let handleToggleAllCameras = (allIds) => {
+    setSelectedCameraIds((prev) => {
+      let isAll = allIds.length > 0 && allIds.every((id) => prev.has(id));
+      if (isAll) {
+        let next = new Set(prev);
+        allIds.forEach((id) => next.delete(id));
+        return next;
+      } else {
+        let next = new Set(prev);
+        allIds.forEach((id) => next.add(id));
+        return next;
+      }
+    });
+  };
+
+  let handleBulkDeleteCameras = (idsToDelete) => {
+    let targetIds = idsToDelete || [...selectedCameraIds];
+    if (targetIds.length === 0) return;
+    let count = targetIds.length;
+    let msg = `Bạn có chắc chắn muốn xóa ${count} thiết bị Camera đã chọn khỏi hệ thống?`;
+    x(msg, `confirm`, () => {
+      targetIds.forEach((id) => p(id));
+      m(`Camera: Xóa hàng loạt`, `Đã xóa ${count} thiết bị Camera`, n);
+      setSelectedCameraIds(new Set());
+      x(`Đã xóa thành công ${count} thiết bị Camera!`, `success`);
+    });
+  };
   (0, B.useEffect)(() => {
     if (!S || S.module !== `cctv`) return;
     let e = c.find((e) => e.id === S.cameraId);
@@ -4708,7 +4887,11 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
             onSelectCamera: V,
             onDragCameraStart: ee,
             onNavigateToSwitch: $e,
-            
+            selectedIds: selectedCameraIds,
+            onToggleCamera: handleToggleCamera,
+            onToggleAllCameras: handleToggleAllCameras,
+            onBulkDelete: () => handleBulkDeleteCameras(),
+            onClearSelection: () => setSelectedCameraIds(new Set()),
           }),
           (0, H.jsxs)(`div`, {
             className: `flex-1 overflow-auto custom-scroll p-6 flex flex-col gap-4`,
@@ -4743,6 +4926,11 @@ function Pe({ onBack: e, isAdmin: t, username: n }) {
                     nvrDB: o,
                     floorFilter: A,
                     onSelectCamera: V,
+                    selectedCameraIds: selectedCameraIds,
+                    onToggleCamera: handleToggleCamera,
+                    onToggleAllCameras: handleToggleAllCameras,
+                    onBulkDelete: () => handleBulkDeleteCameras(),
+                    onClearSelection: () => setSelectedCameraIds(new Set()),
                   })
                 : (0, H.jsxs)(H.Fragment, {
                     children: [
