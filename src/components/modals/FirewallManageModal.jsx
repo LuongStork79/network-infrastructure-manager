@@ -275,16 +275,22 @@ export function FirewallManageModal({
   const handleDelete = () => {
     if (!fw) return;
     const devLabel = isRouter ? 'Router' : 'Firewall';
-    showDialog(`Bạn có chắc chắn muốn xóa ${devLabel} [${fw.name}]?`, 'confirm', () => {
+
+    const executeDelete = () => {
       deleteFirewall(fw.id);
       if (addGlobalLog) {
         addGlobalLog(`${devLabel}: ${fw.name}`, `Đã xóa ${devLabel} [${fw.name}]`, username);
       }
-      if (onDelete) {
-        try { onDelete(); } catch (e) { /* ignore */ }
-      }
       onClose();
-    });
+    };
+
+    if (typeof showDialog === 'function') {
+      showDialog(`Bạn có chắc chắn muốn xóa ${devLabel} [${fw.name}]?`, 'confirm', executeDelete);
+    } else if (onDelete) {
+      onDelete();
+    } else if (typeof window !== 'undefined' && window.confirm(`Bạn có chắc chắn muốn xóa ${devLabel} [${fw.name}]?`)) {
+      executeDelete();
+    }
   };
 
   return (

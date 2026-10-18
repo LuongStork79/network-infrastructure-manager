@@ -1,13 +1,5 @@
-import { create } from 'zustand';
+import { s as dialogStore } from '../core/index-QE6I14Fy.js';
 
-export const useDialogStore = create((set) => ({
-  message: null,
-  type: 'error',
-  onConfirm: null,
-  showDialog: (message, type = 'error', onConfirm = null) =>
-    set({ message, type, onConfirm: onConfirm ?? null }),
-  close: () => set({ message: null, onConfirm: null })
-}));
-
-export const s = useDialogStore;
-export default useDialogStore;
+export const useDialogStore = dialogStore;
+export const s = dialogStore;
+export default dialogStore;

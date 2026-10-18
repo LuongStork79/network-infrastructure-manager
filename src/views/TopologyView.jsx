@@ -14,6 +14,7 @@ import {
   tn as m,
   zt as h,
 } from "./index-QE6I14Fy.js";
+import { useDialogStore } from "../stores/useDialogStore.js";
 var g = e(t(), 1);
 function _(e) {
   let t = e.filter((e) => e.floor.toLowerCase().includes(`server room`)),
@@ -2348,7 +2349,7 @@ function De(e, t) {
 }
 var Oe = (0, g.forwardRef)(function (e, t) {
     let n = (0, H.c)(27),
-      { fw: r, onManage: i } = e,
+      { fw: r, onManage: i, onDelete: onDel } = e,
       a;
 
     let isRouter = r.deviceType === 'router' || 
@@ -2379,17 +2380,34 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       ],
     });
 
+    let delBtn = onDel && (0, J.jsx)(`button`, {
+      type: `button`,
+      onClick: (e) => {
+        e.stopPropagation();
+        onDel(r);
+      },
+      className: `w-6 h-6 rounded-lg bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900 border border-rose-200 dark:border-rose-800 text-rose-500 dark:text-rose-400 flex items-center justify-center text-[10px] transition-all ml-auto cursor-pointer shadow-sm shrink-0`,
+      title: `Xóa ${isRouter ? 'Router' : 'Firewall'} [${r.name}]`,
+      children: (0, J.jsx)(`i`, { className: `fas fa-trash-alt` })
+    });
+
     let o = (0, J.jsxs)(`div`, {
-      className: `firewall-node-top`,
+      className: `firewall-node-top flex items-center justify-between w-full`,
       children: [
-        a,
         (0, J.jsxs)(`div`, {
-          className: `firewall-status-row`,
+          className: `flex items-center gap-2`,
           children: [
-            (0, J.jsx)(`span`, { className: `firewall-status-dot ${isRouter ? 'bg-emerald-500' : ''}` }),
-            (0, J.jsx)(`span`, { children: isRouter ? `Online` : `Protected` }),
+            a,
+            (0, J.jsxs)(`div`, {
+              className: `firewall-status-row`,
+              children: [
+                (0, J.jsx)(`span`, { className: `firewall-status-dot ${isRouter ? 'bg-emerald-500' : ''}` }),
+                (0, J.jsx)(`span`, { children: isRouter ? `Online` : `Protected` }),
+              ],
+            }),
           ],
         }),
+        delBtn,
       ],
     });
 
@@ -2513,7 +2531,7 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     );
   });
 function Ae(e) {
-  let { firewalls: fws, firewall: n, registerRef: r, onManage: i, onAdd: a } = e;
+  let { firewalls: fws, firewall: n, registerRef: r, onManage: i, onAdd: a, onDelete: onDel } = e;
   let devices = (Array.isArray(fws) && fws.length > 0) ? fws : (n ? [n] : []);
 
   let allWanLinks = [];
@@ -2542,6 +2560,7 @@ function Ae(e) {
       fw: dev,
       ref: (el) => r(dev.id, el),
       onManage: () => i(dev.id),
+      onDelete: onDel,
     }, dev.id)
   );
 
@@ -2885,6 +2904,8 @@ function Pe(e) {
 function Fe() {
   let e = d((e) => e.DB),
     t = d((e) => e.FirewallDB),
+    deleteFirewall = d((e) => e.deleteFirewall),
+    showDialog = useDialogStore((e) => e.showDialog),
     n = d((e) => e.GponFrameDB),
     r = d((e) => e.GponOntDB),
     i = u((e) => e.openGponFrameModal),
@@ -2905,6 +2926,19 @@ function Fe() {
     E = u((e) => e.toggleSidebarMobile),
     D = u((e) => e.openAddFirewallModal),
     O = u((e) => e.openEditFirewallModal),
+    handleDeleteFw = (dev) => {
+      if (!dev) return;
+      let isRt = dev.deviceType === 'router' || dev.name?.toLowerCase().includes('router');
+      let label = isRt ? 'Router' : 'Firewall';
+      let execute = () => {
+        deleteFirewall(dev.id);
+      };
+      if (typeof showDialog === 'function') {
+        showDialog(`Bạn có chắc chắn muốn xóa ${label} [${dev.name}]?`, 'confirm', execute);
+      } else if (typeof window !== 'undefined' && window.confirm(`Bạn có chắc chắn muốn xóa ${label} [${dev.name}]?`)) {
+        execute();
+      }
+    },
     j = (0, g.useRef)(null),
     { scale: M, resetView: ee } = ce(j);
   de(j);
@@ -3276,6 +3310,7 @@ function Fe() {
                         registerRef: F,
                         onManage: O,
                         onAdd: D,
+                        onDelete: handleDeleteFw,
                       }),
                     }),
                   q.slots.map((e) =>
@@ -3310,6 +3345,7 @@ function Fe() {
                       registerRef: F,
                       onManage: O,
                       onAdd: D,
+                      onDelete: handleDeleteFw,
                     }),
                   }),
                   (0, J.jsx)(he, { coreSwitches: le, ...$ }),
