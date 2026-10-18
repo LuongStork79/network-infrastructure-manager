@@ -10,7 +10,7 @@ import {
 } from '../services/projectManager.js';
 import { db } from '../services/firebase.js';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { getAllBrandNames } from '../services/brandManager.js';
+import { getAllBrandNames, deleteBrand } from '../services/brandManager.js';
 
 export default function ProjectsView({ onBack }) {
   const [activeTab, setActiveTab] = useState('projects'); // 'projects' | 'devices'
@@ -1225,30 +1225,89 @@ export default function ProjectsView({ onBack }) {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
-                    Hãng Sản Xuất
-                  </label>
-                  <select
-                    value={swBrand}
-                    onChange={(e) => setSwBrand(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      backgroundColor: '#f8fafc',
-                      border: '1.5px solid #cbd5e1',
-                      borderRadius: '12px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: '#0f172a',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {brandOptions.map(b => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', textAlign: 'left' }}>
+                      Hãng Sản Xuất
+                    </label>
+                    {swBrand && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const confirmMsg = `Bạn có chắc chắn muốn xóa thương hiệu "${swBrand}" khỏi danh sách?`;
+                          if (window.confirm(confirmMsg)) {
+                            deleteBrand(swBrand);
+                            const updated = getAllBrandNames();
+                            setSwBrand(updated[0] || '');
+                          }
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#ef4444',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        title={`Xóa thương hiệu "${swBrand}"`}
+                      >
+                        <i className="fas fa-trash-alt" style={{ fontSize: '10px' }} /> Xóa hiệu
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <select
+                      value={swBrand}
+                      onChange={(e) => setSwBrand(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        backgroundColor: '#f8fafc',
+                        border: '1.5px solid #cbd5e1',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {brandOptions.map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                    {swBrand && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const confirmMsg = `Bạn có chắc chắn muốn xóa thương hiệu "${swBrand}" khỏi danh sách?`;
+                          if (window.confirm(confirmMsg)) {
+                            deleteBrand(swBrand);
+                            const updated = getAllBrandNames();
+                            setSwBrand(updated[0] || '');
+                          }
+                        }}
+                        style={{
+                          padding: '10px',
+                          backgroundColor: '#fee2e2',
+                          border: '1.5px solid #fca5a5',
+                          borderRadius: '12px',
+                          color: '#ef4444',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}
+                        title={`Xóa thương hiệu "${swBrand}"`}
+                      >
+                        <i className="fas fa-trash-alt" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div>

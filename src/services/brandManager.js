@@ -1,5 +1,6 @@
 // Quản lý Thương hiệu Switch (Switch Brands Manager)
 const STORAGE_BRANDS_KEY = 'nim_custom_switch_brands';
+const STORAGE_DELETED_BRANDS_KEY = 'nim_deleted_switch_brands';
 
 export const DEFAULT_BRAND_COLORS = {
   Cisco: 'var(--cisco-blue)',
@@ -63,9 +64,35 @@ export function saveCustomBrands(brands) {
   }
 }
 
+export function getDeletedBrands() {
+  try {
+    const raw = localStorage.getItem(STORAGE_DELETED_BRANDS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return new Set(parsed);
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading deleted brands:', e);
+  }
+  return new Set();
+}
+
+export function saveDeletedBrands(deletedSet) {
+  try {
+    localStorage.setItem(STORAGE_DELETED_BRANDS_KEY, JSON.stringify(Array.from(deletedSet)));
+    window.dispatchEvent(new CustomEvent('nim:brands_updated'));
+  } catch (e) {
+    console.error('Error saving deleted brands:', e);
+  }
+}
+
 export function getAllBrandNames() {
   const custom = getCustomBrands();
+  const deleted = getDeletedBrands();
   const allNames = new Set([...Object.keys(DEFAULT_BRAND_COLORS), ...Object.keys(custom)]);
+  deleted.forEach((name) => allNames.delete(name));
   return Array.from(allNames);
 }
 
@@ -95,6 +122,11 @@ export function getBrandShortCode(brandName) {
 export function addCustomBrand(brandName, color = '#4f46e5', code = '') {
   const name = brandName.trim();
   if (!name) return null;
+  const deleted = getDeletedBrands();
+  if (deleted.has(name)) {
+    deleted.delete(name);
+    saveDeletedBrands(deleted);
+  }
   const custom = getCustomBrands();
   const shortCode = code.trim() || name.slice(0, 2).toUpperCase();
   custom[name] = {
@@ -105,20 +137,35 @@ export function addCustomBrand(brandName, color = '#4f46e5', code = '') {
   return { name, color: custom[name].color, code: shortCode };
 }
 
-export function deleteCustomBrand(brandName) {
+export function deleteBrand(brandName) {
   if (!brandName) return false;
   const custom = getCustomBrands();
   if (custom[brandName]) {
     delete custom[brandName];
     saveCustomBrands(custom);
-    return true;
   }
-  return false;
+  const deleted = getDeletedBrands();
+  deleted.add(brandName);
+  saveDeletedBrands(deleted);
+  return true;
 }
+
+export const deleteCustomBrand = deleteBrand;
 
 export function isCustomBrand(brandName) {
   if (!brandName) return false;
   const custom = getCustomBrands();
   return Boolean(custom[brandName]);
 }
+
+export function resetDeletedBrands() {
+  try {
+    localStorage.removeItem(STORAGE_DELETED_BRANDS_KEY);
+    window.dispatchEvent(new CustomEvent('nim:brands_updated'));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 

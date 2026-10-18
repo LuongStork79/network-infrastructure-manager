@@ -8,7 +8,7 @@ import {
   l as s,
   s as c,
 } from "./index-QE6I14Fy.js";
-import { getAllBrandNames, getBrandColor, addCustomBrand, deleteCustomBrand, isCustomBrand } from "../services/brandManager.js";
+import { getAllBrandNames, getBrandColor, addCustomBrand, deleteBrand, deleteCustomBrand, isCustomBrand, getDeletedBrands, resetDeletedBrands } from "../services/brandManager.js";
 import { getActiveProject, getActiveProjectId } from "../services/projectManager.js";
 var u = e(t(), 1),
   d = n();
@@ -92,14 +92,17 @@ function p({
       }
     },
     handleDeleteBrand = () => {
-      if (!isCustomBrand(S)) return;
-      const confirmMsg = `Bạn có chắc chắn muốn xóa thương hiệu tùy chỉnh "${S}"?`;
+      if (!S || S === '__add_new__' || S === '__reset_brands__') return;
+      const switchesWithBrand = (n || []).flatMap((r) => r.switches || []).filter((sw) => sw.brand === S).length;
+      const confirmMsg = switchesWithBrand > 0
+        ? `⚠️ Thương hiệu "${S}" hiện đang được sử dụng bởi ${switchesWithBrand} Switch.\n\nBạn có chắc chắn muốn xóa thương hiệu này khỏi danh sách lựa chọn?`
+        : `Bạn có chắc chắn muốn xóa thương hiệu "${S}" khỏi danh sách?`;
       const execute = () => {
-        deleteCustomBrand(S);
+        deleteBrand(S);
         const updated = getAllBrandNames();
         setAvailableBrands(updated);
-        C(updated[0] || 'Cisco');
-        _(`Đã xóa thương hiệu "${S}"!`, 'success');
+        C(updated[0] || '');
+        _(`Đã xóa thương hiệu "${S}" khỏi danh sách!`, 'success');
       };
       if (typeof _ === 'function') {
         _ (confirmMsg, 'confirm', execute);
@@ -393,11 +396,11 @@ function p({
                           (0, d.jsxs)(`div`, {
                             className: `flex items-center gap-2`,
                             children: [
-                              isCustomBrand(S) && !isAddingBrand && (0, d.jsxs)(`button`, {
+                              S && S !== `__add_new__` && S !== `__reset_brands__` && !isAddingBrand && (0, d.jsxs)(`button`, {
                                 type: `button`,
                                 onClick: handleDeleteBrand,
                                 className: `text-[10px] font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer flex items-center gap-1`,
-                                title: `Xóa hiệu tùy chỉnh [${S}]`,
+                                title: `Xóa thương hiệu đang chọn [${S}]`,
                                 children: [
                                   (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-[9px]` }),
                                   ` Xóa hiệu`,
@@ -457,6 +460,12 @@ function p({
                                 onChange: (e) => {
                                   if (e.target.value === '__add_new__') {
                                     setIsAddingBrand(true);
+                                  } else if (e.target.value === '__reset_brands__') {
+                                    resetDeletedBrands();
+                                    const updated = getAllBrandNames();
+                                    setAvailableBrands(updated);
+                                    C(updated[0] || 'Cisco');
+                                    _('Đã khôi phục danh sách thương hiệu mặc định!', 'success');
                                   } else {
                                     C(e.target.value);
                                   }
@@ -471,13 +480,19 @@ function p({
                                     { value: `__add_new__`, children: `+ Thêm thương hiệu mới...` },
                                     `__add_new__`,
                                   ),
+                                  getDeletedBrands().size > 0 &&
+                                    (0, d.jsx)(
+                                      `option`,
+                                      { value: `__reset_brands__`, children: `↺ Khôi phục thương hiệu mặc định...` },
+                                      `__reset_brands__`,
+                                    ),
                                 ],
                               }),
-                              isCustomBrand(S) && (0, d.jsx)(`button`, {
+                              S && S !== `__add_new__` && S !== `__reset_brands__` && (0, d.jsx)(`button`, {
                                 type: `button`,
                                 onClick: handleDeleteBrand,
                                 className: `w-11 h-11 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-500 hover:text-rose-700 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm`,
-                                title: `Xóa thương hiệu tùy chỉnh "${S}"`,
+                                title: `Xóa thương hiệu "${S}"`,
                                 children: (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-sm` }),
                               }),
                             ],
