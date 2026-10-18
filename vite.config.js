@@ -61,7 +61,7 @@ export default defineConfig({
       },
       {
         find: /.*FirewallManageModal-PTkT46yr\.js$/,
-        replacement: path.resolve(__dirname, 'src/core/FirewallManageModal-PTkT46yr.js')
+        replacement: path.resolve(__dirname, 'src/components/modals/FirewallManageModal.jsx')
       },
       {
         find: /.*ReportModal-B7J25k7g\.js$/,
