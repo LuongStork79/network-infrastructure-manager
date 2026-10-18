@@ -2278,7 +2278,7 @@ function pe(e) {
 var me = 5;
 function he(e) {
   let t = (0, w.c)(63),
-    { onBack: n, username: r } = e,
+    { onBack: n, username: r, isAdmin = true } = e,
     a = m(Te),
     s = m(we),
     u = m(Ce),
@@ -2438,8 +2438,8 @@ function he(e) {
             className: `view-header-actions flex items-center gap-3`,
             children: [
               U,
-              ae,
-              K,
+              isAdmin && ae,
+              isAdmin && K,
               (0, E.jsxs)(`button`, {
                 onClick: n,
                 className: `px-5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl shadow-md hover:bg-black transition-all flex items-center gap-2`,
@@ -2479,8 +2479,8 @@ function he(e) {
                       children: [
                         (0, E.jsxs)(`div`, {
                           className: `gpon-frame-box`,
-                          onClick: () => C(e),
-                          title: `Bấm để xem/sửa Frame`,
+                          onClick: isAdmin ? () => C(e) : undefined,
+                          title: isAdmin ? `Bấm để xem/sửa Frame` : e.name,
                           children: [
                             (0, E.jsx)(`i`, { className: `fas fa-server` }),
                             e.name,
@@ -2501,8 +2501,8 @@ function he(e) {
                                       children: [
                                         (0, E.jsxs)(`div`, {
                                           className: `gpon-slot-box`,
-                                          onClick: () => C(e),
-                                          title: `Bấm để xem/sửa Slot`,
+                                          onClick: isAdmin ? () => C(e) : undefined,
+                                          title: isAdmin ? `Bấm để xem/sửa Slot` : `Slot ${t.slotNumber}`,
                                           children: [
                                             `Slot `,
                                             t.slotNumber,
@@ -2547,7 +2547,7 @@ function he(e) {
                                                       className: `gpon-ont-fan`,
                                                       children:
                                                         c.length === 0
-                                                          ? (0, E.jsxs)(`div`, {
+                                                          ? (isAdmin ? (0, E.jsxs)(`div`, {
                                                               className: `gpon-more-tile`,
                                                               onClick: () =>
                                                                 A({
@@ -2565,7 +2565,10 @@ function he(e) {
                                                                 ),
                                                                 `Thêm ONT`,
                                                               ],
-                                                            })
+                                                            }) : (0, E.jsx)(`div`, {
+                                                              className: `gpon-more-tile text-slate-400 cursor-default`,
+                                                              children: `Trống`,
+                                                            }))
                                                           : (0, E.jsxs)(
                                                               E.Fragment,
                                                               {
@@ -2575,15 +2578,16 @@ function he(e) {
                                                                       ie,
                                                                       {
                                                                         ont: r,
-                                                                        onClick:
-                                                                          () =>
-                                                                            A({
-                                                                              frame:
-                                                                                e,
-                                                                              slot: t,
-                                                                              port: n,
-                                                                              ont: r,
-                                                                            }),
+                                                                        onClick: isAdmin
+                                                                          ? () =>
+                                                                              A({
+                                                                                frame:
+                                                                                  e,
+                                                                                slot: t,
+                                                                                port: n,
+                                                                                ont: r,
+                                                                              })
+                                                                          : undefined,
                                                                       },
                                                                       r.id,
                                                                     ),
@@ -2652,9 +2656,10 @@ function he(e) {
           frame: S,
           username: r,
           onSave: (e) => {
+            if (!isAdmin) return;
             (u(e), C(`closed`));
           },
-          onDelete: () => ee(S),
+          onDelete: isAdmin ? () => ee(S) : () => {},
           onClose: () => C(`closed`),
         })),
       (t[29] = S),
@@ -2672,13 +2677,13 @@ function he(e) {
           slot: D.slot,
           port: D.port,
           ontDB: s,
-          onAddNew: () => {
+          onAddNew: isAdmin ? () => {
             (A({ ...D, ont: null }), O(null));
-          },
-          onEdit: (e) => {
+          } : () => {},
+          onEdit: isAdmin ? (e) => {
             let t = s.find((t) => t.id === e) ?? null;
             (A({ ...D, ont: t }), O(null));
-          },
+          } : () => {},
           onClose: () => O(null),
         })),
       (t[34] = D),
@@ -2697,9 +2702,10 @@ function he(e) {
           ontDB: s,
           username: r,
           onSave: (e) => {
+            if (!isAdmin) return;
             (p(e), A(null));
           },
-          onDelete: () => V(k),
+          onDelete: isAdmin ? () => V(k) : () => {},
           onClose: () => A(null),
         })),
       (t[37] = V),
@@ -2716,9 +2722,9 @@ function he(e) {
         (0, E.jsx)(oe, {
           frameDB: a,
           ontDB: s,
-          onEdit: (e) => {
+          onEdit: isAdmin ? (e) => {
             (L(e), M(!1));
-          },
+          } : () => {},
           onClose: () => M(!1),
         })),
       (t[43] = j),

@@ -2037,10 +2037,10 @@ function G(e) {
                   }),
               ],
             }),
-            (0, j.jsx)(`button`, {
+            r && (0, j.jsx)(`button`, {
               onClick: () => r(n.outgoing.connId),
               title: `Xóa kết nối Port ${n.port}`,
-              className: `opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-50 rounded text-red-400 hover:text-red-500 shrink-0 mt-0.5`,
+              className: `opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-50 rounded text-red-400 hover:text-red-500 shrink-0 mt-0.5 cursor-pointer`,
               children: (0, j.jsx)(`i`, {
                 className: `fas fa-times text-[8px]`,
               }),
@@ -2079,10 +2079,10 @@ function G(e) {
                   }),
               ],
             }),
-            (0, j.jsx)(`button`, {
+            r && (0, j.jsx)(`button`, {
               onClick: () => r(n.outgoing.connId),
               title: `Xóa kết nối Port ${n.port}`,
-              className: `opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-50 rounded text-red-400 hover:text-red-500 shrink-0 mt-0.5`,
+              className: `opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-red-50 rounded text-red-400 hover:text-red-500 shrink-0 mt-0.5 cursor-pointer`,
               children: (0, j.jsx)(`i`, {
                 className: `fas fa-times text-[8px]`,
               }),
@@ -3122,6 +3122,7 @@ function me(e) {
       onDelete: g,
       onSave: _,
       username: y,
+      isAdmin = true,
     } = e,
     x = a(ge),
     S = i(he),
@@ -3387,15 +3388,15 @@ function me(e) {
         E === `patch` &&
         (0, j.jsxs)(j.Fragment, {
           children: [
-            (0, j.jsxs)(`button`, {
+            d && (0, j.jsxs)(`button`, {
               onClick: () => d(n),
-              className: `px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold rounded-lg hover:bg-amber-100 transition-all flex items-center gap-1`,
+              className: `px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold rounded-lg hover:bg-amber-100 transition-all flex items-center gap-1 cursor-pointer`,
               children: [(0, j.jsx)(`i`, { className: `fas fa-edit` }), ` Sửa`],
             }),
-            (0, j.jsx)(`button`, {
+            g && (0, j.jsx)(`button`, {
               onClick: () => g(n.id),
               title: `Xóa ODF`,
-              className: `px-3 py-1.5 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold rounded-lg hover:bg-red-100 transition-all flex items-center gap-1`,
+              className: `px-3 py-1.5 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold rounded-lg hover:bg-red-100 transition-all flex items-center gap-1 cursor-pointer`,
               children: (0, j.jsx)(`i`, { className: `fas fa-trash` }),
             }),
           ],
@@ -3528,14 +3529,14 @@ function me(e) {
                     className: `p-4 bg-slate-50 rounded-xl border border-slate-100 min-h-[60px]`,
                     children: (0, j.jsx)(z, {
                       layout: U,
-                      onPortClick: A,
-                      onEditGroup: T,
+                      onPortClick: isAdmin ? A : () => {},
+                      onEditGroup: isAdmin ? T : () => {},
                     }),
                   }),
                   (0, j.jsx)(te, {
                     oddPorts: K.oddPorts,
                     evenPorts: K.evenPorts,
-                    onDeleteConnection: se,
+                    onDeleteConnection: isAdmin ? se : null,
                     passThroughCount: K.passThroughCount,
                     receiveCount: K.receiveCount,
                     half: K.half,
@@ -4091,7 +4092,7 @@ function ye(e) {
 }
 function Z(e) {
   let t = (0, c.c)(51),
-    { onBack: n, username: o } = e,
+    { onBack: n, username: o, isAdmin = true } = e,
     l = i(De),
     u = i(Ee),
     d = i(Te),
@@ -4231,7 +4232,7 @@ function Z(e) {
           k,
           (0, j.jsxs)(`div`, {
             className: `view-header-actions flex items-center gap-3`,
-            children: [N, I, R],
+            children: [N, isAdmin && I, R],
           }),
         ],
       })),
@@ -4265,10 +4266,11 @@ function Z(e) {
           odfDB: l,
           db: u,
           wifiDB: d,
-          onEdit: V,
-          onDelete: O,
-          onSave: f,
+          onEdit: isAdmin ? V : () => {},
+          onDelete: isAdmin ? O : null,
+          onSave: isAdmin ? f : () => {},
           username: o,
+          isAdmin: isAdmin,
         }),
       })),
       (t[32] = E),

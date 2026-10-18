@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function IpAllocationModal({ ip, existingData, onSave, onDelete, onClose }) {
+export default function IpAllocationModal({ ip, existingData, onSave, onDelete, onClose, isAdmin = true }) {
   const [name, setName] = useState(existingData?.n || existingData?.name || '');
   const [mac, setMac] = useState(existingData?.mac || '');
   const [note, setNote] = useState(existingData?.note || '');
@@ -9,6 +9,7 @@ export default function IpAllocationModal({ ip, existingData, onSave, onDelete, 
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!isAdmin || !onSave) return;
     onSave(ip, {
       name: name.trim() || 'Manual Host',
       mac: mac.trim(),
@@ -20,6 +21,7 @@ export default function IpAllocationModal({ ip, existingData, onSave, onDelete, 
   }
 
   function handleDelete() {
+    if (!isAdmin || !onDelete) return;
     if (confirm(`Bạn có chắc muốn hủy gán và giải phóng địa chỉ IP ${ip}?`)) {
       onDelete(ip);
       onClose();
@@ -147,7 +149,7 @@ export default function IpAllocationModal({ ip, existingData, onSave, onDelete, 
           </div>
 
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-            {existingData ? (
+            {isAdmin && existingData && onDelete ? (
               <button
                 type="button"
                 onClick={handleDelete}
@@ -163,14 +165,16 @@ export default function IpAllocationModal({ ip, existingData, onSave, onDelete, 
                 onClick={onClose}
                 className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
               >
-                Hủy
+                {isAdmin ? 'Hủy' : 'Đóng'}
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <i className="fas fa-check"></i> Lưu Cấu Hình
-              </button>
+              {isAdmin && (
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <i className="fas fa-check"></i> Lưu Cấu Hình
+                </button>
+              )}
             </div>
           </div>
         </form>

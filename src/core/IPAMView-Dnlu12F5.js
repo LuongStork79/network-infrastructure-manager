@@ -24,7 +24,7 @@ var g = e(t(), 1),
   _ = l(),
   v = n();
 function y(e) {
-  let { db: n, elevatorDB: r, activeVlanId: i, onSelect: a, subnets: subMap, onAddSubnet, onEditSubnet, onDeleteSubnet } = e;
+  let { db: n, elevatorDB: r, activeVlanId: i, onSelect: a, subnets: subMap, onAddSubnet, onEditSubnet, onDeleteSubnet, isAdmin = true } = e;
   let currentSubnets = subMap || getAllSubnets();
   return (0, v.jsxs)(`div`, {
     id: `ipam-subnet-list`,
@@ -37,7 +37,7 @@ function y(e) {
             className: `text-xs font-black text-slate-800 uppercase tracking-widest`,
             children: `Subnets List`,
           }),
-          (0, v.jsxs)(`button`, {
+          isAdmin && (0, v.jsxs)(`button`, {
             type: `button`,
             onClick: () => onAddSubnet && onAddSubnet(),
             className: `text-[11px] font-bold px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all`,
@@ -91,7 +91,7 @@ function y(e) {
                       }),
                     ],
                   }),
-                  (0, v.jsxs)(`div`, {
+                  isAdmin && (0, v.jsxs)(`div`, {
                     className: `flex items-center gap-1 shrink-0`,
                     onClick: (ev) => ev.stopPropagation(),
                     children: [
@@ -586,6 +586,7 @@ function E(e) {
       onEdit: a,
       onDelete: o,
       onViewChannels: s,
+      isAdmin = true,
     } = e,
     c;
   t[0] === r
@@ -639,7 +640,7 @@ function E(e) {
               className: `flex items-center justify-between`,
               children: [
                 e,
-                (0, v.jsxs)(`button`, {
+                isAdmin && (0, v.jsxs)(`button`, {
                   onClick: i,
                   className: `px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-[10px] font-bold text-orange-600 hover:bg-orange-100 transition-all flex items-center gap-1.5`,
                   children: [n, `Thêm NVR`],
@@ -681,7 +682,7 @@ function E(e) {
   let m;
   t[17] === i
     ? (m = t[18])
-    : ((m = (0, v.jsxs)(`button`, {
+    : ((m = isAdmin && (0, v.jsxs)(`button`, {
         onClick: i,
         className: `px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg text-[10px] font-bold text-orange-600 hover:bg-orange-100 transition-all flex items-center gap-1.5`,
         children: [p, `Thêm NVR`],
@@ -758,7 +759,7 @@ function E(e) {
                     (0, v.jsx)(`div`, {
                       className: `flex items-center gap-1`,
                       children: t
-                        ? (0, v.jsxs)(v.Fragment, {
+                        ? (isAdmin ? (0, v.jsxs)(v.Fragment, {
                             children: [
                               (0, v.jsx)(`button`, {
                                 onClick: () => a(t.id),
@@ -777,12 +778,12 @@ function E(e) {
                                 }),
                               }),
                             ],
-                          })
-                        : (0, v.jsx)(`button`, {
+                          }) : null)
+                        : (isAdmin ? (0, v.jsx)(`button`, {
                             onClick: i,
                             className: `px-2 py-0.5 text-[9px] font-bold bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors`,
                             children: `+ Thêm vào DB`,
-                          }),
+                          }) : null),
                     }),
                   ],
                 }),
@@ -1994,7 +1995,7 @@ function ne(e) {
 }
 function re(e) {
   let t = (0, _.c)(41),
-    { onBack: n, username: r } = e,
+    { onBack: n, username: r, isAdmin = true } = e,
     i = a(oe),
     o = a(H),
     c = a(ae),
@@ -2025,14 +2026,17 @@ function re(e) {
   }, []);
 
   function handleAddSubnet() {
+    if (!isAdmin) return;
     setSubnetModal({ isOpen: true, isEdit: false, data: null });
   }
 
   function handleEditSubnet(vid, data) {
+    if (!isAdmin) return;
     setSubnetModal({ isOpen: true, isEdit: true, data: { vid, ...data } });
   }
 
   function handleDeleteSubnet(vid, data) {
+    if (!isAdmin) return;
     f(`Bạn có chắc chắn muốn xóa Subnet VLAN ${vid} (${data.name}) không?`, `confirm`, () => {
       deleteSubnet(vid);
       setSubnets(getAllSubnets());
@@ -2041,6 +2045,7 @@ function re(e) {
   }
 
   function handleSaveSubnet(vid, data) {
+    if (!isAdmin) return;
     saveSubnet(vid, data);
     setSubnets(getAllSubnets());
   }
@@ -2050,11 +2055,13 @@ function re(e) {
   }
 
   function handleSaveIp(ip, data) {
+    if (!isAdmin) return;
     setIpAllocation(ip, { ...data, vlan: p });
     setIpAllocations(getCustomIpAllocations());
   }
 
   function handleDeleteIp(ip) {
+    if (!isAdmin) return;
     deleteIpAllocation(ip);
     setIpAllocations(getCustomIpAllocations());
   }
@@ -2126,9 +2133,10 @@ function re(e) {
     activeVlanId: p,
     onSelect: m,
     subnets: subnets,
-    onAddSubnet: handleAddSubnet,
-    onEditSubnet: handleEditSubnet,
-    onDeleteSubnet: handleDeleteSubnet,
+    isAdmin: isAdmin,
+    onAddSubnet: isAdmin ? handleAddSubnet : null,
+    onEditSubnet: isAdmin ? handleEditSubnet : null,
+    onDeleteSubnet: isAdmin ? handleDeleteSubnet : null,
   });
   let P = (0, v.jsx)(`div`, {
     className: `flex-1 overflow-y-auto custom-scroll bg-slate-50/50 p-8 relative`,
@@ -2147,9 +2155,10 @@ function re(e) {
                 ? (0, v.jsx)(E, {
                     nvrDB: c,
                     usedMap: O,
-                    onAddNew: () => b(null),
-                    onEdit: (e) => b(c.find((t) => t.id === e) ?? null),
-                    onDelete: T,
+                    isAdmin: isAdmin,
+                    onAddNew: isAdmin ? () => b(null) : null,
+                    onEdit: isAdmin ? (e) => b(c.find((t) => t.id === e) ?? null) : null,
+                    onDelete: isAdmin ? T : null,
                     onViewChannels: S,
                   })
                 : null,
@@ -2184,16 +2193,18 @@ function re(e) {
   t[31] !== r
     ? ((L =
         h !== `closed` &&
+        isAdmin &&
         (0, v.jsx)(I, {
           record: h,
           db: i,
           elevatorDB: o,
           username: r,
           onSave: (e) => {
+            if (!isAdmin) return;
             (l(e), b(`closed`));
           },
           onDelete: () => {
-            if (!h) return;
+            if (!isAdmin || !h) return;
             let { id: e, name: t } = h;
             f(`Bạn có chắc chắn muốn xóa NVR "${t}"?`, `confirm`, () => {
               (d(e), b(`closed`));
@@ -2226,7 +2237,7 @@ function re(e) {
       F,
       L,
       R,
-      subnetModal?.isOpen &&
+      isAdmin && subnetModal?.isOpen &&
         (0, v.jsx)(SubnetManageModal, {
           initialData: subnetModal.data,
           isEdit: subnetModal.isEdit,
@@ -2237,6 +2248,7 @@ function re(e) {
         (0, v.jsx)(IpAllocationModal, {
           ip: ipModal.ip,
           existingData: ipModal.data,
+          isAdmin: isAdmin,
           onSave: handleSaveIp,
           onDelete: handleDeleteIp,
           onClose: () => setIpModal(null),

@@ -420,11 +420,12 @@ function A(e) {
       onDeleteId: s,
       onShowLogsId: c,
       onBulkDelete: onBulkDel,
+      isAdmin = true,
     } = e,
     [l, d] = (0, p.useState)(``),
     [selectedIds, setSelectedIds] = (0, p.useState)(() => new Set());
 
-  const getPhoneKey = (ph) => String(ph.id || ph.extension || ph.ip || ph.mac || `${ph.name}-${ph.floor}`);
+  const getPhoneKey = (ph) => String(ph.id || ph.extension || ph.ip || '');
 
   (r || []).forEach((ph) => {
     if (!ph.id) {
@@ -465,7 +466,7 @@ function A(e) {
                 className: `text-[10px] font-black text-slate-400`,
                 children: [filteredPhones.length, ` / `, r.length, ` máy`],
               }),
-              filteredPhones.length > 0 &&
+              isAdmin && filteredPhones.length > 0 &&
                 (0, S.jsxs)(`button`, {
                   type: `button`,
                   onClick: () => {
@@ -483,7 +484,7 @@ function A(e) {
                     isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả (${filteredPhones.length})`,
                   ],
                 }),
-              selectedIds.size === 0 && filteredPhones.length > 0 &&
+              isAdmin && selectedIds.size === 0 && filteredPhones.length > 0 &&
                 (0, S.jsxs)(`button`, {
                   type: `button`,
                   onClick: () => {
@@ -500,7 +501,7 @@ function A(e) {
                 }),
             ],
           }),
-          selectedIds.size > 0 &&
+          isAdmin && selectedIds.size > 0 &&
             (0, S.jsxs)(`div`, {
               className: `flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold shrink-0`,
               children: [
@@ -545,31 +546,35 @@ function A(e) {
               children: (0, S.jsxs)(`tr`, {
                 className: `bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
                 children: [
-                  (0, S.jsx)(`th`, {
-                    className: `px-3 py-3 w-10 text-center cursor-pointer select-none`,
-                    onClick: (ev) => {
-                      if (ev.target.tagName !== 'INPUT') {
-                        if (isAllSelected) setSelectedIds(new Set());
-                        else setSelectedIds(new Set(allKeys));
-                      }
-                    },
-                    children: (0, S.jsx)(`input`, {
-                      type: `checkbox`,
-                      checked: isAllSelected,
-                      ref: (el) => {
-                        if (el) el.indeterminate = isSomeSelected && !isAllSelected;
-                      },
-                      onChange: () => {
-                        if (isAllSelected) {
-                          setSelectedIds(new Set());
-                        } else {
-                          setSelectedIds(new Set(allKeys));
+                  isAdmin ? (
+                    (0, S.jsx)(`th`, {
+                      className: `px-3 py-3 w-10 text-center cursor-pointer select-none`,
+                      onClick: (ev) => {
+                        if (ev.target.tagName !== 'INPUT') {
+                          if (isAllSelected) setSelectedIds(new Set());
+                          else setSelectedIds(new Set(allKeys));
                         }
                       },
-                      className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
-                      title: isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả`,
-                    }),
-                  }),
+                      children: (0, S.jsx)(`input`, {
+                        type: `checkbox`,
+                        checked: isAllSelected,
+                        ref: (el) => {
+                          if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+                        },
+                        onChange: () => {
+                          if (isAllSelected) {
+                            setSelectedIds(new Set());
+                          } else {
+                            setSelectedIds(new Set(allKeys));
+                          }
+                        },
+                        className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                        title: isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả`,
+                      }),
+                    })
+                  ) : (
+                    (0, S.jsx)(`th`, { className: `px-3 py-3 w-10 text-center text-slate-400 font-bold text-[10px]`, children: `#` })
+                  ),
                   (0, S.jsx)(`th`, { className: `px-4 py-3 w-20`, children: `Nhánh` }),
                   (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Tên / Vị trí` }),
                   (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `IP Address` }),
@@ -594,32 +599,21 @@ function A(e) {
                             : `Không tìm thấy kết quả phù hợp.`,
                       }),
                     })
-                  : filteredPhones.map((phoneItem) => {
+                  : filteredPhones.map((phoneItem, pIdx) => {
                       let rowKey = getPhoneKey(phoneItem);
                       let isRowSel = selectedIds.has(rowKey) || (phoneItem.id && selectedIds.has(phoneItem.id));
                       return (0, S.jsxs)(
                         `tr`,
                         {
-                          onClick: () => o(phoneItem),
-                          className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors cursor-pointer ${
+                          onClick: isAdmin ? () => o(phoneItem) : undefined,
+                          className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors ${isAdmin ? 'cursor-pointer' : ''} ${
                             isRowSel ? 'bg-green-50/60' : ''
                           }`,
                           children: [
-                            (0, S.jsx)(`td`, {
-                              className: `px-3 py-3 w-10 text-center cursor-pointer`,
-                              onClick: (ev) => {
-                                ev.stopPropagation();
-                                setSelectedIds((prev) => {
-                                  let next = new Set(prev);
-                                  if (next.has(rowKey)) next.delete(rowKey);
-                                  else next.add(rowKey);
-                                  return next;
-                                });
-                              },
-                              children: (0, S.jsx)(`input`, {
-                                type: `checkbox`,
-                                checked: isRowSel,
-                                onChange: (ev) => {
+                            isAdmin ? (
+                              (0, S.jsx)(`td`, {
+                                className: `px-3 py-3 w-10 text-center cursor-pointer`,
+                                onClick: (ev) => {
                                   ev.stopPropagation();
                                   setSelectedIds((prev) => {
                                     let next = new Set(prev);
@@ -628,10 +622,28 @@ function A(e) {
                                     return next;
                                   });
                                 },
-                                onClick: (e) => e.stopPropagation(),
-                                className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
-                              }),
-                            }),
+                                children: (0, S.jsx)(`input`, {
+                                  type: `checkbox`,
+                                  checked: isRowSel,
+                                  onChange: (ev) => {
+                                    ev.stopPropagation();
+                                    setSelectedIds((prev) => {
+                                      let next = new Set(prev);
+                                      if (next.has(rowKey)) next.delete(rowKey);
+                                      else next.add(rowKey);
+                                      return next;
+                                    });
+                                  },
+                                  onClick: (e) => e.stopPropagation(),
+                                  className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                                }),
+                              })
+                            ) : (
+                              (0, S.jsx)(`td`, {
+                                className: `px-3 py-3 w-10 text-center font-mono text-[10px] text-slate-400`,
+                                children: pIdx + 1,
+                              })
+                            ),
                             (0, S.jsx)(`td`, {
                               className: `px-4 py-3`,
                               children: (0, S.jsx)(`span`, {
@@ -706,13 +718,13 @@ function A(e) {
                                       className: `fas fa-history text-[10px]`,
                                     }),
                                   }),
-                                  (0, S.jsx)(`button`, {
+                                  isAdmin && (0, S.jsx)(`button`, {
                                     onClick: (t) => {
                                       t.stopPropagation();
                                       s(phoneItem.id || phoneItem.extension || rowKey);
                                     },
                                     title: `Xóa`,
-                                    className: `p-1.5 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors`,
+                                    className: `p-1.5 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors cursor-pointer`,
                                     children: (0, S.jsx)(`i`, {
                                       className: `fas fa-trash text-[10px]`,
                                     }),
@@ -1202,18 +1214,19 @@ function P(e) {
       (t[45] = c),
       (t[46] = E));
   let D;
-  t[47] !== w || t[48] !== E
-    ? ((D = (0, S.jsxs)(`div`, {
+  t[47] !== w || t[48] !== E || t[49] !== a
+    ? ((D = a ? (0, S.jsxs)(`div`, {
         className: `p-4`,
         children: [
           b,
           (0, S.jsxs)(`div`, { className: `flex gap-1.5`, children: [w, E] }),
         ],
-      })),
+      }) : null),
       (t[47] = w),
       (t[48] = E),
-      (t[49] = D))
-    : (D = t[49]);
+      (t[49] = a),
+      (t[50] = D))
+    : (D = t[50]);
   let O;
   return (
     t[50] !== D || t[51] !== _ || t[52] !== y
@@ -1444,12 +1457,12 @@ function F(e) {
   let L;
   t[42] === a
     ? (L = t[43])
-    : ((L = (0, S.jsx)(`button`, {
+    : ((L = a ? (0, S.jsx)(`button`, {
         onClick: a,
         title: `Xóa`,
-        className: `w-6 h-6 flex items-center justify-center text-slate-200 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all shrink-0`,
+        className: `w-6 h-6 flex items-center justify-center text-slate-200 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all shrink-0 cursor-pointer`,
         children: F,
-      })),
+      }) : null),
       (t[42] = a),
       (t[43] = L));
   let R;
@@ -2169,7 +2182,7 @@ function V(e, t) {
 }
 function H(e) {
   let t = (0, m.c)(112),
-    { onBack: n, username: o } = e,
+    { onBack: n, username: o, isAdmin = true } = e,
     c = i(ie),
     l = i(re),
     u = i(ne),
@@ -2495,7 +2508,7 @@ function H(e) {
           Ne,
           (0, S.jsxs)(`div`, {
             className: `view-header-actions flex items-center gap-3`,
-            children: [Q, Ie, Re, $],
+            children: [Q, isAdmin && Ie, isAdmin && Re, $],
           }),
         ],
       })),
@@ -2587,20 +2600,26 @@ function H(e) {
                     onEdit: V,
                     onDeleteId: me,
                     onShowLogsId: ge,
+                    isAdmin: isAdmin,
                     onBulkDelete: (ids) => {
-                      if (!ids || ids.length === 0) return;
+                      if (!isAdmin || !ids || ids.length === 0) return;
                       let count = ids.length;
                       C(`Bạn có chắc chắn muốn xóa ${count} điện thoại IP đã chọn khỏi danh bạ?`, `confirm`, () => {
-                        let keySet = new Set(ids.map(String));
-                        ids.forEach((id) => h(id));
-                        (l || []).forEach((item) => {
-                          let k1 = String(item.id || '');
-                          let k2 = String(item.extension || '');
-                          let k3 = String(item.ip || '');
-                          if (keySet.has(k1) || keySet.has(k2) || keySet.has(k3)) {
-                            h(item.id || item.extension);
-                          }
-                        });
+                        let store = i.getState();
+                        if (store && typeof store.bulkDeleteIPPhone === 'function') {
+                          store.bulkDeleteIPPhone(ids);
+                        } else {
+                          let keySet = new Set(ids.map(String));
+                          ids.forEach((id) => h(id));
+                          (l || []).forEach((item) => {
+                            let k1 = String(item.id || '');
+                            let k2 = String(item.extension || '');
+                            let k3 = String(item.ip || '');
+                            if (keySet.has(k1) || keySet.has(k2) || keySet.has(k3)) {
+                              h(item.id || item.extension);
+                            }
+                          });
+                        }
                         v(`Điện thoại IP: Xóa hàng loạt`, `Đã xóa ${count} điện thoại IP`, o);
                         C(`Đã xóa thành công ${count} điện thoại IP!`, `success`);
                       });
@@ -2614,7 +2633,7 @@ function H(e) {
                     db: u,
                     activeFloor: ce,
                     onSelectFloor: le,
-                    onCreateFloor: be,
+                    onCreateFloor: isAdmin ? be : null,
                   }),
                   (0, S.jsx)(`div`, {
                     className: `flex-1 flex flex-col overflow-hidden`,
@@ -2623,9 +2642,9 @@ function H(e) {
                       children: (0, S.jsx)(L, {
                         db: u,
                         activeFloor: ce,
-                        onPortClick: Ee,
+                        onPortClick: isAdmin ? Ee : () => {},
                         onShowLogs: we,
-                        onDelete: Se,
+                        onDelete: isAdmin ? Se : null,
                       }),
                     }),
                   }),

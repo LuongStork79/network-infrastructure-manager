@@ -12,7 +12,7 @@ import { db } from '../services/firebase.js';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { getAllBrandNames, deleteBrand } from '../services/brandManager.js';
 
-export default function ProjectsView({ onBack }) {
+export default function ProjectsView({ onBack, isAdmin = true, username = 'system' }) {
   const [activeTab, setActiveTab] = useState('projects'); // 'projects' | 'devices'
   const [projects, setProjects] = useState(getProjectsList());
   const [activeId, setActiveIdState] = useState(getActiveProjectId());
@@ -152,6 +152,10 @@ export default function ProjectsView({ onBack }) {
 
   async function handleSaveProject(e) {
     e.preventDefault();
+    if (!isAdmin) {
+      alert('Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể tạo/sửa dự án.');
+      return;
+    }
     if (!projName.trim()) {
       setProjectFormError('Vui lòng nhập tên dự án!');
       return;
@@ -190,6 +194,10 @@ export default function ProjectsView({ onBack }) {
   }
 
   async function handleDeleteProject(proj) {
+    if (!isAdmin) {
+      alert('Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể xóa dự án.');
+      return;
+    }
     if (projects.length <= 1) {
       alert('Bạn cần giữ lại ít nhất 1 dự án trong hệ thống!');
       return;
@@ -239,6 +247,10 @@ export default function ProjectsView({ onBack }) {
 
   async function handleSaveSwitch(e) {
     e.preventDefault();
+    if (!isAdmin) {
+      alert('Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể thêm/sửa Switch.');
+      return;
+    }
     if (!swName.trim()) {
       setSwitchFormError('Vui lòng nhập tên Switch!');
       return;
@@ -315,6 +327,10 @@ export default function ProjectsView({ onBack }) {
   }
 
   async function handleDeleteSwitch(sw) {
+    if (!isAdmin) {
+      alert('Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể xóa Switch.');
+      return;
+    }
     if (!confirm(`Bạn có chắc chắn muốn xóa Switch "${sw.name}" (${sw.ip}) khỏi dự án này?`)) return;
 
     try {
@@ -381,6 +397,10 @@ export default function ProjectsView({ onBack }) {
 
   async function handleSaveFirewall(e) {
     e.preventDefault();
+    if (!isAdmin) {
+      alert('Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể thêm/sửa Router & Firewall.');
+      return;
+    }
     if (!fwName.trim()) {
       setFwFormError('Vui lòng nhập tên thiết bị!');
       return;
@@ -473,6 +493,10 @@ export default function ProjectsView({ onBack }) {
   async function handleDeleteFirewall(fw) {
     const isRouter = fw.deviceType === 'router' || (fw.name && fw.name.toLowerCase().includes('router'));
     const label = isRouter ? 'Router' : 'Firewall';
+    if (!isAdmin) {
+      alert(`Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể xóa ${label}.`);
+      return;
+    }
     if (!confirm(`Bạn có chắc chắn muốn xóa ${label} "${fw.name}" (${fw.ip}) khỏi dự án này?`)) return;
 
     try {
@@ -540,13 +564,22 @@ export default function ProjectsView({ onBack }) {
             </button>
           </div>
 
-          <button
-            onClick={handleOpenAddProject}
-            className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <i className="fas fa-plus text-[10px]"></i>
-            Tạo Dự Án Mới
-          </button>
+          {!isAdmin && (
+            <span className="px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-black rounded-xl border border-amber-200 uppercase tracking-wider flex items-center gap-1.5 shadow-xs">
+              <i className="fas fa-lock text-[10px]"></i>
+              Chỉ đọc (Viewer)
+            </span>
+          )}
+
+          {isAdmin && (
+            <button
+              onClick={handleOpenAddProject}
+              className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <i className="fas fa-plus text-[10px]"></i>
+              Tạo Dự Án Mới
+            </button>
+          )}
 
           {onBack && (
             <button
@@ -665,15 +698,17 @@ export default function ProjectsView({ onBack }) {
                             Thiết bị
                           </button>
 
-                          <button
-                            onClick={() => handleOpenEditProject(proj)}
-                            className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-all text-xs cursor-pointer"
-                            title="Sửa thông tin dự án"
-                          >
-                            <i className="fas fa-edit"></i>
-                          </button>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleOpenEditProject(proj)}
+                              className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-all text-xs cursor-pointer"
+                              title="Sửa thông tin dự án"
+                            >
+                              <i className="fas fa-edit"></i>
+                            </button>
+                          )}
 
-                          {projects.length > 1 && (
+                          {isAdmin && projects.length > 1 && (
                             <button
                               onClick={() => handleDeleteProject(proj)}
                               className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all text-xs cursor-pointer"
@@ -732,29 +767,33 @@ export default function ProjectsView({ onBack }) {
                     </button>
                   )}
 
-                  <button
-                    onClick={handleOpenAddSwitch}
-                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <i className="fas fa-plus text-[10px]"></i>
-                    + Thêm Switch
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={handleOpenAddSwitch}
+                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <i className="fas fa-plus text-[10px]"></i>
+                        + Thêm Switch
+                      </button>
 
-                  <button
-                    onClick={() => handleOpenAddFirewall('router')}
-                    className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <i className="fas fa-route text-[10px]"></i>
-                    + Thêm Router
-                  </button>
+                      <button
+                        onClick={() => handleOpenAddFirewall('router')}
+                        className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <i className="fas fa-route text-[10px]"></i>
+                        + Thêm Router
+                      </button>
 
-                  <button
-                    onClick={() => handleOpenAddFirewall('firewall')}
-                    className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <i className="fas fa-shield-halved text-[10px]"></i>
-                    + Thêm Firewall
-                  </button>
+                      <button
+                        onClick={() => handleOpenAddFirewall('firewall')}
+                        className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <i className="fas fa-shield-halved text-[10px]"></i>
+                        + Thêm Firewall
+                      </button>
+                    </>
+                  )}
 
                   {onBack && (
                     <button
@@ -840,13 +879,15 @@ export default function ProjectsView({ onBack }) {
                               <p className="text-xs text-slate-500 mb-3">
                                 Dự án này chưa có {deviceSubTab === 'router' ? 'Router Gateway' : 'Firewall'} nào.
                               </p>
-                              <button
-                                onClick={() => handleOpenAddFirewall(deviceSubTab === 'router' ? 'router' : 'firewall')}
-                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <i className="fas fa-plus"></i>
-                                Thêm {deviceSubTab === 'router' ? 'Router' : 'Firewall'} Mới
-                              </button>
+                              {isAdmin && (
+                                <button
+                                  onClick={() => handleOpenAddFirewall(deviceSubTab === 'router' ? 'router' : 'firewall')}
+                                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <i className="fas fa-plus"></i>
+                                  Thêm {deviceSubTab === 'router' ? 'Router' : 'Firewall'} Mới
+                                </button>
+                              )}
                             </div>
                           );
                         }
@@ -858,20 +899,22 @@ export default function ProjectsView({ onBack }) {
                                 <i className="fas fa-shield-halved text-rose-500"></i>
                                 Router & Tường Lửa Firewall ({targetList.length})
                               </h4>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleOpenAddFirewall('router')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 cursor-pointer"
-                                >
-                                  + Thêm Router
-                                </button>
-                                <button
-                                  onClick={() => handleOpenAddFirewall('firewall')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 cursor-pointer"
-                                >
-                                  + Thêm Firewall
-                                </button>
-                              </div>
+                              {isAdmin && (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleOpenAddFirewall('router')}
+                                    className="px-2.5 py-1 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 cursor-pointer"
+                                  >
+                                    + Thêm Router
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenAddFirewall('firewall')}
+                                    className="px-2.5 py-1 text-[11px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 cursor-pointer"
+                                  >
+                                    + Thêm Firewall
+                                  </button>
+                                </div>
+                              )}
                             </div>
                             <div className="overflow-x-auto">
                               <table className="w-full text-left text-xs border-collapse">
@@ -930,22 +973,26 @@ export default function ProjectsView({ onBack }) {
                                           {fw.totalPorts || (Array.isArray(fw.ports) ? fw.ports.length : 24)} Ports
                                         </td>
                                         <td className="py-3 px-4 text-right">
-                                          <div className="flex items-center justify-end gap-1.5">
-                                            <button
-                                              onClick={() => handleOpenEditFirewall(fw)}
-                                              className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                                              title="Chỉnh sửa thiết bị này"
-                                            >
-                                              <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button
-                                              onClick={() => handleDeleteFirewall(fw)}
-                                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                              title="Xóa khỏi dự án"
-                                            >
-                                              <i className="fas fa-trash-alt"></i>
-                                            </button>
-                                          </div>
+                                          {isAdmin ? (
+                                            <div className="flex items-center justify-end gap-1.5">
+                                              <button
+                                                onClick={() => handleOpenEditFirewall(fw)}
+                                                className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                                title="Chỉnh sửa thiết bị này"
+                                              >
+                                                <i className="fas fa-edit"></i>
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeleteFirewall(fw)}
+                                                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                                title="Xóa khỏi dự án"
+                                              >
+                                                <i className="fas fa-trash-alt"></i>
+                                              </button>
+                                            </div>
+                                          ) : (
+                                            <span className="text-[10px] text-slate-400 italic">Chỉ xem</span>
+                                          )}
                                         </td>
                                       </tr>
                                     );
@@ -971,13 +1018,15 @@ export default function ProjectsView({ onBack }) {
                           <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-5">
                             Bạn có thể thêm Switch đầu tiên để quản lý hạ tầng mạng phân tầng.
                           </p>
-                          <button
-                            onClick={handleOpenAddSwitch}
-                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
-                          >
-                            <i className="fas fa-plus"></i>
-                            Thêm Switch Mới
-                          </button>
+                          {isAdmin && (
+                            <button
+                              onClick={handleOpenAddSwitch}
+                              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+                            >
+                              <i className="fas fa-plus"></i>
+                              Thêm Switch Mới
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
@@ -986,12 +1035,14 @@ export default function ProjectsView({ onBack }) {
                               <i className="fas fa-server text-indigo-600"></i>
                               Danh Sách Switch Phân Tầng ({allSwitches.length})
                             </h4>
-                            <button
-                              onClick={handleOpenAddSwitch}
-                              className="px-2.5 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 cursor-pointer"
-                            >
-                              + Thêm Switch
-                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={handleOpenAddSwitch}
+                                className="px-2.5 py-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 cursor-pointer"
+                              >
+                                + Thêm Switch
+                              </button>
+                            )}
                           </div>
                           <div className="overflow-x-auto">
                             <table className="w-full text-left text-xs border-collapse">
@@ -1046,22 +1097,26 @@ export default function ProjectsView({ onBack }) {
                                       </span>
                                     </td>
                                     <td className="py-3 px-4 text-right">
-                                      <div className="flex items-center justify-end gap-1.5">
-                                        <button
-                                          onClick={() => handleOpenEditSwitch(sw)}
-                                          className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                                          title="Chỉnh sửa Switch này"
-                                        >
-                                          <i className="fas fa-edit"></i>
-                                        </button>
-                                        <button
-                                          onClick={() => handleDeleteSwitch(sw)}
-                                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                          title="Xóa Switch khỏi dự án"
-                                        >
-                                          <i className="fas fa-trash-alt"></i>
-                                        </button>
-                                      </div>
+                                      {isAdmin ? (
+                                        <div className="flex items-center justify-end gap-1.5">
+                                          <button
+                                            onClick={() => handleOpenEditSwitch(sw)}
+                                            className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Chỉnh sửa Switch này"
+                                          >
+                                            <i className="fas fa-edit"></i>
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteSwitch(sw)}
+                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Xóa Switch khỏi dự án"
+                                          >
+                                            <i className="fas fa-trash-alt"></i>
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <span className="text-[10px] text-slate-400 italic">Chỉ xem</span>
+                                      )}
                                     </td>
                                   </tr>
                                 ))}
@@ -1083,29 +1138,33 @@ export default function ProjectsView({ onBack }) {
                       <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-5">
                         Hãy bắt đầu thêm Router, Firewall hoặc Switch để xây dựng hạ tầng mạng của bạn!
                       </p>
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => handleOpenAddFirewall('router')}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-                        >
-                          <i className="fas fa-route mr-1.5"></i>
-                          + Thêm Router
-                        </button>
-                        <button
-                          onClick={() => handleOpenAddFirewall('firewall')}
-                          className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-                        >
-                          <i className="fas fa-shield-halved mr-1.5"></i>
-                          + Thêm Firewall
-                        </button>
-                        <button
-                          onClick={handleOpenAddSwitch}
-                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-                        >
-                          <i className="fas fa-server mr-1.5"></i>
-                          + Thêm Switch
-                        </button>
-                      </div>
+                      {isAdmin ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            onClick={() => handleOpenAddFirewall('router')}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          >
+                            <i className="fas fa-route mr-1.5"></i>
+                            + Thêm Router
+                          </button>
+                          <button
+                            onClick={() => handleOpenAddFirewall('firewall')}
+                            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          >
+                            <i className="fas fa-shield-halved mr-1.5"></i>
+                            + Thêm Firewall
+                          </button>
+                          <button
+                            onClick={handleOpenAddSwitch}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          >
+                            <i className="fas fa-server mr-1.5"></i>
+                            + Thêm Switch
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 italic">Tài khoản chỉ xem không có quyền thêm thiết bị.</p>
+                      )}
                     </div>
                   )}
                 </div>
