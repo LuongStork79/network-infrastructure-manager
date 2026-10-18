@@ -1235,6 +1235,9 @@ var J = n(),
       onSelect: c,
       compact: u = !1,
       isDimmed: d = !1,
+      bulkSelectMode = !1,
+      isBulkSelected = !1,
+      onToggleBulkSelect,
     },
     p,
   ) {
@@ -1244,11 +1247,13 @@ var J = n(),
       { colorClass: v } = f(g, _),
       y = [
         `sw-node-ui`,
+        `relative`,
         e.isCore ? `sw-node-core` : ``,
         n ? `active` : ``,
         s ? `vlan-highlight` : ``,
         u ? `compact` : ``,
         d ? `dimmed` : ``,
+        isBulkSelected ? `ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20 dark:bg-rose-950/30` : ``,
       ]
         .filter(Boolean)
         .join(` `);
@@ -1258,9 +1263,27 @@ var J = n(),
         id: e.id,
         className: y,
         style: { borderTopColor: e.color },
-        onClick: () => c(e.id),
-        title: `${e.name} — ${g}/${_} ports`,
+        onClick: (evt) => {
+          if (bulkSelectMode && onToggleBulkSelect) {
+            evt.stopPropagation();
+            onToggleBulkSelect(e.id);
+            return;
+          }
+          c(e.id);
+        },
+        title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${g}/${_} ports`,
         children: [
+          bulkSelectMode &&
+            (0, J.jsx)(`div`, {
+              className: `absolute -top-2 -left-2 z-30 p-0.5`,
+              onClick: (evt) => evt.stopPropagation(),
+              children: (0, J.jsx)(`input`, {
+                type: `checkbox`,
+                checked: !!isBulkSelected,
+                onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
+                className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shadow-md`,
+              }),
+            }),
           (0, J.jsxs)(`div`, {
             className: `compact-icon`,
             children: [
@@ -1284,9 +1307,27 @@ var J = n(),
       ref: p,
       id: e.id,
       className: `${y} sw-brand-card`,
-      onClick: () => c(e.id),
-      title: `${e.name} — ${g}/${_} port`,
+      onClick: (evt) => {
+        if (bulkSelectMode && onToggleBulkSelect) {
+          evt.stopPropagation();
+          onToggleBulkSelect(e.id);
+          return;
+        }
+        c(e.id);
+      },
+      title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${g}/${_} port`,
       children: [
+        bulkSelectMode &&
+          (0, J.jsx)(`div`, {
+            className: `absolute -top-2.5 -left-2.5 z-30 p-1`,
+            onClick: (evt) => evt.stopPropagation(),
+            children: (0, J.jsx)(`input`, {
+              type: `checkbox`,
+              checked: !!isBulkSelected,
+              onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
+              className: `w-5 h-5 rounded cursor-pointer accent-rose-600 shadow-md`,
+            }),
+          }),
         C > 0 &&
           (0, J.jsx)(`span`, {
             className: `sw-combo-badge`,
@@ -1502,6 +1543,9 @@ var fe = (0, g.forwardRef)(function (
     isVlanHighlighted: a,
     onSelect: s,
     isDimmed: c = !1,
+    bulkSelectMode = !1,
+    isBulkSelected = !1,
+    onToggleBulkSelect,
   },
   u,
 ) {
@@ -1510,9 +1554,11 @@ var fe = (0, g.forwardRef)(function (
     { colorClass: m } = f(d, p),
     g = [
       `iso-node`,
+      `relative`,
       i ? `active` : ``,
       a ? `vlan-highlight` : ``,
       c ? `dimmed` : ``,
+      isBulkSelected ? `ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20` : ``,
     ]
       .filter(Boolean)
       .join(` `);
@@ -1521,9 +1567,27 @@ var fe = (0, g.forwardRef)(function (
     id: e.id,
     className: g,
     style: { left: n, top: r },
-    onClick: () => s(e.id),
-    title: `${e.name} — ${d}/${p} ports`,
+    onClick: (evt) => {
+      if (bulkSelectMode && onToggleBulkSelect) {
+        evt.stopPropagation();
+        onToggleBulkSelect(e.id);
+        return;
+      }
+      s(e.id);
+    },
+    title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${d}/${p} ports`,
     children: [
+      bulkSelectMode &&
+        (0, J.jsx)(`div`, {
+          className: `absolute -top-2.5 -left-2.5 z-30 p-0.5`,
+          onClick: (evt) => evt.stopPropagation(),
+          children: (0, J.jsx)(`input`, {
+            type: `checkbox`,
+            checked: !!isBulkSelected,
+            onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
+            className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shadow-md`,
+          }),
+        }),
       (0, J.jsxs)(`div`, {
         className: `iso-name-pill`,
         children: [
@@ -1561,6 +1625,9 @@ function pe({
   zoneOffsets: l = {},
   onZoneDrag: u,
   registerZoneRef: d,
+  bulkSelectMode = !1,
+  selectedDevIds,
+  onToggleBulkSelect,
 }) {
   let f = t === `__core__`,
     { positions: p, width: m, height: h } = w(n, f ? 90 : 0),
@@ -1633,6 +1700,9 @@ function pe({
                   a !== `none` && e.conns.some((e) => e.v.toString() === a),
                 onSelect: o,
                 isDimmed: c != null && !c.has(e.id),
+                bulkSelectMode,
+                isBulkSelected: selectedDevIds?.has(e.id),
+                onToggleBulkSelect,
               },
               e.id,
             )
@@ -1655,6 +1725,9 @@ function me({
   zoneOffsets: u,
   onZoneDrag: d,
   registerZoneRef: f,
+  bulkSelectMode = !1,
+  selectedDevIds,
+  onToggleBulkSelect,
 }) {
   if (c)
     return (0, J.jsx)(pe, {
@@ -1670,6 +1743,9 @@ function me({
       zoneOffsets: u,
       onZoneDrag: d,
       registerZoneRef: f,
+      bulkSelectMode,
+      selectedDevIds,
+      onToggleBulkSelect,
     });
   let p = n.map((e) =>
     (0, J.jsx)(
@@ -1683,6 +1759,9 @@ function me({
           a !== `none` && e.conns.some((e) => e.v.toString() === a),
         onSelect: o,
         isDimmed: l != null && !l.has(e.id),
+        bulkSelectMode,
+        isBulkSelected: selectedDevIds?.has(e.id),
+        onToggleBulkSelect,
       },
       e.id,
     ),
@@ -2348,8 +2427,14 @@ function De(e, t) {
   return e + t.ports.length;
 }
 var Oe = (0, g.forwardRef)(function (e, t) {
-    let n = (0, H.c)(27),
-      { fw: r, onManage: i, onDelete: onDel } = e,
+    let {
+      fw: r,
+      onManage: i,
+      onDelete: onDel,
+      bulkSelectMode = !1,
+      isBulkSelected = !1,
+      onToggleBulkSelect,
+    } = e,
       a;
 
     let isRouter = r.deviceType === 'router' || 
@@ -2380,7 +2465,7 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       ],
     });
 
-    let delBtn = onDel && (0, J.jsx)(`button`, {
+    let delBtn = onDel && !bulkSelectMode && (0, J.jsx)(`button`, {
       type: `button`,
       onClick: (e) => {
         e.stopPropagation();
@@ -2461,10 +2546,30 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     return (0, J.jsxs)(`div`, {
       ref: t,
       id: r.id,
-      className: `firewall-node-ui ${isRouter ? 'is-router' : ''}`,
-      onClick: i,
-      title: `Bấm để xem/sửa thông tin ${isRouter ? 'Router' : 'Firewall'}`,
-      children: [o, c, l, u, h, g],
+      className: `firewall-node-ui relative ${isRouter ? 'is-router' : ''} ${isBulkSelected ? 'ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20 dark:bg-rose-950/30' : ''}`,
+      onClick: (evt) => {
+        if (bulkSelectMode && onToggleBulkSelect) {
+          evt.stopPropagation();
+          onToggleBulkSelect(r.id);
+          return;
+        }
+        i();
+      },
+      title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${isRouter ? 'Router' : 'Firewall'}` : `Bấm để xem/sửa thông tin ${isRouter ? 'Router' : 'Firewall'}`,
+      children: [
+        bulkSelectMode &&
+          (0, J.jsx)(`div`, {
+            className: `absolute -top-2.5 -left-2.5 z-30 p-1`,
+            onClick: (evt) => evt.stopPropagation(),
+            children: (0, J.jsx)(`input`, {
+              type: `checkbox`,
+              checked: !!isBulkSelected,
+              onChange: () => onToggleBulkSelect && onToggleBulkSelect(r.id),
+              className: `w-5 h-5 rounded cursor-pointer accent-rose-600 shadow-md`,
+            }),
+          }),
+        o, c, l, u, h, g,
+      ],
     });
   }),
   ke = (0, g.forwardRef)(function (e, t) {
@@ -2531,7 +2636,17 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     );
   });
 function Ae(e) {
-  let { firewalls: fws, firewall: n, registerRef: r, onManage: i, onAdd: a, onDelete: onDel } = e;
+  let {
+    firewalls: fws,
+    firewall: n,
+    registerRef: r,
+    onManage: i,
+    onAdd: a,
+    onDelete: onDel,
+    bulkSelectMode = !1,
+    selectedDevIds,
+    onToggleBulkSelect,
+  } = e;
   let devices = (Array.isArray(fws) && fws.length > 0) ? fws : (n ? [n] : []);
 
   let allWanLinks = [];
@@ -2561,6 +2676,9 @@ function Ae(e) {
       ref: (el) => r(dev.id, el),
       onManage: () => i(dev.id),
       onDelete: onDel,
+      bulkSelectMode,
+      isBulkSelected: selectedDevIds?.has(dev.id),
+      onToggleBulkSelect,
     }, dev.id)
   );
 
@@ -2905,6 +3023,8 @@ function Fe() {
   let e = d((e) => e.DB),
     t = d((e) => e.FirewallDB),
     deleteFirewall = d((e) => e.deleteFirewall),
+    deleteSwitch = d((e) => e.deleteSwitch),
+    addGlobalLog = d((e) => e.addGlobalLog),
     showDialog = useDialogStore((e) => e.showDialog),
     n = d((e) => e.GponFrameDB),
     r = d((e) => e.GponOntDB),
@@ -2926,12 +3046,98 @@ function Fe() {
     E = u((e) => e.toggleSidebarMobile),
     D = u((e) => e.openAddFirewallModal),
     O = u((e) => e.openEditFirewallModal),
+    [bulkSelectMode, setBulkSelectMode] = (0, g.useState)(false),
+    [selectedDevIds, setSelectedDevIds] = (0, g.useState)(() => new Set()),
+    allSwitches = (0, g.useMemo)(() => {
+      return (e || []).flatMap((rack) => rack.switches || []);
+    }, [e]),
+    allGateways = (0, g.useMemo)(() => {
+      return t || [];
+    }, [t]),
+    selectedSwitchCount = (0, g.useMemo)(() => {
+      return allSwitches.filter((sw) => selectedDevIds.has(sw.id)).length;
+    }, [allSwitches, selectedDevIds]),
+    selectedGatewayCount = (0, g.useMemo)(() => {
+      return allGateways.filter((gw) => selectedDevIds.has(gw.id)).length;
+    }, [allGateways, selectedDevIds]),
+    toggleBulkSelect = (id) => {
+      setSelectedDevIds((prev) => {
+        let next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+        return next;
+      });
+    },
+    handleSelectAllSwitches = () => {
+      setSelectedDevIds((prev) => {
+        let next = new Set(prev);
+        allSwitches.forEach((sw) => next.add(sw.id));
+        return next;
+      });
+    },
+    handleSelectAllGateways = () => {
+      setSelectedDevIds((prev) => {
+        let next = new Set(prev);
+        allGateways.forEach((gw) => next.add(gw.id));
+        return next;
+      });
+    },
+    handleSelectAllTopology = () => {
+      let all = new Set([...allSwitches.map((sw) => sw.id), ...allGateways.map((gw) => gw.id)]);
+      setSelectedDevIds(all);
+    },
+    handleExecuteBulkDelete = () => {
+      if (selectedDevIds.size === 0) return;
+      let total = selectedDevIds.size;
+      let swCount = selectedSwitchCount;
+      let gwCount = selectedGatewayCount;
+      let parts = [];
+      if (swCount > 0) parts.push(`${swCount} Switch`);
+      if (gwCount > 0) parts.push(`${gwCount} Router/Firewall`);
+
+      let confirmText = `Bạn có chắc chắn muốn xóa ${total} thiết bị đã chọn (${parts.join(', ')}) khỏi Topology?\n\nHành động này sẽ xóa vĩnh viễn thiết bị và giải phóng các cổng liên kết mạng liên quan!`;
+
+      let executeDelete = () => {
+        selectedDevIds.forEach((id) => {
+          if (allSwitches.some((sw) => sw.id === id)) {
+            deleteSwitch(id, 'admin');
+          }
+        });
+        selectedDevIds.forEach((id) => {
+          if (allGateways.some((gw) => gw.id === id)) {
+            deleteFirewall(id);
+          }
+        });
+
+        if (typeof addGlobalLog === 'function') {
+          addGlobalLog('Topology: Xóa hàng loạt', `Đã xóa ${total} thiết bị (${parts.join(', ')}) khỏi Topology`, 'admin');
+        }
+
+        setSelectedDevIds(new Set());
+        setBulkSelectMode(false);
+        if (typeof showDialog === 'function') {
+          showDialog(`Đã xóa thành công ${total} thiết bị khỏi Topology!`, 'success');
+        }
+      };
+
+      if (typeof showDialog === 'function') {
+        showDialog(confirmText, 'confirm', executeDelete);
+      } else if (typeof window !== 'undefined' && window.confirm(confirmText)) {
+        executeDelete();
+      }
+    },
     handleDeleteFw = (dev) => {
       if (!dev) return;
       let isRt = dev.deviceType === 'router' || dev.name?.toLowerCase().includes('router');
       let label = isRt ? 'Router' : 'Firewall';
       let execute = () => {
         deleteFirewall(dev.id);
+        if (typeof addGlobalLog === 'function') {
+          addGlobalLog('Topology: Xóa thiết bị', `Đã xóa ${label} [${dev.name}]`, 'admin');
+        }
       };
       if (typeof showDialog === 'function') {
         showDialog(`Bạn có chắc chắn muốn xóa ${label} [${dev.name}]?`, 'confirm', execute);
@@ -3095,6 +3301,10 @@ function Fe() {
       scale: M,
     });
   function Q(e) {
+    if (bulkSelectMode) {
+      toggleBulkSelect(e);
+      return;
+    }
     if (m) {
       v(e);
       return;
@@ -3112,6 +3322,9 @@ function Fe() {
     zoneOffsets: R,
     onZoneDrag: U,
     registerZoneRef: L,
+    bulkSelectMode,
+    selectedDevIds,
+    onToggleBulkSelect: toggleBulkSelect,
   };
   return (0, J.jsxs)(`div`, {
     id: `topology-view`,
@@ -3139,6 +3352,111 @@ function Fe() {
         title: m ? `Thoát chế độ tra đường đi` : `Tra đường đi giữa 2 switch`,
         children: (0, J.jsx)(`i`, { className: `fas fa-route` }),
       }),
+      (0, J.jsxs)(`button`, {
+        type: `button`,
+        onClick: () => {
+          let next = !bulkSelectMode;
+          setBulkSelectMode(next);
+          if (!next) {
+            setSelectedDevIds(new Set());
+          }
+        },
+        style: {
+          top: '20px',
+          right: 'calc(112px + var(--info-panel-shift, 0px))',
+        },
+        className: `fixed z-40 h-9 px-3.5 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all shadow-md cursor-pointer select-none ${
+          bulkSelectMode
+            ? 'bg-rose-600 border-rose-500 text-white shadow-rose-600/40 ring-2 ring-rose-400'
+            : 'bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-slate-900/5'
+        }`,
+        title: bulkSelectMode ? 'Đang bật chế độ chọn hàng loạt (Bấm để thoát)' : 'Bật chế độ chọn & xóa hàng loạt thiết bị (Switch, Router, Firewall)',
+        children: [
+          (0, J.jsx)(`i`, { className: `fas ${bulkSelectMode ? 'fa-check-square text-white' : 'fa-list-check text-rose-500'}` }),
+          (0, J.jsx)(`span`, { children: bulkSelectMode ? `Đang chọn (${selectedDevIds.size})` : `Xóa hàng loạt` })
+        ]
+      }),
+      bulkSelectMode &&
+        (0, J.jsxs)(`div`, {
+          className: `fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 dark:bg-slate-900/95 text-white backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 flex-wrap justify-center max-w-[95vw] select-none`,
+          children: [
+            (0, J.jsxs)(`div`, {
+              className: `flex items-center gap-2 text-xs font-bold mr-1`,
+              children: [
+                (0, J.jsx)(`span`, {
+                  className: `w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse`
+                }),
+                (0, J.jsxs)(`span`, {
+                  children: [
+                    `Đã chọn: `,
+                    (0, J.jsx)(`span`, { className: `text-rose-400 font-extrabold text-sm`, children: selectedDevIds.size }),
+                    ` thiết bị`,
+                    selectedDevIds.size > 0 && (0, J.jsxs)(`span`, {
+                      className: `text-slate-400 font-normal ml-1.5`,
+                      children: [
+                        `(`,
+                        selectedSwitchCount > 0 ? `${selectedSwitchCount} Switch` : null,
+                        selectedSwitchCount > 0 && selectedGatewayCount > 0 ? `, ` : null,
+                        selectedGatewayCount > 0 ? `${selectedGatewayCount} Router/FW` : null,
+                        `)`
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }),
+            (0, J.jsx)(`div`, { className: `h-4 w-px bg-slate-700 mx-1 hidden sm:block` }),
+            allSwitches.length > 0 && (0, J.jsx)(`button`, {
+              type: `button`,
+              onClick: handleSelectAllSwitches,
+              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer`,
+              children: `Chọn tất cả Switch (${allSwitches.length})`
+            }),
+            allGateways.length > 0 && (0, J.jsx)(`button`, {
+              type: `button`,
+              onClick: handleSelectAllGateways,
+              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer`,
+              children: `Chọn tất cả Router/FW (${allGateways.length})`
+            }),
+            (allSwitches.length > 0 || allGateways.length > 0) && (0, J.jsx)(`button`, {
+              type: `button`,
+              onClick: handleSelectAllTopology,
+              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 transition cursor-pointer`,
+              children: `Chọn tất cả (${allSwitches.length + allGateways.length})`
+            }),
+            selectedDevIds.size > 0 && (0, J.jsx)(`button`, {
+              type: `button`,
+              onClick: () => setSelectedDevIds(new Set()),
+              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer`,
+              children: `Bỏ chọn`
+            }),
+            (0, J.jsx)(`div`, { className: `h-4 w-px bg-slate-700 mx-1 hidden sm:block` }),
+            (0, J.jsxs)(`button`, {
+              type: `button`,
+              onClick: handleExecuteBulkDelete,
+              disabled: selectedDevIds.size === 0,
+              className: `px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                selectedDevIds.size > 0
+                  ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 ring-1 ring-rose-400'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+              }`,
+              children: [
+                (0, J.jsx)(`i`, { className: `fas fa-trash-alt` }),
+                ` Xóa đã chọn (${selectedDevIds.size})`
+              ]
+            }),
+            (0, J.jsx)(`button`, {
+              type: `button`,
+              onClick: () => {
+                setBulkSelectMode(false);
+                setSelectedDevIds(new Set());
+              },
+              className: `w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer ml-1`,
+              title: `Thoát chế độ chọn hàng loạt`,
+              children: (0, J.jsx)(`i`, { className: `fas fa-times text-xs` })
+            })
+          ]
+        }),
       (0, J.jsxs)(`div`, {
         className: `zoom-controls`,
         children: [
@@ -3311,6 +3629,9 @@ function Fe() {
                         onManage: O,
                         onAdd: D,
                         onDelete: handleDeleteFw,
+                        bulkSelectMode,
+                        selectedDevIds,
+                        onToggleBulkSelect: toggleBulkSelect,
                       }),
                     }),
                   q.slots.map((e) =>
@@ -3346,6 +3667,9 @@ function Fe() {
                       onManage: O,
                       onAdd: D,
                       onDelete: handleDeleteFw,
+                      bulkSelectMode,
+                      selectedDevIds,
+                      onToggleBulkSelect: toggleBulkSelect,
                     }),
                   }),
                   (0, J.jsx)(he, { coreSwitches: le, ...$ }),
