@@ -3028,7 +3028,7 @@ function Fe() {
           };
     }, [q]),
     X = t[0] ?? null,
-    { cloudLinks: fe, gatewayLinks: ge, firewallLink: pe } = ne({
+    { cloudLinks: fe, gatewayLinks: allGatewayLinks, firewallLink: singleFwLink } = ne({
       devices: t,
       cloudIds: (0, g.useMemo)(
         () => (X ? X.wanLinks.map((e) => `wan-cloud-${e.id}`) : []),
@@ -3251,8 +3251,8 @@ function Fe() {
           (0, J.jsx)(ve, { links: ae, zoneLinks: oe }),
           (0, J.jsx)(be, {
             cloudLinks: fe,
-            gatewayLinks: ge,
-            firewallLink: pe,
+            gatewayLinks: allGatewayLinks,
+            firewallLink: singleFwLink,
             firewallPort: X?.lanUplinkPort,
           }),
           (0, J.jsx)(Se, { links: _e, frameDB: n }),
