@@ -277,21 +277,22 @@ function P(e, t, n, r, a, o = [], s = [], c = [], l = []) {
     }),
     l.forEach((t) => {
       let n = t.lanUplinkTarget ? f(t.lanUplinkTarget, e) : void 0;
+      let isRt = t.deviceType === `router` || t.name?.toLowerCase().includes(`router`);
       u.push({
-        key: `firewall-${t.id}`,
-        source: `firewall`,
-        name: t.name || `(Chưa đặt tên)`,
-        ip: t.ip,
-        mac: t.mac,
+        key: `${isRt ? `router` : `firewall`}-${t.id}`,
+        source: isRt ? `router` : `firewall`,
+        name: t.name || (isRt ? `Router Gateway` : `Firewall Bảo Mật`),
+        ip: t.ip ?? t.mgmtIp ?? ``,
+        mac: t.mac ?? ``,
         vlan: ``,
-        icon: `fa-shield-halved`,
+        icon: isRt ? `fa-route` : `fa-shield-halved`,
         status: null,
-        floor: ``,
+        floor: t.zone || t.floor || `Server Room`,
         switchId: t.lanUplinkTarget,
         switchName: n?.name ?? `—`,
         switchPort: t.lanUplinkPort,
         trunkVlans: null,
-        recordId: null,
+        recordId: t.id,
         ipConflict: !1,
         macConflict: !1,
         historyLogs: (t.logs ?? []).map((e) => ({ time: e.time, msg: e.msg })),
@@ -305,7 +306,7 @@ function F(e) {
     n = [];
   return (
     e.forEach((e) => {
-      let r = e.mac.trim().toUpperCase();
+      let r = (e.mac || ``).trim().toUpperCase();
       if (!r) {
         n.push(e);
         return;
@@ -349,17 +350,17 @@ function I(e) {
     n = new Map();
   return (
     e.forEach((e) => {
-      let r = e.mac.trim().toUpperCase();
+      let r = (e.mac || ``).trim().toUpperCase();
       r && t.set(r, (t.get(r) ?? 0) + 1);
-      let i = e.ip.trim();
+      let i = (e.ip || ``).trim();
       i && n.set(i, (n.get(i) ?? 0) + 1);
     }),
     e.map((e) => ({
       ...e,
-      macConflict: e.mac.trim()
-        ? (t.get(e.mac.trim().toUpperCase()) ?? 0) > 1
+      macConflict: (e.mac || ``).trim()
+        ? (t.get((e.mac || ``).trim().toUpperCase()) ?? 0) > 1
         : !1,
-      ipConflict: e.ip.trim() ? (n.get(e.ip.trim()) ?? 0) > 1 : !1,
+      ipConflict: (e.ip || ``).trim() ? (n.get((e.ip || ``).trim()) ?? 0) > 1 : !1,
     }))
   );
 }
@@ -385,7 +386,9 @@ function V(e) {
     : e.vlan;
 }
 function te(e) {
-  return e.source === `gpon`
+  return e.source === `router`
+    ? `Router Gateway`
+    : e.source === `gpon`
     ? `GPON ONT`
     : e.source === `nvr`
       ? `Đầu ghi NVR`
@@ -1520,8 +1523,9 @@ var ge = {
     elevator: `Thang máy`,
     nvr: `Quản lý NVR`,
     firewall: `Quản lý Firewall`,
+    router: `Quản lý Router`,
   },
-  _e = [`conn`, `wifiap`, `ipphone`],
+  _e = [`conn`, `wifiap`, `ipphone`, `firewall`, `router`],
   ve = {
     active: { color: `bg-emerald-500`, label: `Active` },
     shutdown: { color: `bg-slate-400`, label: `Shutdown` },
@@ -1543,6 +1547,7 @@ function ye({ onBack: e, isAdmin: t, username: n }) {
     ee = _((e) => e.saveWifiAP),
     j = _((e) => e.saveIPPhone),
     M = _((e) => e.saveSwitch),
+    saveFw = _((e) => e.saveFirewall),
     N = _((e) => e.addGlobalLog),
     F = h((e) => e.setActiveView),
     I = h((e) => e.openPortConfigModal),
@@ -1749,6 +1754,17 @@ function ye({ onBack: e, isAdmin: t, username: n }) {
         let e =
           t === `name` ? { name: a } : t === `ip` ? { ip: a } : { mac: a };
         j({ ...n, ...e });
+      }
+    } else if (e.source === `firewall` || e.source === `router`) {
+      let fw = x.find((t) => t.id === e.recordId);
+      if (fw) {
+        let update =
+          t === `name`
+            ? { name: a || `(Chưa đặt tên)` }
+            : t === `ip`
+              ? { ip: a, mgmtIp: a }
+              : { mac: a };
+        saveFw({ ...fw, ...update });
       }
     } else {
       let i = f(e.switchId, r),

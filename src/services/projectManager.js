@@ -6,12 +6,90 @@ import { doc, getDoc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 const STORAGE_PROJECTS_KEY = 'nim_projects_list';
 const STORAGE_ACTIVE_PROJECT_KEY = 'nim_active_project_id';
 
+export const DEFAULT_SAMPLE_FIREWALL = {
+  id: 'fw-sample-01',
+  name: 'FW-Core-01',
+  deviceType: 'firewall',
+  brand: 'Fortinet',
+  model: 'FortiGate 100F',
+  ip: '10.0.1.1',
+  mgmtIp: '10.0.1.1',
+  mac: '00:09:0F:09:12:01',
+  zone: 'Server Room',
+  lanUplinkTarget: '',
+  lanUplinkPort: null,
+  lanUplinkMediaType: 'copper',
+  lanUplinkLocalPort: 'port1',
+  lanUplinkComboMode: 'copper',
+  ports: 24,
+  totalPorts: 24,
+  sfpPorts: 4,
+  uplinkPort: 24,
+  hybridPortCount: 0,
+  comboPorts: 0,
+  hybridPorts: {},
+  haMode: 'active-passive',
+  haPeerIp: '10.0.1.2',
+  wanLinks: [
+    { id: 'wan-1', isp: 'VNPT Fiber 500M', ip: '14.161.20.10', notes: 'Đường truyền chính' },
+    { id: 'wan-2', isp: 'Viettel Leased Line 200M', ip: '115.79.40.22', notes: 'Dự phòng HA' }
+  ],
+  wanLines: [
+    { id: 'wan-1', isp: 'VNPT Fiber 500M', ip: '14.161.20.10', notes: 'Đường truyền chính' },
+    { id: 'wan-2', isp: 'Viettel Leased Line 200M', ip: '115.79.40.22', notes: 'Dự phòng HA' }
+  ],
+  notes: 'Firewall chính kiểm soát an ninh hệ thống và định tuyến Gateway',
+  logs: [{ time: '18/10/2026', msg: 'Khởi tạo mẫu Firewall FortiGate 100F', user: 'system' }]
+};
+
+export const DEFAULT_SAMPLE_ROUTER = {
+  id: 'router-sample-01',
+  name: 'RT-Gateway-01',
+  deviceType: 'router',
+  brand: 'Cisco',
+  model: 'ISR 4331',
+  ip: '10.0.0.1',
+  mgmtIp: '10.0.0.1',
+  mac: '00:1A:2B:3C:4D:99',
+  zone: 'Server Room',
+  lanUplinkTarget: '',
+  lanUplinkPort: null,
+  lanUplinkMediaType: 'copper',
+  lanUplinkLocalPort: 'ether1',
+  lanUplinkComboMode: 'copper',
+  ports: 8,
+  totalPorts: 8,
+  sfpPorts: 2,
+  uplinkPort: 1,
+  hybridPortCount: 0,
+  comboPorts: 0,
+  hybridPorts: {},
+  haMode: 'standalone',
+  haPeerIp: '',
+  wanLinks: [
+    { id: 'wan-rt-1', isp: 'FPT Telecom WAN', ip: '118.69.100.5', notes: 'Đường truyền Gateway WAN' }
+  ],
+  wanLines: [
+    { id: 'wan-rt-1', isp: 'FPT Telecom WAN', ip: '118.69.100.5', notes: 'Đường truyền Gateway WAN' }
+  ],
+  notes: 'Router biên định tuyến dịch vụ mạng và WAN',
+  logs: [{ time: '18/10/2026', msg: 'Khởi tạo mẫu Router Gateway Cisco ISR 4331', user: 'system' }]
+};
+
 export const DEFAULT_PROJECTS = [
   {
-    id: 'default',
-    name: 'Dự án Trung Tâm (DC-Monitoring)',
-    desc: 'Hạ tầng mạng trung tâm, hệ thống Core Switch, CCTV, GPON, IPAM chính',
-    location: 'Tòa nhà Trụ Sở Chính',
+    id: 'proj_1792252512461',
+    name: 'Majestic Premium Nha Trang',
+    desc: 'Dự án hạ tầng mạng',
+    location: '96 Trần Phú',
+    createdAt: '17/10/2026',
+    isDefault: false
+  },
+  {
+    id: 'proj_1792246275972',
+    name: 'Lugano Resoft & Spa',
+    desc: 'Thử nghiệm tạo dự án',
+    location: 'Cam Ranh',
     createdAt: '17/10/2026',
     isDefault: false
   }
@@ -130,7 +208,7 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
         DB: []
       };
       await setDoc(doc(db, 'networkData', `${newId}_switches`), emptyInfrastructure);
-      await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER] });
       await setDoc(doc(db, 'networkData', `${newId}_wifi`), { WifiDB: [] });
       await setDoc(doc(db, 'networkData', `${newId}_wifiFloorplans`), { WifiFloorplans: [] });
       await setDoc(doc(db, 'networkData', `${newId}_cctvCameras`), { CctvCameraDB: [] });
@@ -234,6 +312,19 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
         ]
       };
       await setDoc(doc(db, 'networkData', `${newId}_switches`), standardInfrastructure);
+      await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER] });
+      await setDoc(doc(db, 'networkData', `${newId}_wifi`), { WifiDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_wifiFloorplans`), { WifiFloorplans: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvCameras`), { CctvCameraDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvFloorplans`), { CctvFloorplans: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvFloorConnectors`), { CctvFloorConnectors: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_odf`), { ODFDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_ipphone`), { IPPhoneDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_nvr`), { NVRDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_krone`), { KroneDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_gponFrame`), { GponFrameDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_gponOnt`), { GponOntDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_elevator`), { ElevatorDB: [] });
     }
   } catch (err) {
     console.error('Failed to init project infrastructure:', err);
