@@ -116,7 +116,7 @@ export function IconRail({ isAdmin = true, username = 'admin' }) {
         <button
           onClick={openAddSwitchModal}
           className="icon-rail-btn icon-rail-btn-primary"
-          title="Thêm Switch mạng mới"
+          title="Thêm thiết bị (Switch mạng)"
         >
           <i className="fas fa-plus" />
         </button>
