@@ -13,7 +13,7 @@ export const DEFAULT_PROJECTS = [
     desc: 'Hạ tầng mạng trung tâm, hệ thống Core Switch, CCTV, GPON, IPAM chính',
     location: 'Tòa nhà Trụ Sở Chính',
     createdAt: '17/10/2026',
-    isDefault: true
+    isDefault: false
   }
 ];
 
@@ -42,7 +42,7 @@ export function saveProjectsList(projects) {
   // Đồng bộ lên Google Cloud Firestore (Document: networkData/projects)
   try {
     const projectsRef = doc(db, 'networkData', 'projects');
-    setDoc(projectsRef, { list: projects, updatedAt: new Date().toISOString() }, { merge: true })
+    setDoc(projectsRef, { list: projects, updatedAt: new Date().toISOString() })
       .catch(err => console.warn('Could not sync projects to Firestore:', err));
   } catch (e) {
     console.warn('Firestore sync failed:', e);
@@ -52,9 +52,15 @@ export function saveProjectsList(projects) {
 export function getActiveProjectId() {
   try {
     const active = localStorage.getItem(STORAGE_ACTIVE_PROJECT_KEY);
-    if (active) return active;
+    if (active) {
+      const projects = getProjectsList();
+      if (projects.some(p => p.id === active)) {
+        return active;
+      }
+    }
   } catch (e) {}
-  return 'default';
+  const projects = getProjectsList();
+  return projects[0]?.id || 'default';
 }
 
 export function getActiveProject() {
@@ -126,9 +132,17 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
       await setDoc(doc(db, 'networkData', `${newId}_switches`), emptyInfrastructure);
       await setDoc(doc(db, 'networkData', `${newId}_firewall`), { FirewallDB: [] });
       await setDoc(doc(db, 'networkData', `${newId}_wifi`), { WifiDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_wifiFloorplans`), { WifiFloorplans: [] });
       await setDoc(doc(db, 'networkData', `${newId}_cctvCameras`), { CctvCameraDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvFloorplans`), { CctvFloorplans: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_cctvFloorConnectors`), { CctvFloorConnectors: [] });
       await setDoc(doc(db, 'networkData', `${newId}_odf`), { ODFDB: [] });
       await setDoc(doc(db, 'networkData', `${newId}_ipphone`), { IPPhoneDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_nvr`), { NVRDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_krone`), { KroneDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_gponFrame`), { GponFrameDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_gponOnt`), { GponOntDB: [] });
+      await setDoc(doc(db, 'networkData', `${newId}_elevator`), { ElevatorDB: [] });
     } else {
       // Tạo khung hạ tầng chuẩn với Core Switch và 2 Access Switch hoạt động sẵn
       try {
@@ -226,7 +240,7 @@ export async function initProjectInfrastructure(newId, templateMode = 'empty') {
   }
 }
 
-export async function addProject({ name, desc, location, templateMode = 'clone' }) {
+export async function addProject({ name, desc, location, templateMode = 'empty' }) {
   const projects = getProjectsList();
   const newId = 'proj_' + Date.now();
   const now = new Date();
@@ -270,10 +284,10 @@ export function updateProject(id, { name, desc, location }) {
 }
 
 export async function deleteProject(id) {
-  if (id === 'default') {
-    throw new Error('Không thể xóa dự án mặc định của hệ thống!');
-  }
   const projects = getProjectsList();
+  if (projects.length <= 1) {
+    throw new Error('Bạn cần giữ lại ít nhất 1 dự án trong hệ thống!');
+  }
   const updated = projects.filter(p => p.id !== id);
   saveProjectsList(updated);
 
@@ -285,14 +299,32 @@ export async function deleteProject(id) {
   ];
   for (const mod of modulesToDelete) {
     try {
-      await deleteDoc(doc(db, 'networkData', `${id}_${mod}`));
+      if (id === 'default') {
+        await deleteDoc(doc(db, 'networkData', mod));
+      } else {
+        await deleteDoc(doc(db, 'networkData', `${id}_${mod}`));
+      }
     } catch (e) {
       console.warn(`Could not delete doc ${id}_${mod}:`, e);
     }
   }
 
+  // Xóa cache IPAM tương ứng
+  if (id === 'default') {
+    try {
+      localStorage.removeItem('nim_custom_ipam_subnets');
+      localStorage.removeItem('nim_custom_ip_allocations');
+    } catch (e) {}
+  } else {
+    try {
+      localStorage.removeItem(`nim_custom_ipam_subnets_${id}`);
+      localStorage.removeItem(`nim_custom_ip_allocations_${id}`);
+    } catch (e) {}
+  }
+
+  // Nếu đang làm việc ở dự án bị xóa, chuyển sang dự án đầu tiên còn lại
   if (getActiveProjectId() === id) {
-    setActiveProjectId('default', { reload: true });
+    setActiveProjectId(updated[0].id, { reload: true });
   }
   window.dispatchEvent(new CustomEvent('nim:projects_updated'));
   return updated;

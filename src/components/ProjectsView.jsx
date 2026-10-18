@@ -152,16 +152,17 @@ export default function ProjectsView({ onBack }) {
   }
 
   async function handleDeleteProject(proj) {
-    if (proj.isDefault || proj.id === 'default') {
-      alert('Không thể xóa dự án mặc định của hệ thống!');
+    if (projects.length <= 1) {
+      alert('Bạn cần giữ lại ít nhất 1 dự án trong hệ thống!');
       return;
     }
-    if (confirm(`Bạn có chắc chắn muốn xóa dự án "${proj.name}" không?\nToàn bộ dữ liệu Switch, WiFi, CCTV, IPAM của dự án này sẽ bị xóa khỏi đám mây.`)) {
+    if (confirm(`Bạn có chắc chắn muốn xóa dự án "${proj.name}" không?\nToàn bộ dữ liệu của dự án này sẽ bị xóa khỏi đám mây.`)) {
       try {
         await deleteProject(proj.id);
-        setProjects(getProjectsList());
+        const remaining = getProjectsList();
+        setProjects(remaining);
         if (inspectProjId === proj.id) {
-          setInspectProjId('default');
+          setInspectProjId(remaining[0]?.id || '');
         }
       } catch (err) {
         alert(err.message);
@@ -478,7 +479,7 @@ export default function ProjectsView({ onBack }) {
                             <i className="fas fa-edit"></i>
                           </button>
 
-                          {!proj.isDefault && proj.id !== 'default' && (
+                          {projects.length > 1 && (
                             <button
                               onClick={() => handleDeleteProject(proj)}
                               className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all text-xs cursor-pointer"
@@ -912,7 +913,7 @@ export default function ProjectsView({ onBack }) {
                         </span>
                       </div>
                       <span style={{ fontSize: '11px', color: '#64748b', paddingLeft: '22px' }}>
-                        Tạo sẵn các tầng cơ bản, chưa có thiết bị nào để bạn tự thêm Switch từ đầu như dự án đầu tiên.
+                        Dự án hoàn toàn mới và sạch (0 Switch, 0 Tầng, IPAM trống), không chứa dữ liệu từ dự án mặc định.
                       </span>
                     </label>
 
