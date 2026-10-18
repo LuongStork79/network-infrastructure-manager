@@ -73,13 +73,7 @@ export default function ProjectsView({ onBack }) {
         const data = snap.data();
         setProjectFloors(Array.isArray(data.DB) ? data.DB : []);
       } else {
-        setProjectFloors([
-          { floor: 'Server Room', switches: [] },
-          { floor: 'Tầng 01', switches: [] },
-          { floor: 'Tầng 02', switches: [] },
-          { floor: 'Tầng 03', switches: [] },
-          { floor: 'Outside', switches: [] }
-        ]);
+        setProjectFloors([]);
       }
     }, (err) => {
       setIsLoadingDevices(false);
@@ -1287,28 +1281,66 @@ export default function ProjectsView({ onBack }) {
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px', textAlign: 'left' }}>
                     Tầng / Vị Trí
                   </label>
-                  <select
-                    value={swFloor}
-                    onChange={(e) => setSwFloor(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      backgroundColor: '#f8fafc',
-                      border: '1.5px solid #cbd5e1',
-                      borderRadius: '12px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      color: '#0f172a',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {(projectFloors || []).map(f => (
-                      <option key={f.floor} value={f.floor}>{f.floor}</option>
-                    ))}
-                    <option value="__custom__">+ Nhập tầng mới...</option>
-                  </select>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <select
+                      value={swFloor}
+                      onChange={(e) => setSwFloor(e.target.value)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        backgroundColor: '#f8fafc',
+                        border: '1.5px solid #cbd5e1',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {(projectFloors || []).map(f => (
+                        <option key={f.floor} value={f.floor}>{f.floor}{f.switches?.length ? ` (${f.switches.length} sw)` : ` (trống)`}</option>
+                      ))}
+                      <option value="__custom__">+ Nhập tầng mới...</option>
+                    </select>
+                    {swFloor && swFloor !== '__custom__' && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const target = (projectFloors || []).find(f => f.floor === swFloor);
+                          const swCount = (target?.switches || []).length;
+                          const msg = swCount > 0
+                            ? `Tầng / Vị trí "${swFloor}" đang có ${swCount} switch. Bạn có chắc chắn muốn xóa vị trí này và toàn bộ switch thuộc tầng?`
+                            : `Bạn có chắc chắn muốn xóa Tầng / Vị trí "${swFloor}"?`;
+                          if (window.confirm(msg)) {
+                            const updated = (projectFloors || []).filter(f => f.floor !== swFloor);
+                            const docName = inspectProjId === 'default' ? 'switches' : `${inspectProjId}_switches`;
+                            const docRef = doc(db, 'networkData', docName);
+                            await setDoc(docRef, { DB: updated }, { merge: true });
+                            setProjectFloors(updated);
+                            setSwFloor(updated[0]?.floor || '__custom__');
+                          }
+                        }}
+                        style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          backgroundColor: '#fff1f2',
+                          border: '1.5px solid #fecdd3',
+                          color: '#f43f5e',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                        title={`Xóa tầng/vị trí "${swFloor}"`}
+                      >
+                        <i className="fas fa-trash-alt" />
+                      </button>
+                    )}
+                  </div>
                   {swFloor === '__custom__' && (
                     <input
                       type="text"

@@ -8,7 +8,7 @@ import {
   l as s,
   s as c,
 } from "./index-QE6I14Fy.js";
-import { getAllBrandNames, getBrandColor, addCustomBrand } from "../services/brandManager.js";
+import { getAllBrandNames, getBrandColor, addCustomBrand, deleteCustomBrand, isCustomBrand } from "../services/brandManager.js";
 import { getActiveProject, getActiveProjectId } from "../services/projectManager.js";
 var u = e(t(), 1),
   d = n();
@@ -40,7 +40,73 @@ function p({
     }),
     [isAddingBrand, setIsAddingBrand] = (0, u.useState)(false),
     [newBrandInput, setNewBrandInput] = (0, u.useState)(''),
-    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),[isAddingFloor, setIsAddingFloor] = (0, u.useState)(() => !n || n.length === 0),[newFloorInput, setNewFloorInput] = (0, u.useState)(''),
+    [newBrandColor, setNewBrandColor] = (0, u.useState)('#0ea5e9'),
+    [isAddingFloor, setIsAddingFloor] = (0, u.useState)(() => !n || n.length === 0),
+    [newFloorInput, setNewFloorInput] = (0, u.useState)(''),
+    handleDeleteFloor = () => {
+      if (!n || n.length === 0 || b < 0 || b >= n.length) return;
+      const targetFloor = n[b];
+      const floorName = targetFloor?.floor;
+      if (!floorName) return;
+      const swCount = (targetFloor.switches || []).length;
+
+      const confirmMsg = swCount > 0
+        ? `Tầng / Vị trí "${floorName}" hiện có ${swCount} switch.\n\nBạn có chắc chắn muốn xóa vị trí này và toàn bộ ${swCount} thiết bị thuộc tầng?`
+        : `Bạn có chắc chắn muốn xóa Tầng / Vị trí "${floorName}"?`;
+
+      const execute = () => {
+        if (typeof s?.getState?.()?.deleteFloor === 'function') {
+          s.getState().deleteFloor(floorName);
+        } else {
+          const currentDB = s?.getState?.()?.DB || n;
+          const delSwIds = new Set((targetFloor.switches || []).map((sw) => sw.id));
+          const updatedDB = currentDB
+            .filter((rack) => rack.floor !== floorName)
+            .map((rack) => ({
+              ...rack,
+              switches: (rack.switches || []).map((sw) =>
+                delSwIds.has(sw.uplinkTarget) ? { ...sw, uplinkTarget: 'none' } : sw
+              ),
+            }));
+          if (typeof s?.setState === 'function') {
+            s.setState({ DB: updatedDB });
+          }
+        }
+
+        n.splice(b, 1);
+
+        if (n.length === 0) {
+          setIsAddingFloor(true);
+          x(0);
+        } else {
+          x(Math.max(0, Math.min(b, n.length - 1)));
+        }
+
+        _(`Đã xóa thành công Tầng / Vị trí "${floorName}"!`, 'success');
+      };
+
+      if (typeof _ === 'function') {
+        _ (confirmMsg, 'confirm', execute);
+      } else if (typeof window !== 'undefined' && window.confirm(confirmMsg)) {
+        execute();
+      }
+    },
+    handleDeleteBrand = () => {
+      if (!isCustomBrand(S)) return;
+      const confirmMsg = `Bạn có chắc chắn muốn xóa thương hiệu tùy chỉnh "${S}"?`;
+      const execute = () => {
+        deleteCustomBrand(S);
+        const updated = getAllBrandNames();
+        setAvailableBrands(updated);
+        C(updated[0] || 'Cisco');
+        _(`Đã xóa thương hiệu "${S}"!`, 'success');
+      };
+      if (typeof _ === 'function') {
+        _ (confirmMsg, 'confirm', execute);
+      } else if (typeof window !== 'undefined' && window.confirm(confirmMsg)) {
+        execute();
+      }
+    },
     [w, T] = (0, u.useState)(t?.isCore ?? !1),
     [E, D] = (0, u.useState)(t?.name ?? ``),
     [O, k] = (0, u.useState)(t?.mac ?? ``),
@@ -230,11 +296,26 @@ function p({
                             className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
                             children: `Tầng / Vị trí`,
                           }),
-                          (0, d.jsx)(`button`, {
-                            type: `button`,
-                            onClick: () => setIsAddingFloor(!isAddingFloor),
-                            className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer`,
-                            children: isAddingFloor ? (n && n.length > 0 ? `✕ Đóng` : ``) : `+ Thêm tầng`,
+                          (0, d.jsxs)(`div`, {
+                            className: `flex items-center gap-2`,
+                            children: [
+                              n && n.length > 0 && !isAddingFloor && (0, d.jsxs)(`button`, {
+                                type: `button`,
+                                onClick: handleDeleteFloor,
+                                className: `text-[10px] font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer flex items-center gap-1`,
+                                title: `Xóa vị trí/tầng đang chọn [${n[b]?.floor || ''}]`,
+                                children: [
+                                  (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-[9px]` }),
+                                  ` Xóa vị trí`,
+                                ],
+                              }),
+                              (0, d.jsx)(`button`, {
+                                type: `button`,
+                                onClick: () => setIsAddingFloor(!isAddingFloor),
+                                className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer`,
+                                children: isAddingFloor ? (n && n.length > 0 ? `✕ Đóng` : ``) : `+ Thêm tầng`,
+                              }),
+                            ],
                           }),
                         ],
                       }),
@@ -271,18 +352,30 @@ function p({
                           ],
                         })
                       ) : (
-                        (0, d.jsx)(`select`, {
-                          id: `sw-input-floor`,
-                          value: b,
-                          onChange: (e) => x(Number(e.target.value)),
-                          className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
-                          children: n.map((e, t) =>
-                            (0, d.jsx)(
-                              `option`,
-                              { value: t, children: e.floor },
-                              e.floor,
-                            ),
-                          ),
+                        (0, d.jsxs)(`div`, {
+                          className: `flex items-center gap-1.5 mt-1.5`,
+                          children: [
+                            (0, d.jsx)(`select`, {
+                              id: `sw-input-floor`,
+                              value: b,
+                              onChange: (e) => x(Number(e.target.value)),
+                              className: `flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-800 focus:border-indigo-400 focus:bg-white transition-all`,
+                              children: n.map((e, t) =>
+                                (0, d.jsx)(
+                                  `option`,
+                                  { value: t, children: `${e.floor}${e.switches?.length ? ` (${e.switches.length} sw)` : ` (trống)`}` },
+                                  e.floor,
+                                ),
+                              ),
+                            }),
+                            n && n.length > 0 && (0, d.jsx)(`button`, {
+                              type: `button`,
+                              onClick: handleDeleteFloor,
+                              className: `w-11 h-11 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-500 hover:text-rose-700 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm`,
+                              title: `Xóa tầng / vị trí "${n[b]?.floor || ''}"`,
+                              children: (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-sm` }),
+                            }),
+                          ],
                         })
                       ),
                     ],
@@ -290,18 +383,33 @@ function p({
                   (0, d.jsxs)(`div`, {
                     children: [
                       (0, d.jsxs)(`div`, {
-                        className: `flex justify-between items-center`,
+                        className: `flex justify-between items-center mb-1.5`,
                         children: [
                           (0, d.jsx)(`label`, {
                             htmlFor: `sw-input-brand`,
                             className: `text-[10px] font-bold text-slate-400 uppercase tracking-widest`,
                             children: `Thương hiệu`,
                           }),
-                          (0, d.jsx)(`button`, {
-                            type: `button`,
-                            onClick: () => setIsAddingBrand(!isAddingBrand),
-                            className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors`,
-                            children: isAddingBrand ? `Đóng` : `+ Thêm hiệu`,
+                          (0, d.jsxs)(`div`, {
+                            className: `flex items-center gap-2`,
+                            children: [
+                              isCustomBrand(S) && !isAddingBrand && (0, d.jsxs)(`button`, {
+                                type: `button`,
+                                onClick: handleDeleteBrand,
+                                className: `text-[10px] font-bold text-rose-500 hover:text-rose-700 transition-colors cursor-pointer flex items-center gap-1`,
+                                title: `Xóa hiệu tùy chỉnh [${S}]`,
+                                children: [
+                                  (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-[9px]` }),
+                                  ` Xóa hiệu`,
+                                ],
+                              }),
+                              (0, d.jsx)(`button`, {
+                                type: `button`,
+                                onClick: () => setIsAddingBrand(!isAddingBrand),
+                                className: `text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors cursor-pointer`,
+                                children: isAddingBrand ? `Đóng` : `+ Thêm hiệu`,
+                              }),
+                            ],
                           }),
                         ],
                       }),
@@ -340,26 +448,38 @@ function p({
                               }),
                             ],
                           })
-                        : (0, d.jsx)(`select`, {
-                            id: `sw-input-brand`,
-                            value: S,
-                            onChange: (e) => {
-                              if (e.target.value === '__add_new__') {
-                                setIsAddingBrand(true);
-                              } else {
-                                C(e.target.value);
-                              }
-                            },
-                            className: `w-full mt-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none`,
+                        : (0, d.jsxs)(`div`, {
+                            className: `flex items-center gap-1.5 mt-1.5`,
                             children: [
-                              ...availableBrands.map((e) =>
-                                (0, d.jsx)(`option`, { value: e, children: e }, e),
-                              ),
-                              (0, d.jsx)(
-                                `option`,
-                                { value: `__add_new__`, children: `+ Thêm thương hiệu mới...` },
-                                `__add_new__`,
-                              ),
+                              (0, d.jsx)(`select`, {
+                                id: `sw-input-brand`,
+                                value: S,
+                                onChange: (e) => {
+                                  if (e.target.value === '__add_new__') {
+                                    setIsAddingBrand(true);
+                                  } else {
+                                    C(e.target.value);
+                                  }
+                                },
+                                className: `flex-1 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-800 focus:border-indigo-400 focus:bg-white transition-all`,
+                                children: [
+                                  ...availableBrands.map((e) =>
+                                    (0, d.jsx)(`option`, { value: e, children: e }, e),
+                                  ),
+                                  (0, d.jsx)(
+                                    `option`,
+                                    { value: `__add_new__`, children: `+ Thêm thương hiệu mới...` },
+                                    `__add_new__`,
+                                  ),
+                                ],
+                              }),
+                              isCustomBrand(S) && (0, d.jsx)(`button`, {
+                                type: `button`,
+                                onClick: handleDeleteBrand,
+                                className: `w-11 h-11 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-500 hover:text-rose-700 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm`,
+                                title: `Xóa thương hiệu tùy chỉnh "${S}"`,
+                                children: (0, d.jsx)(`i`, { className: `fas fa-trash-alt text-sm` }),
+                              }),
                             ],
                           }),
                     ],

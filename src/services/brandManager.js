@@ -104,3 +104,21 @@ export function addCustomBrand(brandName, color = '#4f46e5', code = '') {
   saveCustomBrands(custom);
   return { name, color: custom[name].color, code: shortCode };
 }
+
+export function deleteCustomBrand(brandName) {
+  if (!brandName) return false;
+  const custom = getCustomBrands();
+  if (custom[brandName]) {
+    delete custom[brandName];
+    saveCustomBrands(custom);
+    return true;
+  }
+  return false;
+}
+
+export function isCustomBrand(brandName) {
+  if (!brandName) return false;
+  const custom = getCustomBrands();
+  return Boolean(custom[brandName]);
+}
+

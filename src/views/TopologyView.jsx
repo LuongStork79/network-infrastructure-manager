@@ -1822,66 +1822,44 @@ function he(e) {
   );
 }
 function ge(e) {
-  let t = (0, H.c)(20),
-    n,
-    r;
-  t[0] === e
-    ? ((n = t[1]), (r = t[2]))
-    : (({ floor: r, ...n } = e), (t[0] = e), (t[1] = n), (t[2] = r));
-  let i;
-  t[3] === r.switches
-    ? (i = t[4])
-    : ((i = y(v(r.switches.filter(_e)))), (t[3] = r.switches), (t[4] = i));
+  let { floor: r, onDeleteFloor, ...n } = e;
+  let i = y(v(r.switches.filter(_e)));
   let a = i;
   if (!Object.values(a).some(Z)) return null;
   let o = r.floor.toLowerCase().includes(`server room`),
-    s = `absolute -top-4 px-6 py-2 rounded-xl border-[2px] text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-lg shadow-slate-200 z-20 flex items-center gap-2 ${o ? `bg-indigo-900 border-indigo-200` : `bg-slate-800 border-slate-600`}`,
-    c = o ? `fas fa-server text-indigo-400` : `fas fa-building text-indigo-400`,
-    l;
-  t[5] === c
-    ? (l = t[6])
-    : ((l = (0, J.jsx)(`i`, { className: c })), (t[5] = c), (t[6] = l));
-  let u;
-  t[7] !== r.floor || t[8] !== s || t[9] !== l
-    ? ((u = (0, J.jsxs)(`div`, { className: s, children: [l, r.floor] })),
-      (t[7] = r.floor),
-      (t[8] = s),
-      (t[9] = l),
-      (t[10] = u))
-    : (u = t[10]);
-  let d;
-  t[11] === a
-    ? (d = t[12])
-    : ((d = Object.entries(a)), (t[11] = a), (t[12] = d));
-  let f;
-  t[13] !== n || t[14] !== r.floor || t[15] !== d
-    ? ((f = (0, J.jsx)(`div`, {
-        className: `flex flex-wrap justify-center items-center gap-x-20 gap-y-16 w-full max-w-[1600px] px-8 border-t border-slate-200/60 pt-10`,
-        children: d.map((e) => {
-          let [t, i] = e;
-          return i.length > 0
-            ? (0, J.jsx)(me, { zone: t, switches: i, floor: r.floor, ...n }, t)
-            : null;
-        }),
-      })),
-      (t[13] = n),
-      (t[14] = r.floor),
-      (t[15] = d),
-      (t[16] = f))
-    : (f = t[16]);
-  let p;
-  return (
-    t[17] !== u || t[18] !== f
-      ? ((p = (0, J.jsxs)(`div`, {
-          className: `flex flex-col items-center w-full relative z-10 pt-16 mt-6 first:border-0 first:pt-0 first:mt-0`,
-          children: [u, f],
-        })),
-        (t[17] = u),
-        (t[18] = f),
-        (t[19] = p))
-      : (p = t[19]),
-    p
-  );
+    s = `absolute -top-4 px-5 py-1.5 rounded-xl border-[2px] text-[10px] font-black text-white uppercase tracking-[0.2em] shadow-lg shadow-slate-200 z-20 flex items-center gap-2 group ${o ? `bg-indigo-900 border-indigo-200` : `bg-slate-800 border-slate-600`}`,
+    c = o ? `fas fa-server text-indigo-400` : `fas fa-building text-indigo-400`;
+  let l = (0, J.jsx)(`i`, { className: c });
+  let deleteBtn = onDeleteFloor
+    ? (0, J.jsx)(`button`, {
+        type: `button`,
+        onClick: (evt) => {
+          evt.stopPropagation();
+          onDeleteFloor(r.floor);
+        },
+        className: `ml-1.5 text-rose-400 hover:text-white hover:bg-rose-600/80 px-1.5 py-0.5 rounded transition-all cursor-pointer flex items-center justify-center opacity-70 hover:opacity-100`,
+        title: `Xóa vị trí/tầng "${r.floor}"`,
+        children: (0, J.jsx)(`i`, { className: `fas fa-trash-alt text-[9px]` }),
+      })
+    : null;
+  let u = (0, J.jsxs)(`div`, {
+    className: s,
+    children: [l, (0, J.jsx)(`span`, { children: r.floor }), deleteBtn],
+  });
+  let d = Object.entries(a);
+  let f = (0, J.jsx)(`div`, {
+    className: `flex flex-wrap justify-center items-center gap-x-20 gap-y-16 w-full max-w-[1600px] px-8 border-t border-slate-200/60 pt-10`,
+    children: d.map((e) => {
+      let [t, i] = e;
+      return i.length > 0
+        ? (0, J.jsx)(me, { zone: t, switches: i, floor: r.floor, ...n }, t)
+        : null;
+    }),
+  });
+  return (0, J.jsxs)(`div`, {
+    className: `flex flex-col items-center w-full relative z-10 pt-16 mt-6 first:border-0 first:pt-0 first:mt-0`,
+    children: [u, f],
+  });
 }
 function Z(e) {
   return e.length > 0;
@@ -3024,6 +3002,7 @@ function Fe() {
     t = d((e) => e.FirewallDB),
     deleteFirewall = d((e) => e.deleteFirewall),
     deleteSwitch = d((e) => e.deleteSwitch),
+    deleteFloor = d((e) => e.deleteFloor),
     addGlobalLog = d((e) => e.addGlobalLog),
     showDialog = useDialogStore((e) => e.showDialog),
     n = d((e) => e.GponFrameDB),
@@ -3142,6 +3121,35 @@ function Fe() {
       if (typeof showDialog === 'function') {
         showDialog(`Bạn có chắc chắn muốn xóa ${label} [${dev.name}]?`, 'confirm', execute);
       } else if (typeof window !== 'undefined' && window.confirm(`Bạn có chắc chắn muốn xóa ${label} [${dev.name}]?`)) {
+        execute();
+      }
+    },
+    handleDeleteFloor = (floorName) => {
+      if (!floorName) return;
+      let targetRack = (e || []).find((r) => r.floor === floorName);
+      let switchCount = targetRack?.switches?.length || 0;
+      let confirmText =
+        switchCount > 0
+          ? `⚠️ Vị trí/Tầng "${floorName}" đang có ${switchCount} Switch.\n\nXóa vị trí này sẽ xóa toàn bộ các Switch bên trong!\n\nBạn có chắc chắn muốn xóa không?`
+          : `Bạn có chắc chắn muốn xóa vị trí/tầng "${floorName}"?`;
+
+      let execute = () => {
+        if (typeof deleteFloor === 'function') {
+          deleteFloor(floorName);
+        } else if (d?.getState()?.deleteFloor) {
+          d.getState().deleteFloor(floorName);
+        }
+        if (typeof addGlobalLog === 'function') {
+          addGlobalLog('Topology: Xóa vị trí/tầng', `Đã xóa vị trí/tầng "${floorName}"`, 'admin');
+        }
+        if (typeof showDialog === 'function') {
+          showDialog(`Đã xóa thành công vị trí/tầng "${floorName}"!`, 'success');
+        }
+      };
+
+      if (typeof showDialog === 'function') {
+        showDialog(confirmText, 'confirm', execute);
+      } else if (typeof window !== 'undefined' && window.confirm(confirmText)) {
         execute();
       }
     },
@@ -3325,6 +3333,7 @@ function Fe() {
     bulkSelectMode,
     selectedDevIds,
     onToggleBulkSelect: toggleBulkSelect,
+    onDeleteFloor: handleDeleteFloor,
   };
   return (0, J.jsxs)(`div`, {
     id: `topology-view`,
