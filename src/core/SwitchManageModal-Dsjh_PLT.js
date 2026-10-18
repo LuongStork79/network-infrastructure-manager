@@ -24,10 +24,12 @@ function p({
   sw: t,
   db: n,
   username: p,
+  isAdmin: isAdminProp,
   onSave: m,
   onDelete: h,
   onClose: g,
 }) {
+  let isAdmin = isAdminProp !== undefined ? !!isAdminProp : true;
   let _ = c((e) => e.showDialog),
     v = s((e) => e.GponFrameDB),
     y = t ? n.findIndex((e) => e.switches.some((e) => e.id === t.id)) : 0,
@@ -138,6 +140,10 @@ function p({
     }));
   }
   function ie() {
+    if (!isAdmin) {
+      _(`Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.`, `error`);
+      return;
+    }
     let i = E.trim(),
       s = parseInt(V, 10) || 0,
       c = parseInt(q, 10) || 0,
@@ -840,9 +846,15 @@ function p({
         (0, d.jsxs)(`div`, {
           className: `flex gap-3 mt-8 pt-6 border-t border-slate-100 shrink-0`,
           children: [
-            e === `edit` &&
+            isAdmin && e === `edit` &&
               (0, d.jsx)(`button`, {
-                onClick: h,
+                onClick: () => {
+                  if (!isAdmin) {
+                    _(`Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.`, `error`);
+                    return;
+                  }
+                  h();
+                },
                 className: `flex-[0.5] py-3 bg-red-50 border border-red-200 text-sm font-bold text-red-600 hover:bg-red-100 rounded-xl transition-all`,
                 children: `Xóa`,
               }),
@@ -851,10 +863,13 @@ function p({
               className: `flex-1 py-3 bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-all`,
               children: `Hủy`,
             }),
-            (0, d.jsx)(`button`, {
+            isAdmin ? (0, d.jsx)(`button`, {
               onClick: ie,
               className: `flex-1 py-3 bg-slate-800 text-white text-sm font-bold rounded-xl shadow-md hover:bg-black transition-all`,
               children: `Lưu thiết bị`,
+            }) : (0, d.jsx)(`div`, {
+              className: `flex-1 py-3 bg-slate-100 text-slate-400 text-sm font-bold rounded-xl flex items-center justify-center gap-1.5`,
+              children: `Chế độ chỉ đọc`,
             }),
           ],
         }),

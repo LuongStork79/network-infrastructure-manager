@@ -1235,9 +1235,6 @@ var J = n(),
       onSelect: c,
       compact: u = !1,
       isDimmed: d = !1,
-      bulkSelectMode = !1,
-      isBulkSelected = !1,
-      onToggleBulkSelect,
     },
     p,
   ) {
@@ -1253,7 +1250,6 @@ var J = n(),
         s ? `vlan-highlight` : ``,
         u ? `compact` : ``,
         d ? `dimmed` : ``,
-        isBulkSelected ? `ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20 dark:bg-rose-950/30` : ``,
       ]
         .filter(Boolean)
         .join(` `);
@@ -1263,27 +1259,9 @@ var J = n(),
         id: e.id,
         className: y,
         style: { borderTopColor: e.color },
-        onClick: (evt) => {
-          if (bulkSelectMode && onToggleBulkSelect) {
-            evt.stopPropagation();
-            onToggleBulkSelect(e.id);
-            return;
-          }
-          c(e.id);
-        },
-        title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${g}/${_} ports`,
+        onClick: () => c(e.id),
+        title: `${e.name} — ${g}/${_} ports`,
         children: [
-          bulkSelectMode &&
-            (0, J.jsx)(`div`, {
-              className: `absolute -top-2 -left-2 z-30 p-0.5`,
-              onClick: (evt) => evt.stopPropagation(),
-              children: (0, J.jsx)(`input`, {
-                type: `checkbox`,
-                checked: !!isBulkSelected,
-                onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
-                className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shadow-md`,
-              }),
-            }),
           (0, J.jsxs)(`div`, {
             className: `compact-icon`,
             children: [
@@ -1307,27 +1285,9 @@ var J = n(),
       ref: p,
       id: e.id,
       className: `${y} sw-brand-card`,
-      onClick: (evt) => {
-        if (bulkSelectMode && onToggleBulkSelect) {
-          evt.stopPropagation();
-          onToggleBulkSelect(e.id);
-          return;
-        }
-        c(e.id);
-      },
-      title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${g}/${_} port`,
+      onClick: () => c(e.id),
+      title: `${e.name} — ${g}/${_} port`,
       children: [
-        bulkSelectMode &&
-          (0, J.jsx)(`div`, {
-            className: `absolute -top-2.5 -left-2.5 z-30 p-1`,
-            onClick: (evt) => evt.stopPropagation(),
-            children: (0, J.jsx)(`input`, {
-              type: `checkbox`,
-              checked: !!isBulkSelected,
-              onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
-              className: `w-5 h-5 rounded cursor-pointer accent-rose-600 shadow-md`,
-            }),
-          }),
         C > 0 &&
           (0, J.jsx)(`span`, {
             className: `sw-combo-badge`,
@@ -1540,9 +1500,6 @@ var fe = (0, g.forwardRef)(function (
     isVlanHighlighted: a,
     onSelect: s,
     isDimmed: c = !1,
-    bulkSelectMode = !1,
-    isBulkSelected = !1,
-    onToggleBulkSelect,
   },
   u,
 ) {
@@ -1555,7 +1512,6 @@ var fe = (0, g.forwardRef)(function (
       i ? `active` : ``,
       a ? `vlan-highlight` : ``,
       c ? `dimmed` : ``,
-      isBulkSelected ? `ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20` : ``,
     ]
       .filter(Boolean)
       .join(` `);
@@ -1564,27 +1520,9 @@ var fe = (0, g.forwardRef)(function (
     id: e.id,
     className: g,
     style: { left: n, top: r },
-    onClick: (evt) => {
-      if (bulkSelectMode && onToggleBulkSelect) {
-        evt.stopPropagation();
-        onToggleBulkSelect(e.id);
-        return;
-      }
-      s(e.id);
-    },
-    title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${e.name}` : `${e.name} — ${d}/${p} ports`,
+    onClick: () => s(e.id),
+    title: `${e.name} — ${d}/${p} ports`,
     children: [
-      bulkSelectMode &&
-        (0, J.jsx)(`div`, {
-          className: `absolute -top-2.5 -left-2.5 z-30 p-0.5`,
-          onClick: (evt) => evt.stopPropagation(),
-          children: (0, J.jsx)(`input`, {
-            type: `checkbox`,
-            checked: !!isBulkSelected,
-            onChange: () => onToggleBulkSelect && onToggleBulkSelect(e.id),
-            className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shadow-md`,
-          }),
-        }),
       (0, J.jsxs)(`div`, {
         className: `iso-name-pill`,
         children: [
@@ -1622,9 +1560,6 @@ function pe({
   zoneOffsets: l = {},
   onZoneDrag: u,
   registerZoneRef: d,
-  bulkSelectMode = !1,
-  selectedDevIds,
-  onToggleBulkSelect,
 }) {
   let f = t === `__core__`,
     { positions: p, width: m, height: h } = w(n, f ? 90 : 0),
@@ -1697,9 +1632,6 @@ function pe({
                   a !== `none` && e.conns.some((e) => e.v.toString() === a),
                 onSelect: o,
                 isDimmed: c != null && !c.has(e.id),
-                bulkSelectMode,
-                isBulkSelected: selectedDevIds?.has(e.id),
-                onToggleBulkSelect,
               },
               e.id,
             )
@@ -1722,9 +1654,6 @@ function me({
   zoneOffsets: u,
   onZoneDrag: d,
   registerZoneRef: f,
-  bulkSelectMode = !1,
-  selectedDevIds,
-  onToggleBulkSelect,
 }) {
   if (c)
     return (0, J.jsx)(pe, {
@@ -1740,9 +1669,6 @@ function me({
       zoneOffsets: u,
       onZoneDrag: d,
       registerZoneRef: f,
-      bulkSelectMode,
-      selectedDevIds,
-      onToggleBulkSelect,
     });
   let p = n.map((e) =>
     (0, J.jsx)(
@@ -1756,9 +1682,6 @@ function me({
           a !== `none` && e.conns.some((e) => e.v.toString() === a),
         onSelect: o,
         isDimmed: l != null && !l.has(e.id),
-        bulkSelectMode,
-        isBulkSelected: selectedDevIds?.has(e.id),
-        onToggleBulkSelect,
       },
       e.id,
     ),
@@ -2389,9 +2312,6 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       fw: r,
       onManage: i,
       onDelete: onDel,
-      bulkSelectMode = !1,
-      isBulkSelected = !1,
-      onToggleBulkSelect,
     } = e,
       a;
 
@@ -2421,7 +2341,7 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       children: (0, J.jsx)(`i`, { className: `fas ${isRouter ? 'fa-route' : 'fa-shield-halved'} text-xl text-white drop-shadow-sm` }),
     });
 
-    let delBtn = onDel && !bulkSelectMode && (0, J.jsx)(`button`, {
+    let delBtn = onDel && (0, J.jsx)(`button`, {
       type: `button`,
       onClick: (e) => {
         e.stopPropagation();
@@ -2511,28 +2431,10 @@ var Oe = (0, g.forwardRef)(function (e, t) {
     return (0, J.jsxs)(`div`, {
       ref: t,
       id: r.id,
-      className: `firewall-node-ui relative ${isRouter ? 'is-router' : ''} ${isBulkSelected ? 'ring-2 ring-rose-500 shadow-rose-500/40 bg-rose-50/20 dark:bg-rose-950/30' : ''}`,
-      onClick: (evt) => {
-        if (bulkSelectMode && onToggleBulkSelect) {
-          evt.stopPropagation();
-          onToggleBulkSelect(r.id);
-          return;
-        }
-        i();
-      },
-      title: bulkSelectMode ? `Bấm để chọn/bỏ chọn ${isRouter ? 'Router' : 'Firewall'}` : `Bấm để xem/sửa thông tin ${isRouter ? 'Router' : 'Firewall'}`,
+      className: `firewall-node-ui relative ${isRouter ? 'is-router' : ''}`,
+      onClick: () => i(),
+      title: `Bấm để xem/sửa thông tin ${isRouter ? 'Router' : 'Firewall'}`,
       children: [
-        bulkSelectMode &&
-          (0, J.jsx)(`div`, {
-            className: `absolute -top-2.5 -left-2.5 z-30 p-1`,
-            onClick: (evt) => evt.stopPropagation(),
-            children: (0, J.jsx)(`input`, {
-              type: `checkbox`,
-              checked: !!isBulkSelected,
-              onChange: () => onToggleBulkSelect && onToggleBulkSelect(r.id),
-              className: `w-5 h-5 rounded cursor-pointer accent-rose-600 shadow-md`,
-            }),
-          }),
         o, c, l, u, h, g,
       ],
     });
@@ -2608,9 +2510,6 @@ function Ae(e) {
     onManage: i,
     onAdd: a,
     onDelete: onDel,
-    bulkSelectMode = !1,
-    selectedDevIds,
-    onToggleBulkSelect,
   } = e;
   let devices = (Array.isArray(fws) && fws.length > 0) ? fws : (n ? [n] : []);
 
@@ -2641,9 +2540,6 @@ function Ae(e) {
       ref: (el) => r(dev.id, el),
       onManage: () => i(dev.id),
       onDelete: onDel,
-      bulkSelectMode,
-      isBulkSelected: selectedDevIds?.has(dev.id),
-      onToggleBulkSelect,
     }, dev.id)
   );
 
@@ -2924,7 +2820,8 @@ function Pe(e) {
     s
   );
 }
-function Fe() {
+function Fe(props = {}) {
+  let isAdmin = props.isAdmin !== undefined ? !!props.isAdmin : true;
   let e = d((e) => e.DB),
     t = d((e) => e.FirewallDB),
     deleteFirewall = d((e) => e.deleteFirewall),
@@ -2952,128 +2849,13 @@ function Fe() {
     E = u((e) => e.toggleSidebarMobile),
     D = u((e) => e.openAddFirewallModal),
     O = u((e) => e.openEditFirewallModal),
-    [bulkSelectMode, setBulkSelectMode] = (0, g.useState)(false),
-    [selectedDevIds, setSelectedDevIds] = (0, g.useState)(() => new Set()),
-    [isBulkModalOpen, setIsBulkModalOpen] = (0, g.useState)(false),
-    [bulkSearchQuery, setBulkSearchQuery] = (0, g.useState)(''),
-    [bulkFilterType, setBulkFilterType] = (0, g.useState)('all'),
-    [bulkConfirmStep, setBulkConfirmStep] = (0, g.useState)(false);
-
-  (0, g.useEffect)(() => {
-    window.nimOpenTopologyBulkDelete = () => {
-      setIsBulkModalOpen(true);
-      setBulkSelectMode(true);
-      setBulkConfirmStep(false);
-    };
-    return () => {
-      delete window.nimOpenTopologyBulkDelete;
-    };
-  }, []);
-
-  let allSwitches = (0, g.useMemo)(() => {
-      return (e || []).flatMap((rack) => rack.switches || []);
-    }, [e]),
-    allGateways = (0, g.useMemo)(() => {
-      return t || [];
-    }, [t]),
-    selectedSwitchCount = (0, g.useMemo)(() => {
-      return allSwitches.filter((sw) => selectedDevIds.has(sw.id)).length;
-    }, [allSwitches, selectedDevIds]),
-    selectedGatewayCount = (0, g.useMemo)(() => {
-      return allGateways.filter((gw) => selectedDevIds.has(gw.id)).length;
-    }, [allGateways, selectedDevIds]),
-    toggleBulkSelect = (id) => {
-      setSelectedDevIds((prev) => {
-        let next = new Set(prev);
-        if (next.has(id)) {
-          next.delete(id);
-        } else {
-          next.add(id);
-        }
-        return next;
-      });
-    },
-    handleSelectAllSwitches = () => {
-      setSelectedDevIds((prev) => {
-        let next = new Set(prev);
-        allSwitches.forEach((sw) => next.add(sw.id));
-        return next;
-      });
-    },
-    handleSelectAllGateways = () => {
-      setSelectedDevIds((prev) => {
-        let next = new Set(prev);
-        allGateways.forEach((gw) => next.add(gw.id));
-        return next;
-      });
-    },
-    handleSelectAllTopology = () => {
-      let all = new Set([...allSwitches.map((sw) => sw.id), ...allGateways.map((gw) => gw.id)]);
-      setSelectedDevIds(all);
-    },
-    handleClearSelection = () => {
-      setSelectedDevIds(new Set());
-    },
-    handleToggleFloorSwitches = (floorSwitches) => {
-      let swIds = (floorSwitches || []).map((sw) => sw.id);
-      let allSelected = swIds.length > 0 && swIds.every((id) => selectedDevIds.has(id));
-      setSelectedDevIds((prev) => {
-        let next = new Set(prev);
-        if (allSelected) {
-          swIds.forEach((id) => next.delete(id));
-        } else {
-          swIds.forEach((id) => next.add(id));
-        }
-        return next;
-      });
-    },
-    handleExecuteBulkDelete = (skipModalConfirm = false) => {
-      if (selectedDevIds.size === 0) return;
-      let total = selectedDevIds.size;
-      let swCount = selectedSwitchCount;
-      let gwCount = selectedGatewayCount;
-      let parts = [];
-      if (swCount > 0) parts.push(`${swCount} Switch`);
-      if (gwCount > 0) parts.push(`${gwCount} Router/Firewall`);
-
-      let confirmText = `Bạn có chắc chắn muốn xóa ${total} thiết bị đã chọn (${parts.join(', ')}) khỏi Topology?\n\nHành động này sẽ xóa vĩnh viễn thiết bị và giải phóng các cổng liên kết mạng liên quan!`;
-
-      let executeDelete = () => {
-        selectedDevIds.forEach((id) => {
-          if (allSwitches.some((sw) => sw.id === id)) {
-            deleteSwitch(id, 'admin');
-          }
-        });
-        selectedDevIds.forEach((id) => {
-          if (allGateways.some((gw) => gw.id === id)) {
-            deleteFirewall(id);
-          }
-        });
-
-        if (typeof addGlobalLog === 'function') {
-          addGlobalLog('Topology: Xóa hàng loạt', `Đã xóa ${total} thiết bị (${parts.join(', ')}) khỏi Topology`, 'admin');
-        }
-
-        setSelectedDevIds(new Set());
-        setBulkConfirmStep(false);
-        setIsBulkModalOpen(false);
-        setBulkSelectMode(false);
-        if (typeof showDialog === 'function') {
-          showDialog(`Đã xóa thành công ${total} thiết bị khỏi Topology!`, 'success');
-        } else if (typeof window !== 'undefined') {
-          window.alert(`Đã xóa thành công ${total} thiết bị khỏi Topology!`);
-        }
-      };
-
-      if (skipModalConfirm) {
-        executeDelete();
-      } else if (typeof window !== 'undefined' && window.confirm(confirmText)) {
-        executeDelete();
-      } else if (typeof showDialog === 'function') {
-        showDialog(confirmText, 'confirm', executeDelete);
-      }
-    },
     handleDeleteFw = (dev) => {
+      if (!isAdmin) {
+        if (typeof showDialog === 'function') {
+          showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+        }
+        return;
+      }
       if (!dev) return;
       let isRt = dev.deviceType === 'router' || dev.name?.toLowerCase().includes('router');
       let label = isRt ? 'Router' : 'Firewall';
@@ -3090,6 +2872,12 @@ function Fe() {
       }
     },
     handleDeleteFloor = (floorName) => {
+      if (!isAdmin) {
+        if (typeof showDialog === 'function') {
+          showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+        }
+        return;
+      }
       if (!floorName) return;
       let targetRack = (e || []).find((r) => r.floor === floorName);
       let switchCount = targetRack?.switches?.length || 0;
@@ -3274,10 +3062,6 @@ function Fe() {
       scale: M,
     });
   function Q(e) {
-    if (bulkSelectMode) {
-      toggleBulkSelect(e);
-      return;
-    }
     if (m) {
       v(e);
       return;
@@ -3295,10 +3079,7 @@ function Fe() {
     zoneOffsets: R,
     onZoneDrag: U,
     registerZoneRef: L,
-    bulkSelectMode,
-    selectedDevIds,
-    onToggleBulkSelect: toggleBulkSelect,
-    onDeleteFloor: handleDeleteFloor,
+    onDeleteFloor: isAdmin ? handleDeleteFloor : null,
   };
   return (0, J.jsxs)(`div`, {
     id: `topology-view`,
@@ -3326,606 +3107,6 @@ function Fe() {
         title: m ? `Thoát chế độ tra đường đi` : `Tra đường đi giữa 2 switch`,
         children: (0, J.jsx)(`i`, { className: `fas fa-route` }),
       }),
-      (0, J.jsxs)(`button`, {
-        id: `btn-topology-bulk-delete`,
-        type: `button`,
-        onClick: (ev) => {
-          ev.stopPropagation();
-          setIsBulkModalOpen(true);
-          setBulkSelectMode(true);
-          setBulkConfirmStep(false);
-        },
-        style: {
-          top: '18px',
-          right: 'calc(120px + var(--info-panel-shift, 0px))',
-          zIndex: 100,
-          pointerEvents: 'auto',
-        },
-        className: `fixed h-9 px-3.5 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all shadow-md cursor-pointer select-none ${
-          bulkSelectMode || selectedDevIds.size > 0
-            ? 'bg-rose-600 border-rose-500 text-white shadow-rose-600/40 ring-2 ring-rose-400'
-            : 'bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-slate-900/5'
-        }`,
-        title: 'Bật chế độ chọn & mở bảng xóa hàng loạt thiết bị (Switch, Router, Firewall)',
-        children: [
-          (0, J.jsx)(`i`, { className: `fas ${selectedDevIds.size > 0 ? 'fa-check-square text-white' : 'fa-list-check text-rose-500'}` }),
-          (0, J.jsx)(`span`, { children: selectedDevIds.size > 0 ? `Xóa hàng loạt (${selectedDevIds.size})` : `Xóa hàng loạt` })
-        ]
-      }),
-      bulkSelectMode && !isBulkModalOpen &&
-        (0, J.jsxs)(`div`, {
-          className: `fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 dark:bg-slate-900/95 text-white backdrop-blur-md px-5 py-3 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 flex-wrap justify-center max-w-[95vw] select-none`,
-          children: [
-            (0, J.jsxs)(`div`, {
-              className: `flex items-center gap-2 text-xs font-bold mr-1`,
-              children: [
-                (0, J.jsx)(`span`, {
-                  className: `w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse`
-                }),
-                (0, J.jsxs)(`span`, {
-                  children: [
-                    `Đã chọn: `,
-                    (0, J.jsx)(`span`, { className: `text-rose-400 font-extrabold text-sm`, children: selectedDevIds.size }),
-                    ` thiết bị`,
-                    selectedDevIds.size > 0 && (0, J.jsxs)(`span`, {
-                      className: `text-slate-400 font-normal ml-1.5`,
-                      children: [
-                        `(`,
-                        selectedSwitchCount > 0 ? `${selectedSwitchCount} Switch` : null,
-                        selectedSwitchCount > 0 && selectedGatewayCount > 0 ? `, ` : null,
-                        selectedGatewayCount > 0 ? `${selectedGatewayCount} Router/FW` : null,
-                        `)`
-                      ]
-                    })
-                  ]
-                })
-              ]
-            }),
-            (0, J.jsx)(`div`, { className: `h-4 w-px bg-slate-700 mx-1 hidden sm:block` }),
-            (0, J.jsxs)(`button`, {
-              type: `button`,
-              onClick: () => setIsBulkModalOpen(true),
-              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-900 hover:bg-indigo-800 text-white border border-indigo-700 flex items-center gap-1.5 transition cursor-pointer`,
-              children: [
-                (0, J.jsx)(`i`, { className: `fas fa-list` }),
-                ` Mở danh sách`
-              ]
-            }),
-            allSwitches.length > 0 && (0, J.jsx)(`button`, {
-              type: `button`,
-              onClick: handleSelectAllSwitches,
-              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer`,
-              children: `Chọn tất cả Switch (${allSwitches.length})`
-            }),
-            allGateways.length > 0 && (0, J.jsx)(`button`, {
-              type: `button`,
-              onClick: handleSelectAllGateways,
-              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer`,
-              children: `Chọn tất cả Router/FW (${allGateways.length})`
-            }),
-            (allSwitches.length > 0 || allGateways.length > 0) && (0, J.jsx)(`button`, {
-              type: `button`,
-              onClick: handleSelectAllTopology,
-              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 transition cursor-pointer`,
-              children: `Chọn tất cả (${allSwitches.length + allGateways.length})`
-            }),
-            selectedDevIds.size > 0 && (0, J.jsx)(`button`, {
-              type: `button`,
-              onClick: handleClearSelection,
-              className: `px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer`,
-              children: `Bỏ chọn`
-            }),
-            (0, J.jsx)(`div`, { className: `h-4 w-px bg-slate-700 mx-1 hidden sm:block` }),
-            (0, J.jsxs)(`button`, {
-              type: `button`,
-              onClick: () => handleExecuteBulkDelete(false),
-              disabled: selectedDevIds.size === 0,
-              className: `px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
-                selectedDevIds.size > 0
-                  ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 ring-1 ring-rose-400'
-                  : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-              }`,
-              children: [
-                (0, J.jsx)(`i`, { className: `fas fa-trash-alt` }),
-                ` Xóa đã chọn (${selectedDevIds.size})`
-              ]
-            }),
-            (0, J.jsx)(`button`, {
-              type: `button`,
-              onClick: () => {
-                setBulkSelectMode(false);
-                setSelectedDevIds(new Set());
-              },
-              className: `w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer ml-1`,
-              title: `Thoát chế độ chọn hàng loạt`,
-              children: (0, J.jsx)(`i`, { className: `fas fa-times text-xs` })
-            })
-          ]
-        }),
-      isBulkModalOpen &&
-        (0, J.jsx)(`div`, {
-          className: `fixed inset-0 bg-slate-950/65 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-in fade-in duration-150`,
-          onClick: () => {
-            setIsBulkModalOpen(false);
-            setBulkConfirmStep(false);
-          },
-          children: (0, J.jsxs)(`div`, {
-            className: `bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden text-slate-800 dark:text-slate-100`,
-            onClick: (e) => e.stopPropagation(),
-            children: [
-              (0, J.jsxs)(`div`, {
-                className: `px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50`,
-                children: [
-                  (0, J.jsxs)(`div`, {
-                    className: `flex items-center gap-3`,
-                    children: [
-                      (0, J.jsx)(`div`, {
-                        className: `w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm`,
-                        children: (0, J.jsx)(`i`, { className: `fas fa-trash-alt` })
-                      }),
-                      (0, J.jsxs)(`div`, {
-                        children: [
-                          (0, J.jsx)(`h3`, {
-                            className: `text-sm font-bold text-slate-900 dark:text-white leading-tight`,
-                            children: `Xóa hàng loạt thiết bị Topology`
-                          }),
-                          (0, J.jsx)(`p`, {
-                            className: `text-[11px] text-slate-500 dark:text-slate-400 mt-0.5`,
-                            children: `Chọn Switch, Router, Firewall cần xóa khỏi sơ đồ (${allSwitches.length + allGateways.length} thiết bị hiện có)`
-                          })
-                        ]
-                      })
-                    ]
-                  }),
-                  (0, J.jsx)(`button`, {
-                    type: `button`,
-                    onClick: () => {
-                      setIsBulkModalOpen(false);
-                      setBulkConfirmStep(false);
-                    },
-                    className: `w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition cursor-pointer`,
-                    children: (0, J.jsx)(`i`, { className: `fas fa-times text-xs` })
-                  })
-                ]
-              }),
-              bulkConfirmStep
-                ? (0, J.jsxs)(`div`, {
-                    className: `p-6 flex flex-col items-center justify-center text-center`,
-                    children: [
-                      (0, J.jsx)(`div`, {
-                        className: `w-14 h-14 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-2xl mb-3 shadow-inner`,
-                        children: (0, J.jsx)(`i`, { className: `fas fa-exclamation-triangle` })
-                      }),
-                      (0, J.jsxs)(`h4`, {
-                        className: `text-base font-extrabold text-slate-900 dark:text-white`,
-                        children: [`Xác nhận xóa vĩnh viễn `, selectedDevIds.size, ` thiết bị đã chọn?`]
-                      }),
-                      (0, J.jsxs)(`p`, {
-                        className: `text-xs text-slate-500 dark:text-slate-400 max-w-md mt-1.5 mb-4 leading-relaxed`,
-                        children: [
-                          `Toàn bộ cấu hình cổng và liên kết Uplink/WAN của `,
-                          selectedSwitchCount > 0 ? `${selectedSwitchCount} Switch` : null,
-                          selectedSwitchCount > 0 && selectedGatewayCount > 0 ? `, ` : null,
-                          selectedGatewayCount > 0 ? `${selectedGatewayCount} Router/Firewall` : null,
-                          ` sẽ bị xóa hoàn toàn. Hành động này không thể hoàn tác!`
-                        ]
-                      }),
-                      (0, J.jsxs)(`div`, {
-                        className: `flex items-center gap-3 mt-2`,
-                        children: [
-                          (0, J.jsx)(`button`, {
-                            type: `button`,
-                            onClick: () => setBulkConfirmStep(false),
-                            className: `px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition cursor-pointer`,
-                            children: `Quay lại kiểm tra`
-                          }),
-                          (0, J.jsxs)(`button`, {
-                            type: `button`,
-                            onClick: () => handleExecuteBulkDelete(true),
-                            className: `px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-lg shadow-rose-600/30 flex items-center gap-2 transition cursor-pointer`,
-                            children: [
-                              (0, J.jsx)(`i`, { className: `fas fa-trash-alt` }),
-                              `Xác nhận xóa ngay`
-                            ]
-                          })
-                        ]
-                      })
-                    ]
-                  })
-                : (0, J.jsxs)(J.Fragment, {
-                    children: [
-                      (0, J.jsxs)(`div`, {
-                        className: `px-6 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 flex-wrap justify-between bg-slate-50/20 dark:bg-slate-900/20`,
-                        children: [
-                          (0, J.jsxs)(`div`, {
-                            className: `flex items-center gap-2 flex-1 min-w-[200px]`,
-                            children: [
-                              (0, J.jsx)(`i`, { className: `fas fa-search text-slate-400 text-xs` }),
-                              (0, J.jsx)(`input`, {
-                                type: `text`,
-                                value: bulkSearchQuery,
-                                onChange: (e) => setBulkSearchQuery(e.target.value),
-                                placeholder: `Tìm theo tên, model, IP...`,
-                                className: `w-full bg-transparent text-xs text-slate-800 dark:text-slate-200 focus:outline-none placeholder:text-slate-400`
-                              }),
-                              bulkSearchQuery && (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: () => setBulkSearchQuery(''),
-                                className: `text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs`,
-                                children: (0, J.jsx)(`i`, { className: `fas fa-times-circle` })
-                              })
-                            ]
-                          }),
-                          (0, J.jsxs)(`div`, {
-                            className: `flex items-center gap-1.5 flex-wrap`,
-                            children: [
-                              (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: () => setBulkFilterType('all'),
-                                className: `px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                                  bulkFilterType === 'all'
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`,
-                                children: `Tất cả (${allSwitches.length + allGateways.length})`
-                              }),
-                              (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: () => setBulkFilterType('switch'),
-                                className: `px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                                  bulkFilterType === 'switch'
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`,
-                                children: `Switch (${allSwitches.length})`
-                              }),
-                              (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: () => setBulkFilterType('gateway'),
-                                className: `px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                                  bulkFilterType === 'gateway'
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                }`,
-                                children: `Router/FW (${allGateways.length})`
-                              }),
-                              (0, J.jsx)(`div`, { className: `h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1` }),
-                              (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: () => {
-                                  if (bulkFilterType === 'switch') handleSelectAllSwitches();
-                                  else if (bulkFilterType === 'gateway') handleSelectAllGateways();
-                                  else handleSelectAllTopology();
-                                },
-                                className: `px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition cursor-pointer`,
-                                children: `Chọn tất cả`
-                              }),
-                              selectedDevIds.size > 0 && (0, J.jsx)(`button`, {
-                                type: `button`,
-                                onClick: handleClearSelection,
-                                className: `px-2.5 py-1 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer`,
-                                children: `Bỏ chọn`
-                              })
-                            ]
-                          })
-                        ]
-                      }),
-                      (0, J.jsxs)(`div`, {
-                        className: `p-6 overflow-y-auto max-h-[50vh] space-y-5 custom-scroll`,
-                        children: [
-                          (bulkFilterType === 'all' || bulkFilterType === 'gateway') && allGateways.length > 0 && (0, J.jsxs)(`div`, {
-                            className: `space-y-2`,
-                            children: [
-                              (0, J.jsxs)(`div`, {
-                                className: `flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider px-1`,
-                                children: [
-                                  (0, J.jsxs)(`span`, {
-                                    className: `flex items-center gap-1.5`,
-                                    children: [
-                                      (0, J.jsx)(`i`, { className: `fas fa-shield-halved text-rose-500` }),
-                                      `Router & Firewall (${allGateways.length})`
-                                    ]
-                                  }),
-                                  (0, J.jsx)(`button`, {
-                                    type: `button`,
-                                    onClick: () => {
-                                      let gwIds = allGateways.map((g) => g.id);
-                                      let allGWSel = gwIds.every((id) => selectedDevIds.has(id));
-                                      setSelectedDevIds((prev) => {
-                                        let next = new Set(prev);
-                                        if (allGWSel) gwIds.forEach((id) => next.delete(id));
-                                        else gwIds.forEach((id) => next.add(id));
-                                        return next;
-                                      });
-                                    },
-                                    className: `text-[11px] text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold cursor-pointer`,
-                                    children: allGateways.every((g) => selectedDevIds.has(g.id)) ? `Bỏ chọn nhóm` : `Chọn cả nhóm`
-                                  })
-                                ]
-                              }),
-                              (0, J.jsx)(`div`, {
-                                className: `grid grid-cols-1 sm:grid-cols-2 gap-2.5`,
-                                children: allGateways
-                                  .filter((gw) => !bulkSearchQuery.trim() || gw.name?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || gw.ip?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || gw.model?.toLowerCase().includes(bulkSearchQuery.toLowerCase()))
-                                  .map((gw) => {
-                                    let isRt = gw.deviceType === 'router' || gw.name?.toLowerCase().includes('router') || gw.model?.toLowerCase().includes('router');
-                                    let isSel = selectedDevIds.has(gw.id);
-                                    return (0, J.jsxs)(`div`, {
-                                      key: gw.id,
-                                      onClick: () => toggleBulkSelect(gw.id),
-                                      className: `p-3 rounded-xl border flex items-center gap-3 transition-all cursor-pointer ${
-                                        isSel
-                                          ? 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-400 dark:border-rose-700 shadow-sm ring-1 ring-rose-400'
-                                          : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                                      }`,
-                                      children: [
-                                        (0, J.jsx)(`input`, {
-                                          type: `checkbox`,
-                                          checked: isSel,
-                                          onChange: () => toggleBulkSelect(gw.id),
-                                          onClick: (e) => e.stopPropagation(),
-                                          className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shrink-0`
-                                        }),
-                                        (0, J.jsx)(`div`, {
-                                          className: `w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0 ${isRt ? 'bg-sky-600' : 'bg-rose-600'}`,
-                                          children: (0, J.jsx)(`i`, { className: `fas ${isRt ? 'fa-route' : 'fa-shield-halved'} text-xs` })
-                                        }),
-                                        (0, J.jsxs)(`div`, {
-                                          className: `flex-1 min-w-0`,
-                                          children: [
-                                            (0, J.jsxs)(`div`, {
-                                              className: `flex items-center gap-1.5`,
-                                              children: [
-                                                (0, J.jsx)(`span`, {
-                                                  className: `text-xs font-bold text-slate-800 dark:text-slate-200 truncate`,
-                                                  children: gw.name
-                                                }),
-                                                (0, J.jsx)(`span`, {
-                                                  className: `text-[9px] px-1 py-0.2 rounded font-extrabold uppercase shrink-0 ${isRt ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'}`,
-                                                  children: isRt ? 'Router' : 'Firewall'
-                                                })
-                                              ]
-                                            }),
-                                            (0, J.jsxs)(`p`, {
-                                              className: `text-[10px] text-slate-500 dark:text-slate-400 mono mt-0.5`,
-                                              children: [gw.ip || '—', gw.model ? ` • ${gw.model}` : '']
-                                            })
-                                          ]
-                                        })
-                                      ]
-                                    });
-                                  })
-                              })
-                            ]
-                          }),
-                          (bulkFilterType === 'all' || bulkFilterType === 'switch') && allSwitches.some((sw) => sw.isCore) && (0, J.jsxs)(`div`, {
-                            className: `space-y-2`,
-                            children: [
-                              (0, J.jsxs)(`div`, {
-                                className: `flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider px-1`,
-                                children: [
-                                  (0, J.jsxs)(`span`, {
-                                    className: `flex items-center gap-1.5`,
-                                    children: [
-                                      (0, J.jsx)(`i`, { className: `fas fa-crown text-amber-500` }),
-                                      `Core Switch (Cấp lõi)`
-                                    ]
-                                  }),
-                                  (0, J.jsx)(`button`, {
-                                    type: `button`,
-                                    onClick: () => {
-                                      let coreSwIds = allSwitches.filter((sw) => sw.isCore).map((sw) => sw.id);
-                                      let allCoreSel = coreSwIds.every((id) => selectedDevIds.has(id));
-                                      setSelectedDevIds((prev) => {
-                                        let next = new Set(prev);
-                                        if (allCoreSel) coreSwIds.forEach((id) => next.delete(id));
-                                        else coreSwIds.forEach((id) => next.add(id));
-                                        return next;
-                                      });
-                                    },
-                                    className: `text-[11px] text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold cursor-pointer`,
-                                    children: allSwitches.filter((sw) => sw.isCore).every((sw) => selectedDevIds.has(sw.id)) ? `Bỏ chọn Core` : `Chọn tất cả Core`
-                                  })
-                                ]
-                              }),
-                              (0, J.jsx)(`div`, {
-                                className: `grid grid-cols-1 sm:grid-cols-2 gap-2.5`,
-                                children: allSwitches
-                                  .filter((sw) => sw.isCore)
-                                  .filter((sw) => !bulkSearchQuery.trim() || sw.name?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || sw.ip?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || sw.model?.toLowerCase().includes(bulkSearchQuery.toLowerCase()))
-                                  .map((sw) => {
-                                    let isSel = selectedDevIds.has(sw.id);
-                                    return (0, J.jsxs)(`div`, {
-                                      key: sw.id,
-                                      onClick: () => toggleBulkSelect(sw.id),
-                                      className: `p-3 rounded-xl border flex items-center gap-3 transition-all cursor-pointer ${
-                                        isSel
-                                          ? 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-400 dark:border-rose-700 shadow-sm ring-1 ring-rose-400'
-                                          : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                                      }`,
-                                      children: [
-                                        (0, J.jsx)(`input`, {
-                                          type: `checkbox`,
-                                          checked: isSel,
-                                          onChange: () => toggleBulkSelect(sw.id),
-                                          onClick: (e) => e.stopPropagation(),
-                                          className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shrink-0`
-                                        }),
-                                        (0, J.jsx)(`div`, {
-                                          className: `w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm`,
-                                          style: { background: sw.color || '#4f46e5' },
-                                          children: (0, J.jsx)(`i`, { className: `fas fa-crown text-amber-300 text-xs` })
-                                        }),
-                                        (0, J.jsxs)(`div`, {
-                                          className: `flex-1 min-w-0`,
-                                          children: [
-                                            (0, J.jsxs)(`div`, {
-                                              className: `flex items-center gap-1.5`,
-                                              children: [
-                                                (0, J.jsx)(`span`, {
-                                                  className: `text-xs font-bold text-slate-800 dark:text-slate-200 truncate`,
-                                                  children: sw.name
-                                                }),
-                                                (0, J.jsx)(`span`, {
-                                                  className: `text-[9px] px-1 py-0.2 rounded font-extrabold uppercase bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 shrink-0`,
-                                                  children: `CORE`
-                                                })
-                                              ]
-                                            }),
-                                            (0, J.jsxs)(`p`, {
-                                              className: `text-[10px] text-slate-500 dark:text-slate-400 mono mt-0.5`,
-                                              children: [sw.ip || '—', ` • ${sw.ports} ports`, sw.model ? ` • ${sw.model}` : '']
-                                            })
-                                          ]
-                                        })
-                                      ]
-                                    });
-                                  })
-                              })
-                            ]
-                          }),
-                          (bulkFilterType === 'all' || bulkFilterType === 'switch') && (e || []).map((rack) => {
-                            let floorSwitches = (rack.switches || []).filter((sw) => !sw.isCore);
-                            if (floorSwitches.length === 0) return null;
-                            let displayedSwitches = floorSwitches.filter((sw) => !bulkSearchQuery.trim() || sw.name?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || sw.ip?.toLowerCase().includes(bulkSearchQuery.toLowerCase()) || sw.model?.toLowerCase().includes(bulkSearchQuery.toLowerCase()));
-                            if (displayedSwitches.length === 0) return null;
-                            let allFloorSel = floorSwitches.every((sw) => selectedDevIds.has(sw.id));
-
-                            return (0, J.jsxs)(`div`, {
-                              key: rack.floor,
-                              className: `space-y-2`,
-                              children: [
-                                (0, J.jsxs)(`div`, {
-                                  className: `flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider px-1 pt-2`,
-                                  children: [
-                                    (0, J.jsxs)(`span`, {
-                                      className: `flex items-center gap-1.5`,
-                                      children: [
-                                        (0, J.jsx)(`i`, { className: `fas fa-building text-slate-400` }),
-                                        rack.floor,
-                                        ` (${floorSwitches.length} Switch)`
-                                      ]
-                                    }),
-                                    (0, J.jsx)(`button`, {
-                                      type: `button`,
-                                      onClick: () => handleToggleFloorSwitches(floorSwitches),
-                                      className: `text-[11px] text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold cursor-pointer`,
-                                      children: allFloorSel ? `Bỏ chọn tầng` : `Chọn cả tầng (${floorSwitches.length})`
-                                    })
-                                  ]
-                                }),
-                                (0, J.jsx)(`div`, {
-                                  className: `grid grid-cols-1 sm:grid-cols-2 gap-2.5`,
-                                  children: displayedSwitches.map((sw) => {
-                                    let isSel = selectedDevIds.has(sw.id);
-                                    return (0, J.jsxs)(`div`, {
-                                      key: sw.id,
-                                      onClick: () => toggleBulkSelect(sw.id),
-                                      className: `p-3 rounded-xl border flex items-center gap-3 transition-all cursor-pointer ${
-                                        isSel
-                                          ? 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-400 dark:border-rose-700 shadow-sm ring-1 ring-rose-400'
-                                          : 'bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                                      }`,
-                                      children: [
-                                        (0, J.jsx)(`input`, {
-                                          type: `checkbox`,
-                                          checked: isSel,
-                                          onChange: () => toggleBulkSelect(sw.id),
-                                          onClick: (e) => e.stopPropagation(),
-                                          className: `w-4 h-4 rounded cursor-pointer accent-rose-600 shrink-0`
-                                        }),
-                                        (0, J.jsx)(`div`, {
-                                          className: `w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0 shadow-sm`,
-                                          style: { background: sw.color || '#3b82f6' },
-                                          children: (0, J.jsx)(`i`, { className: `fas fa-server text-xs` })
-                                        }),
-                                        (0, J.jsxs)(`div`, {
-                                          className: `flex-1 min-w-0`,
-                                          children: [
-                                            (0, J.jsx)(`p`, {
-                                              className: `text-xs font-bold text-slate-800 dark:text-slate-200 truncate`,
-                                              children: sw.name
-                                            }),
-                                            (0, J.jsxs)(`p`, {
-                                              className: `text-[10px] text-slate-500 dark:text-slate-400 mono mt-0.5`,
-                                              children: [sw.ip || '—', ` • ${sw.ports} ports`, sw.model ? ` • ${sw.model}` : '']
-                                            })
-                                          ]
-                                        })
-                                      ]
-                                    });
-                                  })
-                                })
-                              ]
-                            });
-                          })
-                        ]
-                      }),
-                      (0, J.jsxs)(`div`, {
-                        className: `px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap bg-slate-50/60 dark:bg-slate-900/60`,
-                        children: [
-                          (0, J.jsxs)(`div`, {
-                            className: `text-xs text-slate-600 dark:text-slate-300 font-medium`,
-                            children: [
-                              `Đã chọn: `,
-                              (0, J.jsx)(`span`, { className: `text-rose-600 dark:text-rose-400 font-extrabold text-sm`, children: selectedDevIds.size }),
-                              ` / `,
-                              allSwitches.length + allGateways.length,
-                              ` thiết bị`,
-                              selectedDevIds.size > 0 && (0, J.jsxs)(`span`, {
-                                className: `text-slate-400 ml-1`,
-                                children: [
-                                  `(`,
-                                  selectedSwitchCount > 0 ? `${selectedSwitchCount} Switch` : null,
-                                  selectedSwitchCount > 0 && selectedGatewayCount > 0 ? `, ` : null,
-                                  selectedGatewayCount > 0 ? `${selectedGatewayCount} Router/FW` : null,
-                                  `)`
-                                ]
-                              })
-                            ]
-                          }),
-                          (0, J.jsxs)(`div`, {
-                            className: `flex items-center gap-2.5`,
-                            children: [
-                              (0, J.jsxs)(`button`, {
-                                type: `button`,
-                                onClick: () => {
-                                  setIsBulkModalOpen(false);
-                                  setBulkSelectMode(true);
-                                },
-                                className: `px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer`,
-                                title: `Đóng bảng danh sách và chọn trực tiếp các thiết bị trên sơ đồ mạng`,
-                                children: [
-                                  (0, J.jsx)(`i`, { className: `fas fa-eye text-indigo-500` }),
-                                  `Chọn trên sơ đồ`
-                                ]
-                              }),
-                              (0, J.jsxs)(`button`, {
-                                type: `button`,
-                                onClick: () => {
-                                  if (selectedDevIds.size === 0) return;
-                                  setBulkConfirmStep(true);
-                                },
-                                disabled: selectedDevIds.size === 0,
-                                className: `px-5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition cursor-pointer ${
-                                  selectedDevIds.size > 0
-                                    ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30'
-                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                                }`,
-                                children: [
-                                  (0, J.jsx)(`i`, { className: `fas fa-trash-alt` }),
-                                  `Xóa đã chọn (${selectedDevIds.size})`
-                                ]
-                              })
-                            ]
-                          })
-                        ]
-                      })
-                    ]
-                  })
-            ]
-          })
-        }),
       (0, J.jsxs)(`div`, {
         className: `zoom-controls`,
         children: [
@@ -4097,10 +3278,7 @@ function Fe() {
                         registerRef: F,
                         onManage: O,
                         onAdd: D,
-                        onDelete: handleDeleteFw,
-                        bulkSelectMode,
-                        selectedDevIds,
-                        onToggleBulkSelect: toggleBulkSelect,
+                        onDelete: isAdmin ? handleDeleteFw : null,
                       }),
                     }),
                   q.slots.map((e) =>
@@ -4135,10 +3313,7 @@ function Fe() {
                       registerRef: F,
                       onManage: O,
                       onAdd: D,
-                      onDelete: handleDeleteFw,
-                      bulkSelectMode,
-                      selectedDevIds,
-                      onToggleBulkSelect: toggleBulkSelect,
+                      onDelete: isAdmin ? handleDeleteFw : null,
                     }),
                   }),
                   (0, J.jsx)(he, { coreSwitches: le, ...$ }),

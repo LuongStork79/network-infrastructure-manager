@@ -180,12 +180,18 @@ function p({ user: e, usersDb: t, onSave: n, onClose: l }) {
 }
 function m(e) {
   let t = (0, u.c)(28),
-    { usersDb: n, currentUsername: r, onBack: a, onSave: o, onDelete: s } = e,
+    { usersDb: n = [], currentUsername: r, onBack: a, onSave: o, onDelete: s } = e,
     l = c(h),
-    [m, g] = (0, d.useState)(`closed`),
-    _;
+    [m, g] = (0, d.useState)(`closed`);
+  let currentUserObj = (n || []).find((u) => u.username === r);
+  let isAdmin = e.isAdmin !== undefined ? !!e.isAdmin : currentUserObj?.role === 'admin';
+  let _;
   t[0] !== r || t[1] !== s || t[2] !== l || t[3] !== n
     ? ((_ = function (e) {
+        if (!isAdmin) {
+          l(`Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể xóa tài khoản.`, `error`);
+          return;
+        }
         if (e.username === r) {
           l(`Bạn không thể xóa chính tài khoản đang đăng nhập.`, `error`);
           return;
@@ -229,8 +235,15 @@ function m(e) {
         children: [
           y,
           (0, f.jsxs)(`p`, {
-            className: `text-xs font-medium text-slate-500 mt-1 uppercase tracking-widest`,
-            children: [n.length, ` tài khoản`],
+            className: `text-xs font-medium text-slate-500 mt-1 uppercase tracking-widest flex items-center gap-2`,
+            children: [
+              n.length,
+              ` tài khoản`,
+              !isAdmin && (0, f.jsx)(`span`, {
+                className: `text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 uppercase tracking-wider`,
+                children: `Chế độ chỉ đọc`,
+              }),
+            ],
           }),
         ],
       })),
@@ -241,17 +254,16 @@ function m(e) {
     ? ((x = () => g(null)), (t[8] = x))
     : (x = t[8]);
   let S;
-  t[9] === Symbol.for(`react.memo_cache_sentinel`)
-    ? ((S = (0, f.jsxs)(`button`, {
+  S = isAdmin
+    ? (0, f.jsxs)(`button`, {
         onClick: x,
         className: `px-5 py-2.5 bg-violet-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-violet-700 transition-all flex items-center gap-2`,
         children: [
           (0, f.jsx)(`i`, { className: `fas fa-plus` }),
           ` Thêm người dùng`,
         ],
-      })),
-      (t[9] = S))
-    : (S = t[9]);
+      })
+    : null;
   let C;
   t[10] === Symbol.for(`react.memo_cache_sentinel`)
     ? ((C = (0, f.jsx)(`i`, { className: `fas fa-arrow-left` })), (t[10] = C))
@@ -309,7 +321,7 @@ function m(e) {
                             className: `px-5 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
                             children: `Vai trò`,
                           }),
-                          (0, f.jsx)(`th`, {
+                          isAdmin && (0, f.jsx)(`th`, {
                             className: `px-5 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right`,
                             children: `Thao tác`,
                           }),
@@ -347,7 +359,7 @@ function m(e) {
                                       : `Người dùng`,
                                 }),
                               }),
-                              (0, f.jsxs)(`td`, {
+                              isAdmin && (0, f.jsxs)(`td`, {
                                 className: `px-5 py-3.5 text-right`,
                                 children: [
                                   (0, f.jsxs)(`button`, {
@@ -395,6 +407,10 @@ function m(e) {
           user: m,
           usersDb: n,
           onSave: (e, t) => {
+            if (!isAdmin) {
+              l(`Bạn không có quyền thực hiện thao tác này. Chỉ Quản trị viên mới có thể chỉnh sửa hoặc thêm tài khoản.`, `error`);
+              return;
+            }
             (o(e, t), g(`closed`));
           },
           onClose: () => g(`closed`),

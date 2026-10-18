@@ -19,6 +19,7 @@ export function SwitchManageModal({
   sw = null,
   db = [],
   username = 'admin',
+  isAdmin = true,
   onSave,
   onDelete,
   onClose
@@ -63,6 +64,10 @@ export function SwitchManageModal({
   };
 
   const handleSave = () => {
+    if (!isAdmin) {
+      showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+      return;
+    }
     const swName = name.trim();
     const upPort = parseInt(uplinkPort, 10) || 0;
     const tgtPort = parseInt(targetPort, 10) || 0;
@@ -133,6 +138,10 @@ export function SwitchManageModal({
   };
 
   const handleDelete = () => {
+    if (!isAdmin) {
+      showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+      return;
+    }
     if (!sw) return;
     showDialog(
       `Bạn có chắc chắn muốn xóa Switch [${sw.name}]? Tất cả kết nối liên quan sẽ bị ảnh hưởng!`,
@@ -380,7 +389,7 @@ export function SwitchManageModal({
         </div>
 
         <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-          {mode === 'edit' ? (
+          {isAdmin && mode === 'edit' ? (
             <button
               type="button"
               onClick={handleDelete}
@@ -398,13 +407,20 @@ export function SwitchManageModal({
             >
               Hủy
             </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5"
-            >
-              <i className="fas fa-save" /> Lưu thiết bị
-            </button>
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={handleSave}
+                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1.5"
+              >
+                <i className="fas fa-save" /> Lưu thiết bị
+              </button>
+            ) : (
+              <div className="px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-200">
+                <i className="fas fa-lock" />
+                <span>Chế độ chỉ đọc</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -96,6 +96,7 @@ export function FirewallManageModal({
   fw = null,
   db = [],
   username = 'admin',
+  isAdmin = true,
   onSave,
   onDelete,
   onClose
@@ -158,6 +159,13 @@ export function FirewallManageModal({
   const [lanUplinkLocalPort, setLanUplinkLocalPort] = useState(() => fw?.lanUplinkLocalPort ?? (isRouter ? 'ether1' : 'port1'));
   const [lanUplinkComboMode, setLanUplinkComboMode] = useState(() => fw?.lanUplinkComboMode ?? 'copper');
 
+  // Port configuration (same as Switch: RJ45, SFP, Uplink/Stack, Combo)
+  const [ports, setPorts] = useState(() => String(fw?.ports ?? fw?.totalPorts ?? (isRouter ? 16 : 10)));
+  const [sfpPorts, setSfpPorts] = useState(() => String(fw?.sfpPorts ?? 2));
+  const [uplinkPort, setUplinkPort] = useState(() => String(fw?.uplinkPort ?? 1));
+  const [hybridPortCount, setHybridPortCount] = useState(() => String(fw?.hybridPortCount ?? fw?.comboPorts ?? 0));
+  const [hybridPorts, setHybridPorts] = useState(() => fw?.hybridPorts ?? {});
+
   // HA cluster mode (used for firewalls)
   const [haMode, setHaMode] = useState(() => fw?.haMode ?? 'standalone');
   const [haPeerIp, setHaPeerIp] = useState(() => fw?.haPeerIp ?? '');
@@ -208,6 +216,10 @@ export function FirewallManageModal({
   };
 
   const handleSave = () => {
+    if (!isAdmin) {
+      showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+      return;
+    }
     const devLabel = isRouter ? 'Router' : 'Firewall';
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -254,6 +266,13 @@ export function FirewallManageModal({
       lanUplinkMediaType,
       lanUplinkLocalPort: lanUplinkLocalPort.trim(),
       lanUplinkComboMode,
+      ports: parseInt(ports, 10) || 0,
+      totalPorts: parseInt(ports, 10) || 0,
+      sfpPorts: parseInt(sfpPorts, 10) || 0,
+      uplinkPort: parseInt(uplinkPort, 10) || 0,
+      hybridPortCount: parseInt(hybridPortCount, 10) || 0,
+      comboPorts: parseInt(hybridPortCount, 10) || 0,
+      hybridPorts,
       haMode: !isRouter ? haMode : 'standalone',
       haPeerIp: !isRouter ? haPeerIp.trim() : '',
       wanLinks: cleanedWan,
@@ -273,6 +292,10 @@ export function FirewallManageModal({
   };
 
   const handleDelete = () => {
+    if (!isAdmin) {
+      showDialog('Bạn không có quyền thực hiện thao tác này! Vui lòng liên hệ quản trị viên.', 'error');
+      return;
+    }
     if (!fw) return;
     const devLabel = isRouter ? 'Router' : 'Firewall';
 
@@ -499,6 +522,79 @@ export function FirewallManageModal({
                 placeholder="Server Room / MDF"
                 className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
               />
+            </div>
+          </div>
+
+          {/* Row 4: Port Configuration (RJ45, SFP, Uplink/Stack, Combo) */}
+          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl space-y-3">
+            <div className="flex items-center gap-2">
+              <i className="fas fa-ethernet text-indigo-500 text-xs" />
+              <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                Cấu hình Port thiết bị
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label htmlFor="fw-input-ports" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
+                  Tổng số Port (RJ45)
+                </label>
+                <input
+                  id="fw-input-ports"
+                  type="number"
+                  min="1"
+                  max="128"
+                  value={ports}
+                  onChange={(e) => setPorts(e.target.value)}
+                  className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
+                />
+              </div>
+              <div>
+                <label htmlFor="fw-input-sfp-ports" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
+                  Số cổng SFP
+                </label>
+                <input
+                  id="fw-input-sfp-ports"
+                  type="number"
+                  min="0"
+                  max="64"
+                  value={sfpPorts}
+                  onChange={(e) => setSfpPorts(e.target.value)}
+                  className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
+                />
+              </div>
+              <div>
+                <label htmlFor="fw-input-uplink-port" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
+                  Cổng Uplink/Stack
+                </label>
+                <input
+                  id="fw-input-uplink-port"
+                  type="number"
+                  min="1"
+                  max="128"
+                  value={uplinkPort}
+                  onChange={(e) => setUplinkPort(e.target.value)}
+                  className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="fw-input-hybrid-count" className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
+                Số cổng Combo (Đồng / Quang dùng chung)
+              </label>
+              <input
+                id="fw-input-hybrid-count"
+                type="number"
+                min="0"
+                max="32"
+                value={hybridPortCount}
+                onChange={(e) => setHybridPortCount(e.target.value)}
+                className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:border-indigo-500 transition-all"
+              />
+              <p className="text-[10px] text-slate-400 mt-1">
+                Cổng combo là các cổng cuối trong dải RJ45, có thể chọn dùng Đồng hoặc Quang cho từng cổng — không cộng thêm vào tổng số port.
+              </p>
             </div>
           </div>
 
@@ -784,7 +880,7 @@ export function FirewallManageModal({
         {/* Modal Footer */}
         <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <div>
-            {mode === 'edit' && (
+            {isAdmin && mode === 'edit' && (
               <button
                 type="button"
                 onClick={handleDelete}
@@ -804,18 +900,25 @@ export function FirewallManageModal({
             >
               Hủy
             </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className={`px-5 py-2 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
-                isRouter
-                  ? 'bg-sky-600 hover:bg-sky-700 shadow-sky-600/30'
-                  : 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30'
-              }`}
-            >
-              <i className="fas fa-check" />
-              <span>{isRouter ? 'Lưu Router' : 'Lưu Firewall'}</span>
-            </button>
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={handleSave}
+                className={`px-5 py-2 text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
+                  isRouter
+                    ? 'bg-sky-600 hover:bg-sky-700 shadow-sky-600/30'
+                    : 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30'
+                }`}
+              >
+                <i className="fas fa-check" />
+                <span>{isRouter ? 'Lưu Router' : 'Lưu Firewall'}</span>
+              </button>
+            ) : (
+              <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-slate-200 dark:border-slate-700">
+                <i className="fas fa-lock" />
+                <span>Chế độ chỉ đọc</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
