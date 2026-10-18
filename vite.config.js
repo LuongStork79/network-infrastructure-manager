@@ -53,7 +53,7 @@ export default defineConfig({
       },
       {
         find: /.*PortConfigModal-COc9Vbe5\.js$/,
-        replacement: path.resolve(__dirname, 'src/core/PortConfigModal-COc9Vbe5.js')
+        replacement: path.resolve(__dirname, 'src/components/modals/PortConfigModal.jsx')
       },
       {
         find: /.*SwitchManageModal-Dsjh_PLT\.js$/,
@@ -69,7 +69,7 @@ export default defineConfig({
       },
       {
         find: /.*TopologyView-CohcYaHY\.js$/,
-        replacement: path.resolve(__dirname, 'src/core/TopologyView-CohcYaHY.js')
+        replacement: path.resolve(__dirname, 'src/views/TopologyView.jsx')
       },
       {
         find: /.*CctvView-Dz3hQdDk\.js$/,

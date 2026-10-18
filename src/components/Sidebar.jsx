@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useUIStore } from '../stores/useUIStore.js';
 import { useNetworkStore } from '../stores/useNetworkStore.js';
 import { useSandboxStore } from '../stores/useToastStore.js';
-import { VLANS, VLAN_IDS, findSwitchById } from '../utils/networkUtils.js';
+import { findSwitchById } from '../utils/networkUtils.js';
+import { getAllSubnets } from '../services/ipamManager.js';
 
 export function Sidebar() {
   const sidebarCollapsed = useUIStore((state) => state.sidebarCollapsed);
@@ -18,6 +19,63 @@ export function Sidebar() {
   const setVlanFilter = useNetworkStore((state) => state.setVlanFilter);
 
   const isSandboxMode = useSandboxStore((state) => state.isSandboxMode);
+
+  const [vlanTick, setVlanTick] = useState(0);
+
+  useEffect(() => {
+    const fn = () => setVlanTick((t) => t + 1);
+    window.addEventListener('nim:subnets_updated', fn);
+    window.addEventListener('nim:project_switched', fn);
+    return () => {
+      window.removeEventListener('nim:subnets_updated', fn);
+      window.removeEventListener('nim:project_switched', fn);
+    };
+  }, []);
+
+  const activeVlans = useMemo(() => {
+    let subnets = {};
+    try {
+      subnets = getAllSubnets();
+    } catch {
+      subnets = {};
+    }
+    const vlanMap = new Map();
+    Object.entries(subnets || {}).forEach(([vIdStr, info]) => {
+      const vId = Number(vIdStr);
+      if (!isNaN(vId) && vId > 0 && info && !info._deleted) {
+        vlanMap.set(vId, {
+          id: vId,
+          name: info.name || `VLAN ${vId}`,
+          color: info.color || `var(--vlan-${vId})`,
+        });
+      }
+    });
+
+    (db || []).forEach((rack) => {
+      (rack.switches || []).forEach((sw) => {
+        (sw.conns || []).forEach((conn) => {
+          if (conn.v != null && conn.v > 0 && !vlanMap.has(conn.v)) {
+            vlanMap.set(conn.v, {
+              id: conn.v,
+              name: `VLAN ${conn.v}`,
+              color: `var(--vlan-${conn.v})`,
+            });
+          }
+        });
+      });
+    });
+
+    return Array.from(vlanMap.values()).sort((x, y) => x.id - y.id);
+  }, [db, vlanTick]);
+
+  useEffect(() => {
+    if (vlanFilter && vlanFilter !== 'none') {
+      const exists = activeVlans.some((v) => String(v.id) === String(vlanFilter));
+      if (!exists) {
+        setVlanFilter('none');
+      }
+    }
+  }, [vlanFilter, activeVlans, setVlanFilter]);
 
   const handleSelect = (swId) => {
     toggleSelectSwitch(swId);
@@ -88,10 +146,12 @@ export function Sidebar() {
             onChange={(e) => setVlanFilter(e.target.value)}
             className="w-full bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:outline-none focus:border-indigo-500 py-2 px-3 cursor-pointer transition-colors"
           >
-            <option value="none">Highlight theo VLAN: Tất cả</option>
-            {VLAN_IDS.map((vId) => (
-              <option key={vId} value={String(vId)} style={{ color: `var(--vlan-${vId})` }}>
-                VLAN {vId} ({VLANS[vId]?.name})
+            <option value="none">
+              {activeVlans.length > 0 ? 'Highlight theo VLAN: Tất cả' : 'Highlight theo VLAN: Tất cả (Chưa có VLAN)'}
+            </option>
+            {activeVlans.map((v) => (
+              <option key={v.id} value={String(v.id)} style={{ color: v.color }}>
+                VLAN {v.id} ({v.name})
               </option>
             ))}
           </select>

@@ -353,3 +353,28 @@ export function getBackupBadgeConfig(backup) {
   }
   return { icon: '❌', label: `Quá ${days} ngày`, textClass: 'text-red-600', bgClass: 'bg-red-50 border-red-200' };
 }
+
+export function isSfpPort(sw, port) {
+  if (!sw) return false;
+  const p = Number(port);
+  if (sw.hybridPorts?.[String(p)]?.isSfp) return true;
+  const total = Number(sw.ports) || 24;
+  if (p > total) return true;
+  return false;
+}
+
+export function isComboPort(sw, port) {
+  if (!sw) return false;
+  const p = Number(port);
+  if (sw.hybridPorts?.[String(p)]?.isCombo) return true;
+  const total = Number(sw.ports) || 24;
+  if (total === 24 && (p === 23 || p === 24)) return true;
+  if (total === 48 && (p === 47 || p === 48)) return true;
+  return false;
+}
+
+export function getComboPortMedia(sw, port) {
+  if (!sw) return 'copper';
+  const p = String(port);
+  return sw.hybridPorts?.[p]?.media || 'copper';
+}

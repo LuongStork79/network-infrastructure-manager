@@ -102,6 +102,7 @@ export function FirewallManageModal({
 }) {
   const showDialog = useDialogStore((state) => state.showDialog);
   const firewalls = useNetworkStore((state) => state.FirewallDB);
+  const deleteFirewall = useNetworkStore((state) => state.deleteFirewall);
   const gponFrames = useNetworkStore((state) => state.GponFrameDB);
   const addGlobalLog = useNetworkStore((state) => state.addGlobalLog);
   const saveFirewallBackup = useNetworkStore((state) => state.saveFirewallBackup);
@@ -153,6 +154,9 @@ export function FirewallManageModal({
   const [notes, setNotes] = useState(() => fw?.notes ?? '');
   const [lanUplinkTarget, setLanUplinkTarget] = useState(() => fw?.lanUplinkTarget ?? '');
   const [lanUplinkPort, setLanUplinkPort] = useState(() => String(fw?.lanUplinkPort ?? ''));
+  const [lanUplinkMediaType, setLanUplinkMediaType] = useState(() => fw?.lanUplinkMediaType ?? 'copper');
+  const [lanUplinkLocalPort, setLanUplinkLocalPort] = useState(() => fw?.lanUplinkLocalPort ?? (isRouter ? 'ether1' : 'port1'));
+  const [lanUplinkComboMode, setLanUplinkComboMode] = useState(() => fw?.lanUplinkComboMode ?? 'copper');
 
   // HA cluster mode (used for firewalls)
   const [haMode, setHaMode] = useState(() => fw?.haMode ?? 'standalone');
@@ -247,6 +251,9 @@ export function FirewallManageModal({
       zone: zone.trim() || 'Server Room',
       lanUplinkTarget: lanUplinkTarget || '',
       lanUplinkPort: portNum || null,
+      lanUplinkMediaType,
+      lanUplinkLocalPort: lanUplinkLocalPort.trim(),
+      lanUplinkComboMode,
       haMode: !isRouter ? haMode : 'standalone',
       haPeerIp: !isRouter ? haPeerIp.trim() : '',
       wanLinks: cleanedWan,
@@ -269,8 +276,12 @@ export function FirewallManageModal({
     if (!fw) return;
     const devLabel = isRouter ? 'Router' : 'Firewall';
     showDialog(`Bạn có chắc chắn muốn xóa ${devLabel} [${fw.name}]?`, 'confirm', () => {
+      deleteFirewall(fw.id);
+      if (addGlobalLog) {
+        addGlobalLog(`${devLabel}: ${fw.name}`, `Đã xóa ${devLabel} [${fw.name}]`, username);
+      }
       if (onDelete) {
-        onDelete();
+        try { onDelete(); } catch (e) { /* ignore */ }
       }
       onClose();
     });
@@ -525,14 +536,51 @@ export function FirewallManageModal({
 
           {/* Core Switch LAN Connection */}
           <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl space-y-3">
-            <div className="flex items-center gap-2">
-              <i className="fas fa-network-wired text-indigo-500 text-xs" />
-              <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider">
-                Kết nối LAN xuống Core Switch (Uplink)
-              </span>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <i className="fas fa-network-wired text-indigo-500 text-xs" />
+                <span className="text-[11px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                  Kết nối LAN xuống Core Switch (Uplink)
+                </span>
+              </div>
+              <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5 shadow-2xs">
+                {[
+                  { id: 'copper', label: 'Port Đồng', icon: 'fa-ethernet' },
+                  { id: 'fiber', label: 'Port Quang', icon: 'fa-bolt' },
+                  { id: 'combo', label: 'Combo', icon: 'fa-random' }
+                ].map((pt) => (
+                  <button
+                    key={pt.id}
+                    type="button"
+                    onClick={() => setLanUplinkMediaType(pt.id)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                      lanUplinkMediaType === pt.id
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <i className={`fas ${pt.icon} text-[8px]`} />
+                    <span>{pt.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-              <div className="sm:col-span-8">
+              <div className="sm:col-span-4">
+                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">
+                  Port {isRouter ? 'Router' : 'Firewall'}
+                </label>
+                <input
+                  type="text"
+                  value={lanUplinkLocalPort}
+                  onChange={(e) => setLanUplinkLocalPort(e.target.value)}
+                  placeholder={lanUplinkMediaType === 'fiber' ? 'sfp-sfpplus1' : (isRouter ? 'ether1' : 'port1')}
+                  className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-bold font-mono text-slate-800 dark:text-slate-100 outline-none"
+                />
+              </div>
+
+              <div className="sm:col-span-5">
                 <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Chọn Core Switch</label>
                 <select
                   value={lanUplinkTarget}
@@ -552,8 +600,9 @@ export function FirewallManageModal({
                   </p>
                 )}
               </div>
-              <div className="sm:col-span-4">
-                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Port trên Core SW</label>
+
+              <div className="sm:col-span-3">
+                <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Port Core SW</label>
                 <input
                   type="number"
                   min="1"
@@ -565,6 +614,34 @@ export function FirewallManageModal({
                 />
               </div>
             </div>
+
+            {lanUplinkMediaType === 'combo' && (
+              <div className="flex items-center gap-3 p-2 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-lg border border-indigo-100 dark:border-indigo-900/50">
+                <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                  ⚡ Chế độ Cổng Combo:
+                </span>
+                <label className="flex items-center gap-1 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-200">
+                  <input
+                    type="radio"
+                    name="comboMediaMode"
+                    value="copper"
+                    checked={lanUplinkComboMode !== 'fiber'}
+                    onChange={() => setLanUplinkComboMode('copper')}
+                  />
+                  <span>Ưu tiên Đồng (RJ45)</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-200 ml-2">
+                  <input
+                    type="radio"
+                    name="comboMediaMode"
+                    value="fiber"
+                    checked={lanUplinkComboMode === 'fiber'}
+                    onChange={() => setLanUplinkComboMode('fiber')}
+                  />
+                  <span>Ưu tiên Quang (SFP)</span>
+                </label>
+              </div>
+            )}
           </div>
 
           {/* WAN Links */}

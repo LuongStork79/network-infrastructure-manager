@@ -922,100 +922,103 @@ function W(e) {
     : { cloudLinks: [], firewallLink: null };
 }
 function ne(e) {
-  let t = (0, H.c)(12),
-    {
-      cloudIds: n,
-      firewallId: r,
-      targetId: i,
-      nodeRefs: a,
-      canvasRef: o,
-      scale: s,
-    } = e,
-    c;
-  t[0] === Symbol.for(`react.memo_cache_sentinel`)
-    ? ((c = []), (t[0] = c))
-    : (c = t[0]);
-  let [l, u] = (0, g.useState)(c),
-    [d, f] = (0, g.useState)(null),
-    p,
-    m;
-  (t[1] !== o ||
-  t[2] !== n ||
-  t[3] !== r ||
-  t[4] !== a ||
-  t[5] !== s ||
-  t[6] !== i
-    ? ((p = () => {
-        let e = 0,
-          t = function () {
-            let e = o.current,
-              t = r ? a.get(r) : null;
-            if (!e || !t) {
-              (u([]), f(null));
-              return;
-            }
-            let c = e.getBoundingClientRect(),
-              l = n
-                .map((e) => {
-                  let t = a.get(e);
-                  return t ? { id: e, rect: t.getBoundingClientRect() } : null;
-                })
-                .filter(re),
-              d = i ? a.get(i) : null,
-              p = W({
-                cloudRects: l,
-                firewallRect: t.getBoundingClientRect(),
-                targetRect: d ? d.getBoundingClientRect() : null,
-                canvasRect: c,
-                scale: s,
-              });
-            (u(p.cloudLinks), f(p.firewallLink));
-          },
-          c = function () {
-            (cancelAnimationFrame(e), (e = requestAnimationFrame(t)));
-          };
-        c();
-        let l = o.current,
-          d = l ? new ResizeObserver(c) : null;
-        l && d && d.observe(l);
-        let p = function (e) {
-          e.propertyName === `transform` && c();
-        };
-        l?.addEventListener(`transitionend`, p);
-        let m = !1;
-        return (
-          document.fonts?.ready?.then(() => {
-            m || c();
-          }),
-          () => {
-            ((m = !0),
-              cancelAnimationFrame(e),
-              d?.disconnect(),
-              l?.removeEventListener(`transitionend`, p));
+  let {
+    devices: n = [],
+    cloudIds: singleCloudIds,
+    firewallId: singleFwId,
+    targetId: singleTargetId,
+    nodeRefs: a,
+    canvasRef: o,
+    scale: s,
+  } = e;
+  let [l, u] = (0, g.useState)([]);
+  let [d, f] = (0, g.useState)([]);
+
+  (0, g.useEffect)(() => {
+    let animFrame = 0;
+    let updateLinks = function () {
+      let canvasEl = o.current;
+      if (!canvasEl) {
+        u([]);
+        f([]);
+        return;
+      }
+      let canvasRect = canvasEl.getBoundingClientRect();
+      let devList = Array.isArray(n) && n.length > 0 ? n : (singleFwId ? [{ id: singleFwId, lanUplinkTarget: singleTargetId, wanLinks: (singleCloudIds || []).map(id => ({ id: id.replace('wan-cloud-', '') })) }] : []);
+
+      let allCloudLinks = [];
+      let allGatewayLinks = [];
+
+      devList.forEach((dev) => {
+        let devEl = dev.id ? a.get(dev.id) : null;
+        if (!devEl) return;
+        let devRect = devEl.getBoundingClientRect();
+
+        // 1. WAN cloud links for this gateway device
+        let wans = dev.wanLinks || dev.wanLines || [];
+        wans.forEach((wl) => {
+          let cloudEl = a.get(`wan-cloud-${wl.id}`);
+          if (cloudEl) {
+            let cloudRect = cloudEl.getBoundingClientRect();
+            let link = te(cloudRect, devRect, canvasRect, s);
+            allCloudLinks.push({ id: `wan-cloud-${wl.id}`, ...link });
           }
-        );
-      }),
-      (m = [n, r, i, a, o, s]),
-      (t[1] = o),
-      (t[2] = n),
-      (t[3] = r),
-      (t[4] = a),
-      (t[5] = s),
-      (t[6] = i),
-      (t[7] = p),
-      (t[8] = m))
-    : ((p = t[7]), (m = t[8])),
-    (0, g.useEffect)(p, m));
-  let h;
-  return (
-    t[9] !== l || t[10] !== d
-      ? ((h = { cloudLinks: l, firewallLink: d }),
-        (t[9] = l),
-        (t[10] = d),
-        (t[11] = h))
-      : (h = t[11]),
-    h
-  );
+        });
+
+        // 2. LAN uplink to Core Switch for this gateway device
+        if (dev.lanUplinkTarget) {
+          let targetEl = a.get(dev.lanUplinkTarget);
+          if (targetEl) {
+            let targetRect = targetEl.getBoundingClientRect();
+            let link = te(devRect, targetRect, canvasRect, s);
+            allGatewayLinks.push({
+              id: `uplink-${dev.id}-${dev.lanUplinkTarget}`,
+              port: dev.lanUplinkPort,
+              ...link
+            });
+          }
+        }
+      });
+
+      u(allCloudLinks);
+      f(allGatewayLinks);
+    };
+
+    let cancel = function () {
+      cancelAnimationFrame(animFrame);
+      animFrame = requestAnimationFrame(updateLinks);
+    };
+
+    cancel();
+
+    let canvasEl = o.current;
+    let resizeObs = canvasEl ? new ResizeObserver(cancel) : null;
+    canvasEl && resizeObs && resizeObs.observe(canvasEl);
+
+    let onTrans = function (ev) {
+      ev.propertyName === 'transform' && cancel();
+    };
+    canvasEl?.addEventListener('transitionend', onTrans);
+
+    let cancelled = false;
+    document.fonts?.ready?.then(() => {
+      if (!cancelled) cancel();
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(animFrame);
+      resizeObs?.disconnect();
+      canvasEl?.removeEventListener('transitionend', onTrans);
+    };
+  }, [n, singleCloudIds, singleFwId, singleTargetId, a, o, s]);
+
+  return {
+    cloudLinks: l,
+    gatewayLinks: d,
+    firewallLink: d[0] || null,
+    firewallPort: d[0]?.port ?? null,
+  };
 }
 function re(e) {
   return e !== null;
@@ -2026,64 +2029,55 @@ function ye(e) {
   );
 }
 function be(e) {
-  let t = (0, H.c)(13),
-    { cloudLinks: n, firewallLink: r, firewallPort: i } = e;
-  if (n.length === 0 && !r) return null;
-  let a;
-  t[0] === n ? (a = t[1]) : ((a = n.map(xe)), (t[0] = n), (t[1] = a));
-  let o;
-  t[2] === r
-    ? (o = t[3])
-    : ((o =
-        r &&
-        (0, J.jsx)(`path`, {
-          d: r.pathD,
-          className: `wan-link-path wan-link-path-core`,
-        })),
-      (t[2] = r),
-      (t[3] = o));
-  let s;
-  t[4] !== a || t[5] !== o
-    ? ((s = (0, J.jsxs)(`svg`, {
-        className: `topology-lines wan-lines`,
-        id: `wan-svg-layer`,
-        children: [a, o],
-      })),
-      (t[4] = a),
-      (t[5] = o),
-      (t[6] = s))
-    : (s = t[6]);
-  let c;
-  t[7] !== r || t[8] !== i
-    ? ((c =
-        r &&
-        i != null &&
-        (0, J.jsx)(`div`, {
-          className: `absolute inset-0 pointer-events-none z-10`,
-          children: (0, J.jsxs)(`div`, {
-            className: `wan-port-badge absolute inline-flex items-center gap-1 px-2 py-0.5 rounded-full border whitespace-nowrap font-bold text-[10px]`,
-            style: {
-              left: r.labelX,
-              top: r.labelY,
-              transform: `translate(-50%, -50%)`,
-            },
-            children: [(0, J.jsx)(`i`, { className: `fas fa-plug` }), ` P`, i],
-          }),
-        })),
-      (t[7] = r),
-      (t[8] = i),
-      (t[9] = c))
-    : (c = t[9]);
-  let l;
-  return (
-    t[10] !== s || t[11] !== c
-      ? ((l = (0, J.jsxs)(J.Fragment, { children: [s, c] })),
-        (t[10] = s),
-        (t[11] = c),
-        (t[12] = l))
-      : (l = t[12]),
-    l
+  let { cloudLinks: n = [], gatewayLinks: r = [], firewallLink: legacyLink, firewallPort: legacyPort } = e;
+  let activeGatewayLinks = Array.isArray(r) && r.length > 0 
+    ? r 
+    : (legacyLink ? [{ ...legacyLink, port: legacyPort, id: 'legacy-fw-link' }] : []);
+
+  if (n.length === 0 && activeGatewayLinks.length === 0) return null;
+
+  let cloudPaths = n.map(xe);
+  let gatewayPaths = activeGatewayLinks.map((link) =>
+    (0, J.jsx)('path', {
+      d: link.pathD,
+      className: 'wan-link-path wan-link-path-core',
+    }, link.id)
   );
+
+  let badges = activeGatewayLinks
+    .filter((link) => link.port != null && link.port !== '')
+    .map((link) =>
+      (0, J.jsx)(
+        'div',
+        {
+          key: link.id,
+          className: 'absolute inset-0 pointer-events-none z-10',
+          children: (0, J.jsxs)('div', {
+            className: 'wan-port-badge absolute inline-flex items-center gap-1 px-2 py-0.5 rounded-full border whitespace-nowrap font-bold text-[10px]',
+            style: {
+              left: link.labelX,
+              top: link.labelY,
+              transform: 'translate(-50%, -50%)',
+            },
+            children: [
+              (0, J.jsx)('i', { className: 'fas fa-plug' }),
+              ` P${link.port}`,
+            ],
+          }),
+        }
+      )
+    );
+
+  return (0, J.jsxs)(J.Fragment, {
+    children: [
+      (0, J.jsxs)('svg', {
+        className: 'topology-lines wan-lines',
+        id: 'wan-svg-layer',
+        children: [...cloudPaths, ...gatewayPaths],
+      }),
+      ...badges,
+    ],
+  });
 }
 function xe(e) {
   return (0, J.jsx)(`path`, { d: e.pathD, className: `wan-link-path` }, e.id);
@@ -3034,7 +3028,8 @@ function Fe() {
           };
     }, [q]),
     X = t[0] ?? null,
-    { cloudLinks: fe, firewallLink: pe } = ne({
+    { cloudLinks: fe, gatewayLinks: ge, firewallLink: pe } = ne({
+      devices: t,
       cloudIds: (0, g.useMemo)(
         () => (X ? X.wanLinks.map((e) => `wan-cloud-${e.id}`) : []),
         [X],
@@ -3256,6 +3251,7 @@ function Fe() {
           (0, J.jsx)(ve, { links: ae, zoneLinks: oe }),
           (0, J.jsx)(be, {
             cloudLinks: fe,
+            gatewayLinks: ge,
             firewallLink: pe,
             firewallPort: X?.lanUplinkPort,
           }),
