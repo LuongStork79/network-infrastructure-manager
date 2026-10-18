@@ -1,16 +1,18 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useUIStore } from '../stores/useUIStore.js';
 import { useNetworkStore } from '../stores/useNetworkStore.js';
 import { useSandboxStore } from '../stores/useToastStore.js';
 import { useDialogStore } from '../stores/useDialogStore.js';
 
 export function IconRail({ isAdmin = true, username = 'admin' }) {
+  const [addMenuOpen, setAddMenuOpen] = useState(false);
   const activeView = useUIStore((state) => state.activeView);
   const setActiveView = useUIStore((state) => state.setActiveView);
   const showFullTopologyView = useUIStore((state) => state.showFullTopologyView);
   const openReportModal = useUIStore((state) => state.openReportModal);
   const openGlobalTimelineModal = useUIStore((state) => state.openGlobalTimelineModal);
   const openAddSwitchModal = useUIStore((state) => state.openAddSwitchModal);
+  const openAddFirewallModal = useUIStore((state) => state.openAddFirewallModal);
 
   const isSandboxMode = useSandboxStore((state) => state.isSandboxMode);
   const showDialog = useDialogStore((state) => state.showDialog);
@@ -112,13 +114,73 @@ export function IconRail({ isAdmin = true, username = 'admin' }) {
 
   return (
     <aside className="icon-rail">
-      <button
-        onClick={openAddSwitchModal}
-        className="icon-rail-btn icon-rail-btn-primary"
-        title="Thêm thiết bị mới"
-      >
-        <i className="fas fa-plus" />
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => setAddMenuOpen((prev) => !prev)}
+          className={`icon-rail-btn icon-rail-btn-primary ${addMenuOpen ? 'ring-2 ring-indigo-400' : ''}`}
+          title="Thêm thiết bị mới (Switch, Router, Firewall)"
+        >
+          <i className="fas fa-plus" />
+        </button>
+        {addMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setAddMenuOpen(false)} />
+            <div className="absolute top-0 left-[54px] z-50 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-2 select-none animate-in fade-in zoom-in-95 duration-150">
+              <p className="px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800 mb-1">
+                Thêm thiết bị
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  openAddSwitchModal();
+                  setAddMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-800 text-left transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                  <i className="fas fa-network-wired text-xs" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100">Switch</p>
+                  <p className="text-[9px] text-slate-400">Switch mạng các tầng</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  openAddFirewallModal?.('router');
+                  setAddMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-sky-50 dark:hover:bg-slate-800 text-left transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                  <i className="fas fa-route text-xs" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100">Router</p>
+                  <p className="text-[9px] text-slate-400">Định tuyến mạng / WAN</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  openAddFirewallModal?.('firewall');
+                  setAddMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-slate-800 text-left transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <i className="fas fa-shield-halved text-xs" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100">Firewall</p>
+                  <p className="text-[9px] text-slate-400">Tường lửa bảo mật</p>
+                </div>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
 
       <div className="icon-rail-group custom-scroll">
         <button

@@ -411,8 +411,7 @@ function k(e, t) {
   );
 }
 function A(e) {
-  let t = (0, m.c)(32),
-    {
+  let {
       db: n,
       phones: r,
       statusFilter: i,
@@ -423,330 +422,256 @@ function A(e) {
       onBulkDelete: onBulkDel,
     } = e,
     [l, d] = (0, p.useState)(``),
-    [selectedIds, setSelectedIds] = (0, p.useState)(() => new Set()),
-    f,
-    h,
-    g,
-    _,
-    v,
-    y;
-  if (
-    t[0] !== n ||
-    t[1] !== a ||
-    t[2] !== s ||
-    t[3] !== o ||
-    t[4] !== c ||
-    t[5] !== r ||
-    t[6] !== l ||
-    t[7] !== i
-  ) {
-    let e = u(r, i, a, l);
-    v = `flex-1 flex flex-col overflow-hidden`;
-    let p;
-    t[14] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((p = (0, S.jsx)(`i`, {
-          className: `fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]`,
-        })),
-        (t[14] = p))
-      : (p = t[14]);
-    let m;
-    t[15] === Symbol.for(`react.memo_cache_sentinel`)
-      ? ((m = (e) => d(e.target.value)), (t[15] = m))
-      : (m = t[15]);
-    let b;
-    (t[16] === l
-      ? (b = t[17])
-      : ((b = (0, S.jsxs)(`div`, {
-          className: `relative flex-1 max-w-sm`,
-          children: [
-            p,
-            (0, S.jsx)(`input`, {
-              type: `text`,
-              value: l,
-              onChange: m,
-              placeholder: `Tìm extension, tên, IP, vị trí...`,
-              className: `w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:border-green-500 transition-colors`,
-            }),
-          ],
-        })),
-        (t[16] = l),
-        (t[17] = b)),
-      (y = (0, S.jsxs)(`div`, {
+    [selectedIds, setSelectedIds] = (0, p.useState)(() => new Set());
+
+  let filteredPhones = u(r, i, a, l);
+  let isAllSelected = filteredPhones.length > 0 && filteredPhones.every((ph) => selectedIds.has(ph.id));
+  let isSomeSelected = filteredPhones.some((ph) => selectedIds.has(ph.id));
+
+  return (0, S.jsxs)(`div`, {
+    className: `flex-1 flex flex-col overflow-hidden`,
+    children: [
+      (0, S.jsxs)(`div`, {
         className: `px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between gap-3 shrink-0`,
         children: [
           (0, S.jsxs)(`div`, {
             className: `flex items-center gap-3 flex-1`,
             children: [
-              b,
+              (0, S.jsxs)(`div`, {
+                className: `relative flex-1 max-w-sm`,
+                children: [
+                  (0, S.jsx)(`i`, {
+                    className: `fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]`,
+                  }),
+                  (0, S.jsx)(`input`, {
+                    type: `text`,
+                    value: l,
+                    onChange: (e) => d(e.target.value),
+                    placeholder: `Tìm extension, tên, IP, vị trí...`,
+                    className: `w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:border-green-500 transition-colors`,
+                  }),
+                ],
+              }),
               (0, S.jsxs)(`span`, {
                 className: `text-[10px] font-black text-slate-400`,
-                children: [e.length, ` / `, r.length, ` máy`],
-              }),
-            ]
-          }),
-          selectedIds.size > 0 && (0, S.jsxs)(`div`, {
-            className: `flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold shrink-0`,
-            children: [
-              (0, S.jsxs)(`span`, {
-                className: `text-rose-700 text-[11px] font-bold flex items-center gap-1`,
-                children: [
-                  (0, S.jsx)(`i`, { className: `fas fa-check-square text-rose-500` }),
-                  `Đã chọn ${selectedIds.size} máy`,
-                ],
-              }),
-              (0, S.jsxs)(`button`, {
-                type: `button`,
-                onClick: () => {
-                  if (onBulkDel) {
-                    onBulkDel([...selectedIds]);
-                    setSelectedIds(new Set());
-                  }
-                },
-                className: `px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all`,
-                children: [
-                  (0, S.jsx)(`i`, { className: `fas fa-trash-alt` }),
-                  `Xóa hàng loạt`,
-                ],
-              }),
-              (0, S.jsx)(`button`, {
-                type: `button`,
-                onClick: () => setSelectedIds(new Set()),
-                className: `px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-50`,
-                children: `Bỏ chọn`,
+                children: [filteredPhones.length, ` / `, r.length, ` máy`],
               }),
             ],
           }),
-        ],
-      })),
-      (_ = `flex-1 overflow-auto custom-scroll`),
-      (h = `w-full text-left`),
-      t[18] === Symbol.for(`react.memo_cache_sentinel`)
-        ? ((g = (0, S.jsx)(`thead`, {
-            className: `sticky top-0 z-10`,
-            children: (0, S.jsxs)(`tr`, {
-              className: `bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
+          selectedIds.size > 0 &&
+            (0, S.jsxs)(`div`, {
+              className: `flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold shrink-0`,
               children: [
-                (0, S.jsx)(`th`, {
-                  className: `px-3 py-3 w-10 text-center`,
-                  children: (0, S.jsx)(`input`, {
-                    type: `checkbox`,
-                    checked: e.length > 0 && e.every((ph) => selectedIds.has(ph.id)),
-                    ref: (el) => { if (el) el.indeterminate = e.some((ph) => selectedIds.has(ph.id)) && !e.every((ph) => selectedIds.has(ph.id)); },
-                    onChange: () => {
-                      let isAll = e.length > 0 && e.every((ph) => selectedIds.has(ph.id));
-                      if (isAll) {
-                        setSelectedIds(new Set());
-                      } else {
-                        setSelectedIds(new Set(e.map((ph) => ph.id)));
-                      }
-                    },
-                    className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
-                    title: e.length > 0 && e.every((ph) => selectedIds.has(ph.id)) ? `Bỏ chọn tất cả` : `Chọn tất cả`,
-                  }),
+                (0, S.jsxs)(`span`, {
+                  className: `text-rose-700 text-[11px] font-bold flex items-center gap-1`,
+                  children: [
+                    (0, S.jsx)(`i`, { className: `fas fa-check-square text-rose-500` }),
+                    `Đã chọn ${selectedIds.size} máy`,
+                  ],
                 }),
-                (0, S.jsx)(`th`, {
-                  className: `px-4 py-3 w-20`,
-                  children: `Nhánh`,
+                (0, S.jsxs)(`button`, {
+                  type: `button`,
+                  onClick: () => {
+                    if (onBulkDel) {
+                      onBulkDel([...selectedIds]);
+                      setSelectedIds(new Set());
+                    }
+                  },
+                  className: `px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all`,
+                  children: [
+                    (0, S.jsx)(`i`, { className: `fas fa-trash-alt` }),
+                    `Xóa hàng loạt`,
+                  ],
                 }),
-                (0, S.jsx)(`th`, {
-                  className: `px-4 py-3`,
-                  children: `Tên / Vị trí`,
+                (0, S.jsx)(`button`, {
+                  type: `button`,
+                  onClick: () => setSelectedIds(new Set()),
+                  className: `px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-medium cursor-pointer hover:bg-slate-50`,
+                  children: `Bỏ chọn`,
                 }),
-                (0, S.jsx)(`th`, {
-                  className: `px-4 py-3`,
-                  children: `IP Address`,
-                }),
-                (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Model` }),
-                (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Tầng` }),
-                (0, S.jsx)(`th`, {
-                  className: `px-4 py-3`,
-                  children: `Switch / Port`,
-                }),
-                (0, S.jsx)(`th`, {
-                  className: `px-4 py-3 w-28`,
-                  children: `Trạng thái`,
-                }),
-                (0, S.jsx)(`th`, { className: `px-4 py-3 w-16` }),
               ],
             }),
-          })),
-          (t[18] = g))
-        : (g = t[18]),
-      (f =
-        e.length === 0
-          ? (0, S.jsx)(`tr`, {
-              children: (0, S.jsx)(`td`, {
-                colSpan: 8,
-                className: `px-4 py-12 text-center text-sm text-slate-400 italic`,
-                children:
-                  r.length === 0
-                    ? `Chưa có điện thoại nào. Thêm mới hoặc Import từ Switch.`
-                    : `Không tìm thấy kết quả phù hợp.`,
+        ],
+      }),
+      (0, S.jsx)(`div`, {
+        className: `flex-1 overflow-auto custom-scroll`,
+        children: (0, S.jsxs)(`table`, {
+          className: `w-full text-left`,
+          children: [
+            (0, S.jsx)(`thead`, {
+              className: `sticky top-0 z-10`,
+              children: (0, S.jsxs)(`tr`, {
+                className: `bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
+                children: [
+                  (0, S.jsx)(`th`, {
+                    className: `px-3 py-3 w-10 text-center`,
+                    children: (0, S.jsx)(`input`, {
+                      type: `checkbox`,
+                      checked: isAllSelected,
+                      ref: (el) => {
+                        if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+                      },
+                      onChange: () => {
+                        if (isAllSelected) {
+                          setSelectedIds(new Set());
+                        } else {
+                          setSelectedIds(new Set(filteredPhones.map((ph) => ph.id)));
+                        }
+                      },
+                      className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                      title: isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả`,
+                    }),
+                  }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3 w-20`, children: `Nhánh` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Tên / Vị trí` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `IP Address` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Model` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Tầng` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3`, children: `Switch / Port` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3 w-28`, children: `Trạng thái` }),
+                  (0, S.jsx)(`th`, { className: `px-4 py-3 w-16` }),
+                ],
               }),
-            })
-          : e.map((e) => {
-              let isRowSel = selectedIds.has(e.id);
-              return (0, S.jsxs)(
-                `tr`,
-                {
-                  onClick: () => o(e),
-                  className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors cursor-pointer ${isRowSel ? 'bg-green-50/60' : ''}`,
-                  children: [
-                    (0, S.jsx)(`td`, {
-                      className: `px-3 py-3 w-10 text-center`,
-                      onClick: (ev) => ev.stopPropagation(),
-                      children: (0, S.jsx)(`input`, {
-                        type: `checkbox`,
-                        checked: isRowSel,
-                        onChange: () => {
-                          setSelectedIds((prev) => {
-                            let next = new Set(prev);
-                            if (next.has(e.id)) next.delete(e.id);
-                            else next.add(e.id);
-                            return next;
-                          });
+            }),
+            (0, S.jsx)(`tbody`, {
+              children:
+                filteredPhones.length === 0
+                  ? (0, S.jsx)(`tr`, {
+                      children: (0, S.jsx)(`td`, {
+                        colSpan: 9,
+                        className: `px-4 py-12 text-center text-sm text-slate-400 italic`,
+                        children:
+                          r.length === 0
+                            ? `Chưa có điện thoại nào. Thêm mới hoặc Import từ Switch.`
+                            : `Không tìm thấy kết quả phù hợp.`,
+                      }),
+                    })
+                  : filteredPhones.map((phoneItem) => {
+                      let isRowSel = selectedIds.has(phoneItem.id);
+                      return (0, S.jsxs)(
+                        `tr`,
+                        {
+                          onClick: () => o(phoneItem),
+                          className: `border-b border-slate-100 hover:bg-green-50/30 transition-colors cursor-pointer ${
+                            isRowSel ? 'bg-green-50/60' : ''
+                          }`,
+                          children: [
+                            (0, S.jsx)(`td`, {
+                              className: `px-3 py-3 w-10 text-center`,
+                              onClick: (ev) => ev.stopPropagation(),
+                              children: (0, S.jsx)(`input`, {
+                                type: `checkbox`,
+                                checked: isRowSel,
+                                onChange: () => {
+                                  setSelectedIds((prev) => {
+                                    let next = new Set(prev);
+                                    if (next.has(phoneItem.id)) next.delete(phoneItem.id);
+                                    else next.add(phoneItem.id);
+                                    return next;
+                                  });
+                                },
+                                className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
+                              }),
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3`,
+                              children: (0, S.jsx)(`span`, {
+                                className: `text-sm font-black text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-lg`,
+                                children: phoneItem.extension || `—`,
+                              }),
+                            }),
+                            (0, S.jsxs)(`td`, {
+                              className: `px-4 py-3`,
+                              children: [
+                                (0, S.jsx)(`p`, {
+                                  className: `text-xs font-bold text-slate-800`,
+                                  children: phoneItem.name || `—`,
+                                }),
+                                phoneItem.location &&
+                                  (0, S.jsx)(`p`, {
+                                    className: `text-[9px] text-slate-400 font-bold`,
+                                    children: phoneItem.location,
+                                  }),
+                              ],
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3 text-xs font-mono text-indigo-600`,
+                              children: phoneItem.ip || `—`,
+                            }),
+                            (0, S.jsxs)(`td`, {
+                              className: `px-4 py-3`,
+                              children: [
+                                phoneItem.brand &&
+                                  (0, S.jsx)(`p`, {
+                                    className: `text-[10px] font-black text-slate-600`,
+                                    children: phoneItem.brand,
+                                  }),
+                                (0, S.jsx)(`p`, {
+                                  className: `text-[9px] text-slate-400`,
+                                  children: phoneItem.model || `—`,
+                                }),
+                              ],
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3 text-xs text-slate-600`,
+                              children: phoneItem.floor || `—`,
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3 text-[10px] text-slate-500`,
+                              children: k(phoneItem, n),
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3`,
+                              children: (0, S.jsx)(`span`, {
+                                className: `text-[9px] font-black px-2 py-1 rounded-full ${
+                                  D[phoneItem.status] ?? `bg-slate-100 text-slate-700`
+                                }`,
+                                children: O[phoneItem.status] || phoneItem.status,
+                              }),
+                            }),
+                            (0, S.jsx)(`td`, {
+                              className: `px-4 py-3`,
+                              children: (0, S.jsxs)(`div`, {
+                                className: `flex items-center gap-1`,
+                                children: [
+                                  (0, S.jsx)(`button`, {
+                                    onClick: (t) => {
+                                      t.stopPropagation();
+                                      c(phoneItem.id);
+                                    },
+                                    title: `Lịch sử thay đổi`,
+                                    className: `p-1.5 hover:bg-indigo-50 rounded text-indigo-300 hover:text-indigo-500 transition-colors ${
+                                      phoneItem.logs?.length ? `text-indigo-400` : ``
+                                    }`,
+                                    children: (0, S.jsx)(`i`, {
+                                      className: `fas fa-history text-[10px]`,
+                                    }),
+                                  }),
+                                  (0, S.jsx)(`button`, {
+                                    onClick: (t) => {
+                                      t.stopPropagation();
+                                      s(phoneItem.id);
+                                    },
+                                    title: `Xóa`,
+                                    className: `p-1.5 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors`,
+                                    children: (0, S.jsx)(`i`, {
+                                      className: `fas fa-trash text-[10px]`,
+                                    }),
+                                  }),
+                                ],
+                              }),
+                            }),
+                          ],
                         },
-                        className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
-                      }),
+                        phoneItem.id
+                      );
                     }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3`,
-                      children: (0, S.jsx)(`span`, {
-                        className: `text-sm font-black text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-lg`,
-                        children: e.extension || `—`,
-                      }),
-                    }),
-                    (0, S.jsxs)(`td`, {
-                      className: `px-4 py-3`,
-                      children: [
-                        (0, S.jsx)(`p`, {
-                          className: `text-xs font-bold text-slate-800`,
-                          children: e.name || `—`,
-                        }),
-                        e.location &&
-                          (0, S.jsx)(`p`, {
-                            className: `text-[9px] text-slate-400 font-bold`,
-                            children: e.location,
-                          }),
-                      ],
-                    }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3 text-xs font-mono text-indigo-600`,
-                      children: e.ip || `—`,
-                    }),
-                    (0, S.jsxs)(`td`, {
-                      className: `px-4 py-3`,
-                      children: [
-                        e.brand &&
-                          (0, S.jsx)(`p`, {
-                            className: `text-[10px] font-black text-slate-600`,
-                            children: e.brand,
-                          }),
-                        (0, S.jsx)(`p`, {
-                          className: `text-[9px] text-slate-400`,
-                          children: e.model || `—`,
-                        }),
-                      ],
-                    }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3 text-xs text-slate-600`,
-                      children: e.floor || `—`,
-                    }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3 text-[10px] text-slate-500`,
-                      children: k(e, n),
-                    }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3`,
-                      children: (0, S.jsx)(`span`, {
-                        className: `text-[9px] font-black px-2 py-1 rounded-full ${D[e.status] ?? `bg-slate-100 text-slate-700`}`,
-                        children: O[e.status] || e.status,
-                      }),
-                    }),
-                    (0, S.jsx)(`td`, {
-                      className: `px-4 py-3`,
-                      children: (0, S.jsxs)(`div`, {
-                        className: `flex items-center gap-1`,
-                        children: [
-                          (0, S.jsx)(`button`, {
-                            onClick: (t) => {
-                              (t.stopPropagation(), c(e.id));
-                            },
-                            title: `Lịch sử thay đổi`,
-                            className: `p-1.5 hover:bg-indigo-50 rounded text-indigo-300 hover:text-indigo-500 transition-colors ${e.logs?.length ? `text-indigo-400` : ``}`,
-                            children: (0, S.jsx)(`i`, {
-                              className: `fas fa-history text-[10px]`,
-                            }),
-                          }),
-                          (0, S.jsx)(`button`, {
-                            onClick: (t) => {
-                              (t.stopPropagation(), s(e.id));
-                            },
-                            title: `Xóa`,
-                            className: `p-1.5 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors`,
-                            children: (0, S.jsx)(`i`, {
-                              className: `fas fa-trash text-[10px]`,
-                            }),
-                          }),
-                        ],
-                      }),
-                    }),
-                  ],
-                },
-                e.id,
-              );
-            })),
-      (t[0] = n),
-      (t[1] = a),
-      (t[2] = s),
-      (t[3] = o),
-      (t[4] = c),
-      (t[5] = r),
-      (t[6] = l),
-      (t[7] = i),
-      (t[8] = f),
-      (t[9] = h),
-      (t[10] = g),
-      (t[11] = _),
-      (t[12] = v),
-      (t[13] = y));
-  } else
-    ((f = t[8]),
-      (h = t[9]),
-      (g = t[10]),
-      (_ = t[11]),
-      (v = t[12]),
-      (y = t[13]));
-  let b;
-  t[19] === f
-    ? (b = t[20])
-    : ((b = (0, S.jsx)(`tbody`, { children: f })), (t[19] = f), (t[20] = b));
-  let x;
-  t[21] !== h || t[22] !== g || t[23] !== b
-    ? ((x = (0, S.jsxs)(`table`, { className: h, children: [g, b] })),
-      (t[21] = h),
-      (t[22] = g),
-      (t[23] = b),
-      (t[24] = x))
-    : (x = t[24]);
-  let C;
-  t[25] !== _ || t[26] !== x
-    ? ((C = (0, S.jsx)(`div`, { className: _, children: x })),
-      (t[25] = _),
-      (t[26] = x),
-      (t[27] = C))
-    : (C = t[27]);
-  let w;
-  return (
-    t[28] !== v || t[29] !== y || t[30] !== C
-      ? ((w = (0, S.jsxs)(`div`, { className: v, children: [y, C] })),
-        (t[28] = v),
-        (t[29] = y),
-        (t[30] = C),
-        (t[31] = w))
-      : (w = t[31]),
-    w
-  );
+            }),
+          ],
+        }),
+      }),
+    ],
+  });
 }
 function j(e) {
   let t = (0, m.c)(38),
