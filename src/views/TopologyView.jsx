@@ -2508,7 +2508,6 @@ function Ae(e) {
     firewall: n,
     registerRef: r,
     onManage: i,
-    onAdd: a,
     onDelete: onDel,
   } = e;
   let devices = (Array.isArray(fws) && fws.length > 0) ? fws : (n ? [n] : []);
@@ -2847,7 +2846,6 @@ function Fe(props = {}) {
     w = u((e) => e.topologyIconMode),
     T = u((e) => e.toggleTopologyIconMode),
     E = u((e) => e.toggleSidebarMobile),
-    D = u((e) => e.openAddFirewallModal),
     O = u((e) => e.openEditFirewallModal),
     handleDeleteFw = (dev) => {
       if (!isAdmin) {
@@ -3277,7 +3275,6 @@ function Fe(props = {}) {
                         firewall: X,
                         registerRef: F,
                         onManage: O,
-                        onAdd: D,
                         onDelete: isAdmin ? handleDeleteFw : null,
                       }),
                     }),
@@ -3312,7 +3309,6 @@ function Fe(props = {}) {
                       firewall: X,
                       registerRef: F,
                       onManage: O,
-                      onAdd: D,
                       onDelete: isAdmin ? handleDeleteFw : null,
                     }),
                   }),

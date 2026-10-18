@@ -2098,6 +2098,87 @@ function ye({ onBack: e, isAdmin: t, username: n }) {
                                 children: [
                                   (0, W.jsxs)(`button`, {
                                     onClick: () => {
+                                      (h.getState().openAddSwitchModal(), Ce(!1));
+                                    },
+                                    className: `w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-indigo-50 text-left transition-colors`,
+                                    children: [
+                                      (0, W.jsx)(`div`, {
+                                        className: `w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0`,
+                                        children: (0, W.jsx)(`i`, {
+                                          className: `fas fa-network-wired text-xs`,
+                                        }),
+                                      }),
+                                      (0, W.jsxs)(`div`, {
+                                        children: [
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-xs font-bold text-slate-800`,
+                                            children: `Switch`,
+                                          }),
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-[9px] text-slate-400`,
+                                            children: `Thêm Switch mạng vào Topology / Tầng`,
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                  (0, W.jsxs)(`button`, {
+                                    onClick: () => {
+                                      (h.getState().openAddFirewallModal?.('router'), Ce(!1));
+                                    },
+                                    className: `w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-sky-50 text-left transition-colors`,
+                                    children: [
+                                      (0, W.jsx)(`div`, {
+                                        className: `w-7 h-7 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center shrink-0`,
+                                        children: (0, W.jsx)(`i`, {
+                                          className: `fas fa-route text-xs`,
+                                        }),
+                                      }),
+                                      (0, W.jsxs)(`div`, {
+                                        children: [
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-xs font-bold text-slate-800`,
+                                            children: `Router`,
+                                          }),
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-[9px] text-slate-400`,
+                                            children: `Thêm Router định tuyến mạng / WAN`,
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                  (0, W.jsxs)(`button`, {
+                                    onClick: () => {
+                                      (h.getState().openAddFirewallModal?.('firewall'), Ce(!1));
+                                    },
+                                    className: `w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-rose-50 text-left transition-colors`,
+                                    children: [
+                                      (0, W.jsx)(`div`, {
+                                        className: `w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0`,
+                                        children: (0, W.jsx)(`i`, {
+                                          className: `fas fa-shield-halved text-xs`,
+                                        }),
+                                      }),
+                                      (0, W.jsxs)(`div`, {
+                                        children: [
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-xs font-bold text-slate-800`,
+                                            children: `Firewall`,
+                                          }),
+                                          (0, W.jsx)(`p`, {
+                                            className: `text-[9px] text-slate-400`,
+                                            children: `Thêm Firewall bảo mật tường lửa`,
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                  (0, W.jsx)(`div`, {
+                                    className: `my-1 border-t border-slate-100`,
+                                  }),
+                                  (0, W.jsxs)(`button`, {
+                                    onClick: () => {
                                       (Ee(!0), Ce(!1));
                                     },
                                     className: `w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-cyan-50 text-left transition-colors`,

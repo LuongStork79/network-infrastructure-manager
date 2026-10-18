@@ -424,21 +424,30 @@ function A(e) {
     [l, d] = (0, p.useState)(``),
     [selectedIds, setSelectedIds] = (0, p.useState)(() => new Set());
 
+  const getPhoneKey = (ph) => String(ph.id || ph.extension || ph.ip || ph.mac || `${ph.name}-${ph.floor}`);
+
+  (r || []).forEach((ph) => {
+    if (!ph.id) {
+      ph.id = `phone-${ph.extension || Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    }
+  });
+
   let filteredPhones = u(r, i, a, l);
-  let isAllSelected = filteredPhones.length > 0 && filteredPhones.every((ph) => selectedIds.has(ph.id));
-  let isSomeSelected = filteredPhones.some((ph) => selectedIds.has(ph.id));
+  let allKeys = filteredPhones.map(getPhoneKey);
+  let isAllSelected = filteredPhones.length > 0 && allKeys.every((k) => selectedIds.has(k));
+  let isSomeSelected = filteredPhones.length > 0 && allKeys.some((k) => selectedIds.has(k));
 
   return (0, S.jsxs)(`div`, {
     className: `flex-1 flex flex-col overflow-hidden`,
     children: [
       (0, S.jsxs)(`div`, {
-        className: `px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between gap-3 shrink-0`,
+        className: `px-6 py-3 bg-white border-b border-slate-100 flex items-center justify-between gap-3 shrink-0 flex-wrap`,
         children: [
           (0, S.jsxs)(`div`, {
-            className: `flex items-center gap-3 flex-1`,
+            className: `flex items-center gap-3 flex-1 flex-wrap`,
             children: [
               (0, S.jsxs)(`div`, {
-                className: `relative flex-1 max-w-sm`,
+                className: `relative flex-1 min-w-[200px] max-w-sm`,
                 children: [
                   (0, S.jsx)(`i`, {
                     className: `fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]`,
@@ -456,6 +465,39 @@ function A(e) {
                 className: `text-[10px] font-black text-slate-400`,
                 children: [filteredPhones.length, ` / `, r.length, ` máy`],
               }),
+              filteredPhones.length > 0 &&
+                (0, S.jsxs)(`button`, {
+                  type: `button`,
+                  onClick: () => {
+                    if (isAllSelected) {
+                      setSelectedIds(new Set());
+                    } else {
+                      setSelectedIds(new Set(allKeys));
+                    }
+                  },
+                  className: `px-2.5 py-1 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm`,
+                  children: [
+                    (0, S.jsx)(`i`, {
+                      className: `fas ${isAllSelected ? 'fa-square-check text-green-600' : 'fa-check text-slate-400'}`,
+                    }),
+                    isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả (${filteredPhones.length})`,
+                  ],
+                }),
+              selectedIds.size === 0 && filteredPhones.length > 0 &&
+                (0, S.jsxs)(`button`, {
+                  type: `button`,
+                  onClick: () => {
+                    if (onBulkDel) {
+                      onBulkDel(allKeys);
+                    }
+                  },
+                  className: `px-2.5 py-1 text-xs font-bold rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm`,
+                  title: `Xóa tất cả ${filteredPhones.length} máy trong danh sách hiện tại`,
+                  children: [
+                    (0, S.jsx)(`i`, { className: `fas fa-trash-alt text-[10px]` }),
+                    `Xóa tất cả (${filteredPhones.length})`,
+                  ],
+                }),
             ],
           }),
           selectedIds.size > 0 &&
@@ -480,7 +522,7 @@ function A(e) {
                   className: `px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm transition-all`,
                   children: [
                     (0, S.jsx)(`i`, { className: `fas fa-trash-alt` }),
-                    `Xóa hàng loạt`,
+                    `Xóa hàng loạt (${selectedIds.size})`,
                   ],
                 }),
                 (0, S.jsx)(`button`, {
@@ -504,7 +546,13 @@ function A(e) {
                 className: `bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-400 uppercase tracking-widest`,
                 children: [
                   (0, S.jsx)(`th`, {
-                    className: `px-3 py-3 w-10 text-center`,
+                    className: `px-3 py-3 w-10 text-center cursor-pointer select-none`,
+                    onClick: (ev) => {
+                      if (ev.target.tagName !== 'INPUT') {
+                        if (isAllSelected) setSelectedIds(new Set());
+                        else setSelectedIds(new Set(allKeys));
+                      }
+                    },
                     children: (0, S.jsx)(`input`, {
                       type: `checkbox`,
                       checked: isAllSelected,
@@ -515,7 +563,7 @@ function A(e) {
                         if (isAllSelected) {
                           setSelectedIds(new Set());
                         } else {
-                          setSelectedIds(new Set(filteredPhones.map((ph) => ph.id)));
+                          setSelectedIds(new Set(allKeys));
                         }
                       },
                       className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
@@ -547,7 +595,8 @@ function A(e) {
                       }),
                     })
                   : filteredPhones.map((phoneItem) => {
-                      let isRowSel = selectedIds.has(phoneItem.id);
+                      let rowKey = getPhoneKey(phoneItem);
+                      let isRowSel = selectedIds.has(rowKey) || (phoneItem.id && selectedIds.has(phoneItem.id));
                       return (0, S.jsxs)(
                         `tr`,
                         {
@@ -557,19 +606,29 @@ function A(e) {
                           }`,
                           children: [
                             (0, S.jsx)(`td`, {
-                              className: `px-3 py-3 w-10 text-center`,
-                              onClick: (ev) => ev.stopPropagation(),
+                              className: `px-3 py-3 w-10 text-center cursor-pointer`,
+                              onClick: (ev) => {
+                                ev.stopPropagation();
+                                setSelectedIds((prev) => {
+                                  let next = new Set(prev);
+                                  if (next.has(rowKey)) next.delete(rowKey);
+                                  else next.add(rowKey);
+                                  return next;
+                                });
+                              },
                               children: (0, S.jsx)(`input`, {
                                 type: `checkbox`,
                                 checked: isRowSel,
-                                onChange: () => {
+                                onChange: (ev) => {
+                                  ev.stopPropagation();
                                   setSelectedIds((prev) => {
                                     let next = new Set(prev);
-                                    if (next.has(phoneItem.id)) next.delete(phoneItem.id);
-                                    else next.add(phoneItem.id);
+                                    if (next.has(rowKey)) next.delete(rowKey);
+                                    else next.add(rowKey);
                                     return next;
                                   });
                                 },
+                                onClick: (e) => e.stopPropagation(),
                                 className: `rounded border-slate-300 text-green-600 focus:ring-green-500 w-4 h-4 cursor-pointer`,
                               }),
                             }),
@@ -650,7 +709,7 @@ function A(e) {
                                   (0, S.jsx)(`button`, {
                                     onClick: (t) => {
                                       t.stopPropagation();
-                                      s(phoneItem.id);
+                                      s(phoneItem.id || phoneItem.extension || rowKey);
                                     },
                                     title: `Xóa`,
                                     className: `p-1.5 hover:bg-red-50 rounded text-red-400 hover:text-red-600 transition-colors`,
@@ -663,7 +722,7 @@ function A(e) {
                             }),
                           ],
                         },
-                        phoneItem.id
+                        phoneItem.id || phoneItem.extension || rowKey
                       );
                     }),
             }),
@@ -2532,7 +2591,16 @@ function H(e) {
                       if (!ids || ids.length === 0) return;
                       let count = ids.length;
                       C(`Bạn có chắc chắn muốn xóa ${count} điện thoại IP đã chọn khỏi danh bạ?`, `confirm`, () => {
+                        let keySet = new Set(ids.map(String));
                         ids.forEach((id) => h(id));
+                        (l || []).forEach((item) => {
+                          let k1 = String(item.id || '');
+                          let k2 = String(item.extension || '');
+                          let k3 = String(item.ip || '');
+                          if (keySet.has(k1) || keySet.has(k2) || keySet.has(k3)) {
+                            h(item.id || item.extension);
+                          }
+                        });
                         v(`Điện thoại IP: Xóa hàng loạt`, `Đã xóa ${count} điện thoại IP`, o);
                         C(`Đã xóa thành công ${count} điện thoại IP!`, `success`);
                       });
