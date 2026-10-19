@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from '../../core/react-adapter.js';
 import { useDialogStore } from '../../stores/useDialogStore.js';
 import { useNetworkStore } from '../../stores/useNetworkStore.js';
 import { formatMacAddress } from '../../utils/elevator.js';

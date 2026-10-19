@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from '../core/react-adapter.js';
 import WifiManageModal from './modals/WifiManageModal.jsx';
 
 /**

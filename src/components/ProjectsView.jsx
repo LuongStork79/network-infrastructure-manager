@@ -957,7 +957,11 @@ export default function ProjectsView({ onBack, isAdmin = true, username = 'syste
                                   {targetList.map((fw) => {
                                     const isRouter = fw.deviceType === 'router' || (fw.name && fw.name.toLowerCase().includes('router'));
                                     return (
-                                      <tr key={fw.id} className="hover:bg-slate-50/70 transition-colors">
+                                      <tr
+                                        key={fw.id}
+                                        onClick={() => isAdmin && handleOpenEditFirewall(fw)}
+                                        className={`hover:bg-slate-50/70 transition-colors ${isAdmin ? 'cursor-pointer' : ''}`}
+                                      >
                                         <td className="py-3 px-4 font-extrabold text-slate-800 flex items-center gap-2">
                                           <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs ${
                                             isRouter ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600'
@@ -999,14 +1003,20 @@ export default function ProjectsView({ onBack, isAdmin = true, username = 'syste
                                           {isAdmin ? (
                                             <div className="flex items-center justify-end gap-1.5">
                                               <button
-                                                onClick={() => handleOpenEditFirewall(fw)}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleOpenEditFirewall(fw);
+                                                }}
                                                 className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Chỉnh sửa thiết bị này"
                                               >
                                                 <i className="fas fa-edit"></i>
                                               </button>
                                               <button
-                                                onClick={() => handleDeleteFirewall(fw)}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleDeleteFirewall(fw);
+                                                }}
                                                 className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                                                 title="Xóa khỏi dự án"
                                               >
@@ -1081,68 +1091,78 @@ export default function ProjectsView({ onBack, isAdmin = true, username = 'syste
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
-                                {allSwitches.map((sw) => (
-                                  <tr key={sw.id} className="hover:bg-slate-50/70 transition-colors">
-                                    <td className="py-3 px-4 font-extrabold text-slate-800 flex items-center gap-2">
-                                      <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
-                                        <i className="fas fa-server"></i>
-                                      </span>
-                                      <div>
-                                        <span>{sw.name}</span>
-                                        <span className="block text-[10px] font-mono text-slate-400 font-normal">ID: {sw.id}</span>
-                                      </div>
-                                    </td>
-                                    <td className="py-3 px-4 font-mono font-bold text-indigo-700">
-                                      {sw.ip || 'Chưa cấu hình'}
-                                    </td>
-                                    <td className="py-3 px-4 text-slate-600 font-medium">
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">
-                                        <i className="fas fa-layer-group text-[9px]"></i>
-                                        {sw.floorName}
-                                      </span>
-                                    </td>
-                                    <td className="py-3 px-4 text-slate-700 font-medium">
-                                      <span className="font-bold text-slate-800">{sw.brand || 'Cisco'}</span>
-                                      <span className="text-slate-400 text-[10px] ml-1.5">{sw.model || ''}</span>
-                                    </td>
-                                    <td className="py-3 px-4 font-mono font-bold text-slate-700">
-                                      {sw.totalPorts || sw.ports?.length || 24} Ports
-                                    </td>
-                                    <td className="py-3 px-4">
-                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                        sw.type === 'core'
-                                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                          : sw.type === 'distribution'
-                                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                      }`}>
-                                        {sw.type || 'Access'}
-                                      </span>
-                                    </td>
-                                    <td className="py-3 px-4 text-right">
-                                      {isAdmin ? (
-                                        <div className="flex items-center justify-end gap-1.5">
-                                          <button
-                                            onClick={() => handleOpenEditSwitch(sw)}
-                                            className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                                            title="Chỉnh sửa Switch này"
-                                          >
-                                            <i className="fas fa-edit"></i>
-                                          </button>
-                                          <button
-                                            onClick={() => handleDeleteSwitch(sw)}
-                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                                            title="Xóa Switch khỏi dự án"
-                                          >
-                                            <i className="fas fa-trash-alt"></i>
-                                          </button>
+                                  {allSwitches.map((sw) => (
+                                    <tr
+                                      key={sw.id}
+                                      onClick={() => isAdmin && handleOpenEditSwitch(sw)}
+                                      className={`hover:bg-slate-50/70 transition-colors ${isAdmin ? 'cursor-pointer' : ''}`}
+                                    >
+                                      <td className="py-3 px-4 font-extrabold text-slate-800 flex items-center gap-2">
+                                        <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs">
+                                          <i className="fas fa-server"></i>
+                                        </span>
+                                        <div>
+                                          <span>{sw.name}</span>
+                                          <span className="block text-[10px] font-mono text-slate-400 font-normal">ID: {sw.id}</span>
                                         </div>
-                                      ) : (
-                                        <span className="text-[10px] text-slate-400 italic">Chỉ xem</span>
-                                      )}
-                                    </td>
-                                  </tr>
-                                ))}
+                                      </td>
+                                      <td className="py-3 px-4 font-mono font-bold text-indigo-700">
+                                        {sw.ip || 'Chưa cấu hình'}
+                                      </td>
+                                      <td className="py-3 px-4 text-slate-600 font-medium">
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">
+                                          <i className="fas fa-layer-group text-[9px]"></i>
+                                          {sw.floorName}
+                                        </span>
+                                      </td>
+                                      <td className="py-3 px-4 text-slate-700 font-medium">
+                                        <span className="font-bold text-slate-800">{sw.brand || 'Cisco'}</span>
+                                        <span className="text-slate-400 text-[10px] ml-1.5">{sw.model || ''}</span>
+                                      </td>
+                                      <td className="py-3 px-4 font-mono font-bold text-slate-700">
+                                        {sw.totalPorts || sw.ports?.length || 24} Ports
+                                      </td>
+                                      <td className="py-3 px-4">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                          sw.type === 'core'
+                                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                            : sw.type === 'distribution'
+                                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                        }`}>
+                                          {sw.type || 'Access'}
+                                        </span>
+                                      </td>
+                                      <td className="py-3 px-4 text-right">
+                                        {isAdmin ? (
+                                          <div className="flex items-center justify-end gap-1.5">
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleOpenEditSwitch(sw);
+                                              }}
+                                              className="p-1.5 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                              title="Chỉnh sửa Switch này"
+                                            >
+                                              <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteSwitch(sw);
+                                              }}
+                                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                              title="Xóa Switch khỏi dự án"
+                                            >
+                                              <i className="fas fa-trash-alt"></i>
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <span className="text-[10px] text-slate-400 italic">Chỉ xem</span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
                               </tbody>
                             </table>
                           </div>

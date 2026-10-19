@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from '../../core/react-adapter.js';
 
 /**
  * Modal to edit device backup status and configuration details

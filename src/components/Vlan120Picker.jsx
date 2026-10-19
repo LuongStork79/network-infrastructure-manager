@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from '../core/react-adapter.js';
 
 /**
  * IP helper: Convert IPv4 to 32-bit unsigned integer

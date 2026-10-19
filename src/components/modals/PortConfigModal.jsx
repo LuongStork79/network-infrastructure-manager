@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from '../../core/react-adapter.js';
 import { useDialogStore } from '../../stores/useDialogStore.js';
 import { formatMacAddress } from '../../utils/elevator.js';
 import {
