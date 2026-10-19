@@ -6,7 +6,9 @@ import {
   setActiveProjectId,
   addProject,
   updateProject,
-  deleteProject
+  deleteProject,
+  DEFAULT_SAMPLE_FIREWALL,
+  DEFAULT_SAMPLE_ROUTER
 } from '../services/projectManager.js';
 import { db } from '../services/firebase.js';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
@@ -792,6 +794,27 @@ export default function ProjectsView({ onBack, isAdmin = true, username = 'syste
                         <i className="fas fa-shield-halved text-[10px]"></i>
                         + Thêm Firewall
                       </button>
+
+                      {routers.length === 0 && firewalls.length === 0 && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              const docName = inspectProjId === 'default' ? 'firewall' : `${inspectProjId}_firewall`;
+                              const docRef = doc(db, 'networkData', docName);
+                              await setDoc(docRef, { FirewallDB: [DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER] });
+                              setProjectFirewalls([DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER]);
+                              alert('Đã thêm mẫu Router Cisco & Firewall Fortinet vào dự án!');
+                            } catch (err) {
+                              alert(err.message);
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          title="Thêm mẫu Router Cisco và Firewall Fortinet vào dự án"
+                        >
+                          <i className="fas fa-magic text-[10px]"></i>
+                          + Thêm Mẫu Router & FW
+                        </button>
+                      )}
                     </>
                   )}
 
@@ -1160,6 +1183,23 @@ export default function ProjectsView({ onBack, isAdmin = true, username = 'syste
                           >
                             <i className="fas fa-server mr-1.5"></i>
                             + Thêm Switch
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const docName = inspectProjId === 'default' ? 'firewall' : `${inspectProjId}_firewall`;
+                                const docRef = doc(db, 'networkData', docName);
+                                await setDoc(docRef, { FirewallDB: [DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER] });
+                                setProjectFirewalls([DEFAULT_SAMPLE_FIREWALL, DEFAULT_SAMPLE_ROUTER]);
+                                alert('Đã thêm mẫu Router Cisco & Firewall Fortinet vào dự án!');
+                              } catch (err) {
+                                alert(err.message);
+                              }
+                            }}
+                            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                          >
+                            <i className="fas fa-magic"></i>
+                            + Thêm Mẫu Router & FW
                           </button>
                         </div>
                       ) : (

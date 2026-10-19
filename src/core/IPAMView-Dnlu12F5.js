@@ -37,7 +37,7 @@ function y(e) {
             className: `text-xs font-black text-slate-800 uppercase tracking-widest`,
             children: `Subnets List`,
           }),
-          isAdmin && (0, v.jsxs)(`button`, {
+          (0, v.jsxs)(`button`, {
             type: `button`,
             onClick: () => onAddSubnet && onAddSubnet(),
             className: `text-[11px] font-bold px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all`,
@@ -2026,7 +2026,6 @@ function re(e) {
   }, []);
 
   function handleAddSubnet() {
-    if (!isAdmin) return;
     setSubnetModal({ isOpen: true, isEdit: false, data: null });
   }
 
@@ -2134,9 +2133,9 @@ function re(e) {
     onSelect: m,
     subnets: subnets,
     isAdmin: isAdmin,
-    onAddSubnet: isAdmin ? handleAddSubnet : null,
-    onEditSubnet: isAdmin ? handleEditSubnet : null,
-    onDeleteSubnet: isAdmin ? handleDeleteSubnet : null,
+    onAddSubnet: handleAddSubnet,
+    onEditSubnet: handleEditSubnet,
+    onDeleteSubnet: handleDeleteSubnet,
   });
   let P = (0, v.jsx)(`div`, {
     className: `flex-1 overflow-y-auto custom-scroll bg-slate-50/50 p-8 relative`,
@@ -2237,7 +2236,7 @@ function re(e) {
       F,
       L,
       R,
-      isAdmin && subnetModal?.isOpen &&
+      subnetModal?.isOpen &&
         (0, v.jsx)(SubnetManageModal, {
           initialData: subnetModal.data,
           isEdit: subnetModal.isEdit,

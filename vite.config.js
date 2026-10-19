@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   base: process.env.NODE_ENV === 'production' ? '/network-infrastructure-manager/' : '/',
-  plugins: [react()],
+  plugins: [react({ jsxRuntime: 'classic' })],
   resolve: {
     alias: [
       {
@@ -57,7 +57,7 @@ export default defineConfig({
       },
       {
         find: /.*SwitchManageModal-Dsjh_PLT\.js$/,
-        replacement: path.resolve(__dirname, 'src/core/SwitchManageModal-Dsjh_PLT.js')
+        replacement: path.resolve(__dirname, 'src/components/modals/SwitchManageModal.jsx')
       },
       {
         find: /.*FirewallManageModal-PTkT46yr\.js$/,

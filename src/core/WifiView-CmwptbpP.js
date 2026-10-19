@@ -1125,14 +1125,7 @@ function z(e) {
       (t[69] = A.length),
       (t[70] = xe))
     : (xe = t[70]);
-  let Se;
-  t[71] !== de ||
-  t[72] !== fe ||
-  t[73] !== me ||
-  t[74] !== ge ||
-  t[75] !== be ||
-  t[76] !== xe
-    ? ((Se = (0, k.jsxs)(`div`, {
+  let Se = (0, k.jsxs)(`div`, {
         className: `p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-3 flex-wrap shrink-0`,
         children: [
           Q, de, fe, me, ge, be,
@@ -1165,15 +1158,7 @@ function z(e) {
           }),
           xe
         ],
-      })),
-      (t[71] = de),
-      (t[72] = fe),
-      (t[73] = me),
-      (t[74] = ge),
-      (t[75] = be),
-      (t[76] = xe),
-      (t[77] = Se))
-    : (Se = t[77]);
+      });
   let Ce;
   t[78] === Symbol.for(`react.memo_cache_sentinel`)
     ? ((Ce = (0, k.jsx)(`th`, { className: `p-3 pl-4 w-12`, children: `STT` })),
@@ -1300,116 +1285,79 @@ function z(e) {
     ? ((We = (0, k.jsx)(`th`, { className: `p-3`, children: `MAC` })),
       (t[123] = We))
     : (We = t[123]);
-  let Ge;
-  t[124] !== Ee ||
-  t[125] !== ke ||
-  t[126] !== Me ||
-  t[127] !== Ie ||
-  t[128] !== ze ||
-  t[129] !== Ue
-    ? ((Ge = (0, k.jsx)(`thead`, {
-        children: (0, k.jsxs)(`tr`, {
-          className: `bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0`,
-          children: [
-            (0, k.jsx)(`th`, {
-              className: `p-3 pl-4 w-10 text-center`,
-              children: (0, k.jsx)(`input`, {
-                type: `checkbox`,
-                checked: Z.length > 0 && Z.every((item) => selIds.has(item.ap.id)),
-                ref: (el) => { if (el) el.indeterminate = Z.some((item) => selIds.has(item.ap.id)) && !Z.every((item) => selIds.has(item.ap.id)); },
-                onChange: () => {
-                  if (onToggleAllAps) {
-                    onToggleAllAps(Z.map((item) => item.ap.id));
-                  } else {
-                    let isAll = Z.length > 0 && Z.every((item) => selIds.has(item.ap.id));
-                    if (isAll) clearSel();
-                    else setLocalSelectedIds(new Set(Z.map((item) => item.ap.id)));
-                  }
-                },
-                className: `rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-4 h-4 cursor-pointer`,
-                title: Z.length > 0 && Z.every((item) => selIds.has(item.ap.id)) ? `Bỏ chọn tất cả` : `Chọn tất cả`,
-              }),
-            }),
-            Ce,
-            Ee,
-            (0, k.jsx)(`th`, { className: `p-3`, children: `S/N` }),
-            (0, k.jsx)(`th`, { className: `p-3`, children: `User` }),
-            (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `Default Password` }),
-            (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `PasswordNew` }),
-            ke, Me, Ne, Ie, ze, Be, Ue, We
-          ],
+  let isAllSelected = Z.length > 0 && Z.every((item) => selIds.has(item.ap.id));
+  let isSomeSelected = Z.some((item) => selIds.has(item.ap.id)) && !isAllSelected;
+
+  let Ge = (0, k.jsx)(`thead`, {
+    children: (0, k.jsxs)(`tr`, {
+      className: `bg-slate-50 dark:bg-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase border-b border-slate-200 dark:border-slate-700 sticky top-0`,
+      children: [
+        (0, k.jsx)(`th`, {
+          className: `p-3 pl-4 w-10 text-center`,
+          children: (0, k.jsx)(`input`, {
+            type: `checkbox`,
+            checked: isAllSelected,
+            ref: (el) => { if (el) el.indeterminate = isSomeSelected; },
+            onChange: () => {
+              if (onToggleAllAps) {
+                onToggleAllAps(Z.map((item) => item.ap.id));
+              } else {
+                if (isAllSelected) clearSel();
+                else setLocalSelectedIds(new Set(Z.map((item) => item.ap.id)));
+              }
+            },
+            className: `rounded border-slate-300 dark:border-slate-600 text-cyan-600 focus:ring-cyan-500 w-4 h-4 cursor-pointer`,
+            title: isAllSelected ? `Bỏ chọn tất cả` : `Chọn tất cả`,
+          }),
         }),
-      })),
-      (t[124] = Ee),
-      (t[125] = ke),
-      (t[126] = Me),
-      (t[127] = Ie),
-      (t[128] = ze),
-      (t[129] = Ue),
-      (t[130] = Ge))
-    : (Ge = t[130]);
-  let Ke;
-  t[131] !== Z || t[132] !== a
-    ? ((Ke =
-        Z.length === 0
-          ? (0, k.jsx)(`tr`, {
-              children: (0, k.jsx)(`td`, {
-                colSpan: 14,
-                className: `p-8 text-center text-xs text-slate-400 italic`,
-                children: `Không tìm thấy AP nào khớp bộ lọc.`,
-              }),
-            })
-          : Z.map((e, t) => {
-              let { ap: n, link: r } = e;
-              return (0, k.jsx)(
-                ae,
-                {
-                  ap: n,
-                  link: r,
-                  stt: t + 1,
-                  onSelectAp: a,
-                  isSelected: selIds.has(n.id),
-                  onToggle: toggleOne,
-                },
-                n.id,
-              );
-            })),
-      (t[131] = Z),
-      (t[132] = a),
-      (t[133] = Ke))
-    : (Ke = t[133]);
-  let qe;
-  t[134] === Ke
-    ? (qe = t[135])
-    : ((qe = (0, k.jsx)(`tbody`, { children: Ke })),
-      (t[134] = Ke),
-      (t[135] = qe));
-  let Je;
-  t[136] !== Ge || t[137] !== qe
-    ? ((Je = (0, k.jsx)(`div`, {
-        className: `flex-1 overflow-auto custom-scroll`,
-        children: (0, k.jsxs)(`table`, {
-          className: `w-full text-left`,
-          children: [Ge, qe],
+        Ce,
+        Ee,
+        (0, k.jsx)(`th`, { className: `p-3`, children: `S/N` }),
+        (0, k.jsx)(`th`, { className: `p-3`, children: `User` }),
+        (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `Default Password` }),
+        (0, k.jsx)(`th`, { className: `p-3 whitespace-nowrap`, children: `PasswordNew` }),
+        ke, Me, Ne, Ie, ze, Be, Ue, We
+      ],
+    }),
+  });
+
+  let Ke = Z.length === 0
+    ? (0, k.jsx)(`tr`, {
+        children: (0, k.jsx)(`td`, {
+          colSpan: 14,
+          className: `p-8 text-center text-xs text-slate-400 italic`,
+          children: `Không tìm thấy AP nào khớp bộ lọc.`,
         }),
-      })),
-      (t[136] = Ge),
-      (t[137] = qe),
-      (t[138] = Je))
-    : (Je = t[138]);
-  let Ye;
-  return (
-    t[139] !== Se || t[140] !== Je
-      ? ((Ye = (0, k.jsxs)(`div`, {
-          className: `bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0`,
-          children: [Se, Je],
-        })),
-        (t[139] = Se),
-        (t[140] = Je),
-        (t[141] = Ye))
-      : (Ye = t[141]),
-    Ye
-  );
+      })
+    : Z.map((e, t) => {
+        let { ap: n, link: r } = e;
+        return (0, k.jsx)(
+          ae,
+          {
+            ap: n,
+            link: r,
+            stt: t + 1,
+            onSelectAp: a,
+            isSelected: selIds.has(n.id),
+            onToggle: toggleOne,
+          },
+          n.id,
+        );
+      });
+
+  let qe = (0, k.jsx)(`tbody`, { children: Ke });
+  let Je = (0, k.jsx)(`div`, {
+    className: `flex-1 overflow-auto custom-scroll`,
+    children: (0, k.jsxs)(`table`, {
+      className: `w-full text-left`,
+      children: [Ge, qe],
+    }),
+  });
+
+  return (0, k.jsxs)(`div`, {
+    className: `bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col min-h-0`,
+    children: [Se, Je],
+  });
 }
 function B(e) {
   return !e;
