@@ -2419,12 +2419,13 @@ var Oe = (0, g.forwardRef)(function (e, t) {
       children: [p, m],
     });
 
-    let g = r.wanLinks.length > 0 && (0, J.jsxs)(`div`, {
+    let wanCount = (r.wanLinks || r.wanLines || []).length;
+    let g = wanCount > 0 && (0, J.jsxs)(`div`, {
       className: `firewall-wan-badge`,
       children: [
         (0, J.jsx)(`i`, { className: `fas fa-globe` }),
         ` WAN ×`,
-        r.wanLinks.length,
+        wanCount,
       ],
     });
 
@@ -2514,7 +2515,7 @@ function Ae(e) {
 
   let allWanLinks = [];
   devices.forEach(dev => {
-    (dev.wanLinks || []).forEach(wl => {
+    (dev.wanLinks || dev.wanLines || []).forEach(wl => {
       allWanLinks.push({ ...wl, parentFwId: dev.id });
     });
   });
@@ -3030,7 +3031,7 @@ function Fe(props = {}) {
     { cloudLinks: fe, gatewayLinks: allGatewayLinks, firewallLink: singleFwLink } = ne({
       devices: t,
       cloudIds: (0, g.useMemo)(
-        () => (X ? X.wanLinks.map((e) => `wan-cloud-${e.id}`) : []),
+        () => (X ? (X.wanLinks || X.wanLines || []).map((e) => `wan-cloud-${e.id}`) : []),
         [X],
       ),
       firewallId: X?.id ?? null,
